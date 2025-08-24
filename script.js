@@ -1023,7 +1023,7 @@ let restaurants = [
 
 // Global variables
 let map;
-let currentFilter = 'all'; // Start with 'all' selected by default
+let currentFilter = null; // Start with no filter selected
 let mapMarkers = [];
 
 // Initialize app
@@ -1034,31 +1034,27 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeApp() {
     populateFilterButtons();
     setupFilterButtons();
-    setupRandomButton(); // Setup for the new random button
+    setupRandomButton();
     setupViewToggle();
-    renderCategories(); // Render the default 'all' view
+    renderInitialView();
     initializeMap();
     loadStoredData();
+    setupSubmissionForm(); // Setup for the submission form
 }
 
 /**
- * MODIFIED: Dynamically creates filter buttons and adds a static "View All" button.
+ * Dynamically creates filter buttons and adds a static "View All" button.
  */
 function populateFilterButtons() {
     const filterContainer = document.getElementById('filterButtons');
-    filterContainer.innerHTML = ''; // Clear any existing buttons
+    filterContainer.innerHTML = '';
     
-    // 1. Create and prepend the "View All" button
     const allButton = document.createElement('button');
-    allButton.className = 'cuisine-filter active'; // Active by default
+    allButton.className = 'cuisine-filter';
     allButton.dataset.tag = 'all';
-    allButton.innerHTML = `
-        <span class="filter-text">View All</span>
-        <div class="filter-glow"></div>
-    `;
+    allButton.innerHTML = `<span class="filter-text">View All</span><div class="filter-glow"></div>`;
     filterContainer.appendChild(allButton);
 
-    // 2. Create buttons for each unique tag
     const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
     const allTags = new Set(restaurants.flatMap(r => r.tags));
     const filteredTags = [...allTags]
@@ -1070,19 +1066,17 @@ function populateFilterButtons() {
         button.className = 'cuisine-filter';
         button.dataset.tag = tag;
         const tagName = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
-        button.innerHTML = `
-            <span class="filter-text">${tagName}</span>
-            <div class="filter-glow"></div>
-        `;
+        button.innerHTML = `<span class="filter-text">${tagName}</span><div class="filter-glow"></div>`;
         filterContainer.appendChild(button);
     });
 }
 
 /**
- * Sets up event listeners for the filter buttons.
+ * Sets up event listeners for filter buttons and the new submission button.
  */
 function setupFilterButtons() {
     const filterContainer = document.getElementById('filterButtons');
+    const submitBtn = document.getElementById('submitRestaurantBtn');
 
     filterContainer.addEventListener('click', function(event) {
         const button = event.target.closest('.cuisine-filter');
@@ -1095,10 +1089,14 @@ function setupFilterButtons() {
         renderCategories();
         updateMapMarkers();
     });
+
+    if (submitBtn) {
+        submitBtn.addEventListener('click', openSubmissionModal);
+    }
 }
 
 /**
- * NEW: Sets up the event listener for the random restaurant button.
+ * Sets up the event listener for the random restaurant button.
  */
 function setupRandomButton() {
     const randomBtn = document.getElementById('randomRestaurantBtn');
@@ -1119,6 +1117,7 @@ function setupViewToggle() {
     const mapBtn = document.getElementById('mapViewBtn');
     const gridContent = document.getElementById('gridContent');
     const mapContent = document.getElementById('mapContent');
+    const randomizerSection = document.getElementById('randomizerSection');
     
     gridBtn.addEventListener('click', function() {
         gridBtn.classList.add('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'text-white', 'shadow-lg');
@@ -1128,6 +1127,7 @@ function setupViewToggle() {
         
         gridContent.classList.remove('hidden');
         mapContent.classList.add('hidden');
+        randomizerSection.classList.remove('hidden');
     });
     
     mapBtn.addEventListener('click', function() {
@@ -1138,6 +1138,7 @@ function setupViewToggle() {
         
         mapContent.classList.remove('hidden');
         gridContent.classList.add('hidden');
+        randomizerSection.classList.add('hidden');
         
         setTimeout(() => {
             if (map) {
@@ -1150,7 +1151,16 @@ function setupViewToggle() {
 }
 
 /**
- * NEW: Helper function to group restaurants by their tags.
+ * Displays a prompt message before a filter is selected.
+ */
+function renderInitialView() {
+    const container = document.getElementById('categoryContainer');
+    container.innerHTML = ''; // Remove the initial welcome message
+    updateMapMarkers();
+}
+
+/**
+ * Helper function to group restaurants by their tags.
  */
 function groupByTag(restaurantList) {
     const grouped = {};
@@ -1170,16 +1180,24 @@ function groupByTag(restaurantList) {
 }
 
 /**
- * MODIFIED: Renders restaurants based on the current filter ('all' or a specific tag).
+ * Renders restaurants based on the current filter ('all' or a specific tag).
  */
 function renderCategories() {
     const container = document.getElementById('categoryContainer');
     container.innerHTML = '';
 
+    if (!currentFilter) {
+        renderInitialView();
+        return;
+    }
+
     if (currentFilter === 'all') {
         const groupedRestaurants = groupByTag(restaurants);
-        // Sort the tags alphabetically for consistent order
         const sortedTags = Object.keys(groupedRestaurants).sort();
+        if (sortedTags.length === 0) {
+             container.innerHTML = `<div class="text-center py-16 animate-fade-in"><h2 class="text-3xl font-bold text-white mb-4">No categories to display.</h2></div>`;
+             return;
+        }
         sortedTags.forEach(tag => {
             const restaurantList = groupedRestaurants[tag];
             const categorySection = createCategorySection(tag, restaurantList);
@@ -1323,38 +1341,42 @@ function updateMapMarkers() {
     mapMarkers.forEach(marker => map.removeLayer(marker));
     mapMarkers = [];
     
-    const restaurantsToShow = currentFilter === 'all'
+    const restaurantsToShow = !currentFilter || currentFilter === 'all'
         ? restaurants
         : restaurants.filter(r => r.tags.includes(currentFilter));
 
-    restaurantsToShow.forEach(restaurant => {
-        if (restaurant.lat && restaurant.lng) {
-            const marker = L.marker([restaurant.lat, restaurant.lng])
-                .bindPopup(`
-                    <div class="p-4 min-w-64">
-                        <div class="flex items-center space-x-3 mb-3">
-                            <img src="${restaurant.imageURL}" alt="${restaurant.name}" class="w-16 h-16 rounded-lg object-cover" onerror="this.src='https://placehold.co/64x64/1e293b/ffffff?text=N/A'; this.onerror=null;">
-                            <div>
-                                <h3 class="font-bold text-gray-900">${restaurant.name}</h3>
-                                <div class="flex items-center space-x-1">
-                                    <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                                    <span class="text-sm text-gray-600">${restaurant.rating || 'N/A'}</span>
-                                    <span class="text-sm text-gray-400">•</span>
-                                    <span class="text-sm text-gray-600">${restaurant.priceRange || ''}</span>
+    if (!currentFilter) {
+        // Do not show any markers if no filter is selected
+    } else {
+        restaurantsToShow.forEach(restaurant => {
+            if (restaurant.lat && restaurant.lng) {
+                const marker = L.marker([restaurant.lat, restaurant.lng])
+                    .bindPopup(`
+                        <div class="p-4 min-w-64">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <img src="${restaurant.imageURL}" alt="${restaurant.name}" class="w-16 h-16 rounded-lg object-cover" onerror="this.src='https://placehold.co/64x64/1e293b/ffffff?text=N/A'; this.onerror=null;">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">${restaurant.name}</h3>
+                                    <div class="flex items-center space-x-1">
+                                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                        <span class="text-sm text-gray-600">${restaurant.rating || 'N/A'}</span>
+                                        <span class="text-sm text-gray-400">•</span>
+                                        <span class="text-sm text-gray-600">${restaurant.priceRange || ''}</span>
+                                    </div>
                                 </div>
                             </div>
+                            <p class="text-sm text-gray-600 mb-3">${restaurant.description.substring(0, 100)}...</p>
+                            <button onclick="openRestaurantModal(${restaurant.id})" class="w-full px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-medium rounded-lg hover:from-brand-600 hover:to-brand-700 transition-all duration-200">
+                                View Details
+                            </button>
                         </div>
-                        <p class="text-sm text-gray-600 mb-3">${restaurant.description.substring(0, 100)}...</p>
-                        <button onclick="openRestaurantModal(${restaurant.id})" class="w-full px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-medium rounded-lg hover:from-brand-600 hover:to-brand-700 transition-all duration-200">
-                            View Details
-                        </button>
-                    </div>
-                `);
-            
-            marker.addTo(map);
-            mapMarkers.push(marker);
-        }
-    });
+                    `);
+                
+                marker.addTo(map);
+                mapMarkers.push(marker);
+            }
+        });
+    }
 }
 
 // Storage functions
@@ -1377,5 +1399,78 @@ function saveData() {
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeRestaurantModal();
+    }
+});
+
+// Submission Modal Functions
+function setupSubmissionForm() {
+    const form = document.getElementById('submissionForm');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the form from reloading the page
+
+            // --- PASTE YOUR GOOGLE SCRIPT URL HERE ---
+            const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwDGuTaqUFY3XdsnhvezlMa_CxCv6I5Wnjp27_Kf16AO4q8sTcFB2jsjPjW-CgJ1CQ/exec';
+            // -----------------------------------------
+
+            const formData = new FormData(form);
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Submitting...';
+
+            fetch(googleScriptURL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    alert('Thank you for your suggestion!');
+                    form.reset();
+                    closeSubmissionModal();
+                } else {
+                    // Log the detailed error from the script if available
+                    console.error('Submission Error:', data.error);
+                    alert('An error occurred. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                alert('A network error occurred. Please check your connection and try again.');
+            })
+            .finally(() => {
+                // Re-enable the button and restore its text
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            });
+        });
+    }
+}
+
+function openSubmissionModal() {
+    const modal = document.getElementById('submissionModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeSubmissionModal() {
+    const modal = document.getElementById('submissionModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+// Add event listener to close submission modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        // We also need to check if the submission modal is open
+        if (!document.getElementById('submissionModal').classList.contains('hidden')) {
+            closeSubmissionModal();
+        }
     }
 });
