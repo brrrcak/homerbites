@@ -1,5 +1,12 @@
 // Simplified script.js - Remove ALL import statements and use global supabase
 
+// --- SPECIAL CONFIGURATION FOR YOUR MOM ---
+// <-- 1. Replace this with the email your mom will use to sign up.
+const MOMS_EMAIL = 'moms-email@example.com'; 
+// <-- 2. Replace this with the special message you want to show her.
+const MOMS_MESSAGE = "Hi Mom! ❤️ Thanks for checking out my website. I love you! - Your Favorite Child";
+// -----------------------------------------
+
 // Global variables
 let map;
 let currentFilter = null;
@@ -87,11 +94,8 @@ function getStaticRestaurants() {
     ];
 }
 
-// --- NEW/MODIFIED FUNCTIONS ---
+// --- CORE FUNCTIONS ---
 
-/**
- * Displays a welcome message in the content area on initial page load.
- */
 function showInitialMessage() {
     const container = document.getElementById('categoryContainer');
     if (!container) return;
@@ -136,16 +140,13 @@ function setupSearch() {
     }
 }
 
-/**
- * Renders all restaurants in a single grid, sorted alphabetically by name.
- */
 function renderAllAlphabetical() {
     const container = document.getElementById('categoryContainer');
     if (!container) return;
 
     const sortedRestaurants = [...restaurants].sort((a, b) => a.name.localeCompare(b.name));
 
-    container.innerHTML = ''; // Clear previous content
+    container.innerHTML = '';
 
     const section = document.createElement('div');
     section.className = 'animate-slide-up';
@@ -305,7 +306,6 @@ function initializeMap() {
         map = L.map('map', { zoomControl: false }).setView([59.6426, -151.5377], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
         L.control.zoom({ position: 'topright' }).addTo(map);
-        // Markers will now be added by search/view all actions, not on initial load
     } catch (error) {
         console.error('Map initialization failed:', error);
     }
@@ -378,6 +378,12 @@ async function handleLogin(email, password) {
         currentUser = data.user;
         updateAuthUI();
         closeAuthModal();
+
+        // Check for the special user (your mom!)
+        if (currentUser.email.toLowerCase() === MOMS_EMAIL.toLowerCase()) {
+            // Use a short delay to make sure the login modal is gone
+            setTimeout(showSpecialMessage, 500);
+        }
     }
 }
 
@@ -414,6 +420,25 @@ async function handleLogout() {
         updateAuthUI();
     }
 }
+
+async function handlePasswordReset(email) {
+    if (typeof supabase === 'undefined') {
+        alert('Database connection not available');
+        return;
+    }
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.href, // Redirect back to the main page after reset
+    });
+
+    if (error) {
+        alert('Error: ' + error.message);
+    } else {
+        alert('Password reset link sent! Please check your email.');
+        closeAuthModal();
+    }
+}
+
 
 async function loadRestaurantsFromSupabase() {
     if (typeof supabase === 'undefined') {
@@ -510,7 +535,7 @@ async function submitRestaurant(formData) {
     }
 }
 
-// --- UI & UTILITY FUNCTIONS ---
+// --- UI & MODAL FUNCTIONS ---
 
 function setupSubmissionForm() {
     const form = document.getElementById('submissionForm');
@@ -723,6 +748,76 @@ function closeSubmissionModal() {
 }
 
 function showAuthModal(type) {
+    // Remove existing modal first to prevent duplicates
+    closeAuthModal();
+
+    let modalContentHTML = '';
+
+    // Define CSS classes for reuse
+    const inputClasses = "mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white focus:outline-none focus:ring-accent-500 focus:border-accent-500";
+    const buttonClasses = "w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200";
+    const linkClasses = "text-blue-400 hover:text-blue-300";
+
+    if (type === 'login') {
+        modalContentHTML = `
+            <h2 class="text-2xl font-bold mb-6 text-white">Login</h2>
+            <form id="authForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300">Email</label>
+                    <input type="email" name="email" required class="${inputClasses}">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-300">Password</label>
+                    <input type="password" name="password" required class="${inputClasses}">
+                    <div class="text-right mt-2">
+                        <button type="button" onclick="showAuthModal('reset_password')" class="text-sm ${linkClasses}">Forgot Password?</button>
+                    </div>
+                </div>
+                <button type="submit" class="${buttonClasses}">Login</button>
+            </form>
+            <p class="text-center mt-4 text-gray-400">
+                Don't have an account? <button onclick="showAuthModal('signup')" class="${linkClasses}">Sign Up</button>
+            </p>
+        `;
+    } else if (type === 'signup') {
+        modalContentHTML = `
+            <h2 class="text-2xl font-bold mb-6 text-white">Sign Up</h2>
+            <form id="authForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300">Full Name</label>
+                    <input type="text" name="fullName" required class="${inputClasses}">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300">Email</label>
+                    <input type="email" name="email" required class="${inputClasses}">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-300">Password</label>
+                    <input type="password" name="password" required class="${inputClasses}">
+                </div>
+                <button type="submit" class="${buttonClasses}">Sign Up</button>
+            </form>
+            <p class="text-center mt-4 text-gray-400">
+                Already have an account? <button onclick="showAuthModal('login')" class="${linkClasses}">Login</button>
+            </p>
+        `;
+    } else if (type === 'reset_password') {
+        modalContentHTML = `
+            <h2 class="text-2xl font-bold mb-6 text-white">Reset Password</h2>
+            <p class="text-gray-300 mb-4">Enter your email and we'll send a link to reset your password.</p>
+            <form id="authForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300">Email</label>
+                    <input type="email" name="email" required class="${inputClasses}">
+                </div>
+                <button type="submit" class="${buttonClasses}">Send Reset Link</button>
+            </form>
+            <p class="text-center mt-4 text-gray-400">
+                Remember your password? <button onclick="showAuthModal('login')" class="${linkClasses}">Login</button>
+            </p>
+        `;
+    }
+
     const modalHTML = `
         <div id="authModal" class="fixed inset-0 z-50">
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAuthModal()"></div>
@@ -730,44 +825,14 @@ function showAuthModal(type) {
                 <div class="backdrop-blur-2xl bg-slate-800/50 rounded-3xl max-w-md w-full shadow-2xl animate-scale-in border border-white/20">
                     <div class="relative p-8">
                         <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
-                        <h2 class="text-2xl font-bold mb-6 text-white">${type === 'login' ? 'Login' : 'Sign Up'}</h2>
-                        <form id="authForm">
-                            ${type === 'signup' ? `
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-300">Full Name</label>
-                                    <input type="text" name="fullName" required class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                                </div>
-                            ` : ''}
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-300">Email</label>
-                                <input type="email" name="email" required class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                            </div>
-                            <div class="mb-6">
-                                <label class="block text-sm font-medium text-gray-300">Password</label>
-                                <input type="password" name="password" required class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                            </div>
-                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200">
-                                ${type === 'login' ? 'Login' : 'Sign Up'}
-                            </button>
-                        </form>
-                        <p class="text-center mt-4 text-gray-400">
-                            ${type === 'login' ? "Don't have an account?" : "Already have an account?"}
-                            <button onclick="showAuthModal('${type === 'login' ? 'signup' : 'login'}')" class="text-blue-400 hover:text-blue-300">
-                                ${type === 'login' ? 'Sign Up' : 'Login'}
-                            </button>
-                        </p>
+                        ${modalContentHTML}
                     </div>
                 </div>
             </div>
         </div>
     `;
-    
-    const existingModal = document.getElementById('authModal');
-    if (existingModal) existingModal.remove();
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
@@ -775,11 +840,16 @@ function showAuthModal(type) {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(form);
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const fullName = formData.get('fullName');
         
         if (type === 'login') {
-            await handleLogin(formData.get('email'), formData.get('password'));
-        } else {
-            await handleSignup(formData.get('email'), formData.get('password'), formData.get('fullName'));
+            await handleLogin(email, password);
+        } else if (type === 'signup') {
+            await handleSignup(email, password, fullName);
+        } else if (type === 'reset_password') {
+            await handlePasswordReset(email);
         }
     });
 }
@@ -789,9 +859,38 @@ function closeAuthModal() {
     if (modal) modal.remove();
 }
 
+// Special message modal for your mom
+function showSpecialMessage() {
+    // First, ensure no other modals are open
+    closeSpecialMessageModal();
+
+    const modalHTML = `
+        <div id="specialMessageModal" class="fixed inset-0 z-[60]">
+            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeSpecialMessageModal()"></div>
+            <div class="fixed inset-0 flex items-center justify-center p-4">
+                <div class="backdrop-blur-2xl bg-gradient-to-br from-purple-900 to-slate-800 rounded-3xl max-w-md w-full shadow-2xl animate-scale-in border border-white/20 text-white p-8 text-center">
+                    <p class="text-xl leading-relaxed font-medium">${MOMS_MESSAGE}</p>
+                    <button onclick="closeSpecialMessageModal()" class="mt-8 px-8 py-3 bg-gradient-to-r from-accent-500 to-accent-600 font-semibold rounded-xl hover:from-accent-600 hover:to-accent-700 transition-all duration-200 shadow-lg shadow-accent-500/25">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function closeSpecialMessageModal() {
+    const modal = document.getElementById('specialMessageModal');
+    if (modal) modal.remove();
+}
+
+// Event Listeners
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-        if (!document.getElementById('submissionModal')?.classList.contains('hidden')) {
+        if (document.getElementById('specialMessageModal')) {
+            closeSpecialMessageModal();
+        } else if (!document.getElementById('submissionModal')?.classList.contains('hidden')) {
             closeSubmissionModal();
         } else if (document.getElementById('authModal')) {
             closeAuthModal();
