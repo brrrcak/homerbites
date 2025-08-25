@@ -1,1050 +1,336 @@
-// Enhanced Restaurant Data with High-Quality Images
-let restaurants = [
-    {
-        id: 1,
-        name: "Cosmic Kitchen",
-        description: "A cozy Homer favorite serving hearty breakfasts, smash burgers, and Mexican-inspired plates with plenty of vegetarian options—all in a laid-back, rustic setting.",
-        address: "510 E Pioneer Ave, Homer, AK 99603",
-        phone: "(907) 235-1301",
-        website: "https://www.cosmickitchenhomer.com/",
-        hours: "Tuesday - Saturday: 11:00AM - 7:00PM",
-        imageURL: "https://scontent-sea1-1.xx.fbcdn.net/v/t39.30808-6/481341661_122129057186592631_7628068687369387549_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=5icgLVwy9UMQ7kNvwFVUR7n&_nc_oc=AdlpuMF-gtAUBXSK4ZhHcZ2df-S--7j_ZJoMQhF64TU6DPSH1H2Sme1eAmANG6YxUY4&_nc_zt=23&_nc_ht=scontent-sea1-1.xx&_nc_gid=OC6MpAtgGyG_Ln-OU_O6zg&oh=00_AfUk8g1iC0r0tpqXDGn_BTQY4thLnN6tGxhCyjYM5Yv_EA&oe=68B08DA0",
-        lat: 59.647521,
-        lng: -151.533005,
-        menu: "https://order.toasttab.com/online/cosmickitchenhomer",
-        tags: ["restaurant", "burgers", "mexican", "breakfast", "vegetarian"],
-        rating: 4,
-        priceRange: "$-$$"
-    },
-    {
-        id: 2,
-        name: "Fat Olive's Restaurant",
-        cuisine: "italian;pizza;american",
-        description: "Home",
-        address: "",
-        phone: "+1 907-235-8488",
-        website: "https://www.fatoliveshomer.com/",
-        hours: "Mo-Su 11:00-20:30",
-        imageURL: "https://static.parastorage.com/client/pfavico.ico",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "italian", "pizza", "american"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 3,
-        name: "Two Sisters Bakery & Cafe",
-        cuisine: "american",
-        description: "Cuisine: american",
-        address: "",
-        phone: "+1 907-2352280",
-        website: "https://twosistersbakery.net",
-        hours: "Mo-Fr 07:00-18:00; Sa 07:00-14:00; Su 09:00-14:00",
-        imageURL: "https://www.twosistersbakery.net/uploads/b/6555a1b0-6873-11ea-8fc5-3bfe1bbec7b5/IMG_1239.jpeg",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "american", "bakery", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 4,
-        name: "Duncan House Diner",
-        cuisine: "american",
-        description: "Cuisine: american",
-        address: "",
-        phone: "nan",
-        website: "http://www.duncanhousediner.com/",
-        hours: "Mo-Su 07:00-14:00",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "american", "diner"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 5,
-        name: "AJ's Steakhouse & Tavern",
-        cuisine: "nan",
-        description: "Pub",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["pub", "steakhouse", "american"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 6,
-        name: "Don Jose's Mexican Restaurant",
-        cuisine: "mexican;tacos;burrito",
-        description: "Located in the majestic great land of Alaska. Don Jose’s has brought the warmth of Mexico to Alaska, through the culinary traditions of Mexico.",
-        address: "",
-        phone: "+1-907-235-7963",
-        website: "https://www.alaskadonjoses.com/",
-        hours: "HOURS",
-        imageURL: "http://static1.squarespace.com/static/61ce6c924fa60d0025c004a5/t/63866264bcba5f52634027c7/1669751396988/don+jose%27s+logo+bold+%281%29.png?format=1500w",
-        lat: null,
-        lng: null,
-        menu: "https://www.alaskadonjoses.com/menus",
-        tags: ["restaurant", "mexican", "tacos", "burrito"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 7,
-        name: "McDonald's",
-        cuisine: "burger",
-        description: "Looking for Fast food near you? Visit McDonald's in Homer, AK at 3656 Ben Walters Ln, for breakfast, burgers, fries, and more, or order online!",
-        address: "",
-        phone: "nan",
-        website: "https://www.mcdonalds.com/us/en-us/location/ak/homer/3656-ben-walters-ln/7548.html",
-        hours: "Hours",
-        imageURL: "https://www.mcdonalds.com/content/dam/sites/usa/nfl/icons/McD_GoldenArches_200x200.jpg",
-        lat: null,
-        lng: null,
-        menu: "https://www.mcdonalds.com/us/en-us/full-menu.html",
-        tags: ["fast_food", "burgers"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 8,
-        name: "The Chart Room",
-        cuisine: "american",
-        description: "Cuisine: american",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "american", "seafood"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 9,
-        name: "The Otter Room Bar & Grill",
-        cuisine: "nan",
-        description: "View the menu and dining options at the Otter Room Bar & Grill located in the Best Western Bidaraka Inn hotel in Homer, Alaska.",
-        address: "",
-        phone: "nan",
-        website: "http://www.bidarkainn.com/restaurants",
-        hours: "Hours: 12pm – 10pm",
-        imageURL: "http://www.bidarkainn.com/Content/images/favicon.ico",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["bar", "grill", "american"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 10,
-        name: "Wild Honey Bistro",
-        cuisine: "crepe",
-        description: "Cuisine: crepe",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "Mo-Sa 08:00-17:00; Su 09:00-15:00",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "crepe", "bistro", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 11,
-        name: "Homestead Restuarant",
-        cuisine: "international",
-        description: "Cuisine: international",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "international", "american", "seafood"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 12,
-        name: "Pho & Thai Restaurant",
-        cuisine: "thai",
-        description: "Cuisine: thai",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "thai", "pho", "asian"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 13,
-        name: "Harbor Grill",
-        cuisine: "nan",
-        description: "Restaurant",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "grill", "seafood", "burgers"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 14,
-        name: "Happy Face",
-        cuisine: "nan",
-        description: "Restaurant",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 15,
-        name: "Kharacters",
-        cuisine: "nan",
-        description: "Bar",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["bar"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 16,
-        name: "Blackwater Bend Espresso",
-        cuisine: "nan",
-        description: "Cafe",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 17,
-        name: "Finn's Pizza",
-        cuisine: "pizza",
-        description: "Finn’s Pizza in Homer, Alaska. Pizza that's so good, you'll wish you could ship it home (and you can certainly try).",
-        address: "",
-        phone: "+1 907 2352878",
-        website: "https://finnspizza.co/",
-        hours: "12:00-21:00",
-        imageURL: "https://www.finnspizza.co/assets/finns-pizza2.jpg",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "pizza"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 18,
-        name: "Boardwalk Fish & Chips",
-        cuisine: "regional",
-        description: "Cuisine: regional",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "seafood", "fish_and_chips"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 19,
-        name: "Glacier Drive-in",
-        cuisine: "nan",
-        description: "Restaurant",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "burgers", "fast_food"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 20,
-        name: "Cece's Cafe",
-        cuisine: "nan",
-        description: "Restaurant",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "cafe"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 21,
-        name: "The Bagel Shop",
-        cuisine: "sandwich",
-        description: "Cuisine: sandwich",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "Tu-Fr 07:00-14:00, Sa-Su 07:00-16:00",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "sandwich", "bagels", "breakfast"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 22,
-        name: "Down East Saloon",
-        cuisine: "nan",
-        description: "Bar",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["bar"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 23,
-        name: "La Baleine Cafe",
-        cuisine: "regional",
-        description: "Cuisine: regional",
-        address: "",
-        phone: "+1 907 2996672",
-        website: "nan",
-        hours: "Tu-Su 05:00-16:00, Mo off",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "cafe", "seafood", "breakfast"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 24,
-        name: "Little Mermaid Restaurant",
-        cuisine: "regional",
-        description: "This domain may be for sale!",
-        address: "",
-        phone: "nan",
-        website: "https://littlemermaidhomer.com/",
-        hours: "Mo-Su 11:00-21:00",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "https://littlemermaidhomer.com/menu",
-        tags: ["restaurant", "seafood", "american"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 25,
-        name: "Beluga Bar & Grill",
-        cuisine: "burger",
-        description: "Cuisine: burger",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "Tu-Sa 15:00-22:00",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "burgers", "bar", "grill"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 26,
-        name: "Glacier Room",
-        cuisine: "nan",
-        description: "Restaurant",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 27,
-        name: "Barnacle Espresso Co.",
-        cuisine: "nan",
-        description: "Cafe",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 28,
-        name: "Coop's Coffee",
-        cuisine: "coffee_shop",
-        description: "Cuisine: coffee_shop",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 29,
-        name: "Dandelion Cafe",
-        cuisine: "mexican",
-        description: "Cuisine: mexican",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["fast_food", "mexican", "cafe"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 30,
-        name: "Kannery Grill",
-        cuisine: "nan",
-        description: "온라인 스포츠베팅을 즐기는 이용자들에게 있어 안전하고 신뢰할 수 있는 베팅 환경은 무엇보다 중요합니다. 먹튀검증 사이트는 이용자들이 안심하고 베팅을 즐길 수 있도록 먹튀 피해를 예방하고 이용자를 보호하는 역할을 담당하고 있습니다. 먹튀검증 사이트를 통해 검증된 안전한 토토사이트를 선택함으로써, 이용자들은 스포츠베팅의 재미와 즐거움을 마음껏 누릴 수 있습니다. rationalconspiracy.com",
-        address: "",
-        phone: "+1 (907) 435-0949",
-        website: "https://kannerygrill.com/",
-        hours: "Su-Th 16:00-22:00, Fr-Sa 16:00-23:00",
-        imageURL: "https://kannerygrill.com/wp-content/uploads/2024/09/cropped-kannerygrill-ICON-32x32.png",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "grill", "seafood"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 31,
-        name: "Vida's Thai Food",
-        cuisine: "thai",
-        description: "Cuisine: thai",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "thai", "asian"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 32,
-        name: "Flying Whale",
-        cuisine: "coffee_shop",
-        description: "Cuisine: coffee_shop",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 33,
-        name: "Icy Otter",
-        cuisine: "coffee_shop",
-        description: "Cuisine: coffee_shop",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee", "ice_cream"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 34,
-        name: "Salmon Sisters Mug Up Coffee",
-        cuisine: "nan",
-        description: "Cafe",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 35,
-        name: "Alice's Champagne Palace Bar & Grill",
-        cuisine: "american",
-        description: "Cuisine: american",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["pub", "american", "grill"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 36,
-        name: "Wasabi's Restaurant",
-        cuisine: "sushi",
-        description: "Cuisine: sushi",
-        address: "",
-        phone: "nan",
-        website: "https://wasabisrestaurant.com/",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "sushi", "asian"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 37,
-        name: "American Legion Post 16",
-        cuisine: "nan",
-        description: "Bar",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["bar"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 38,
-        name: "Young's Oriental Resturant",
-        cuisine: "chinese",
-        description: "Cuisine: chinese",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "chinese", "asian"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 39,
-        name: "Captain's Coffee Roasting Company",
-        cuisine: "coffee_shop",
-        description: "Cuisine: coffee_shop",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 40,
-        name: "Twisted Goat",
-        cuisine: "regional",
-        description: "Cuisine: regional",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "Th-Tu 12:00-22:00, We off",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "regional", "pizza"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 41,
-        name: "Salty Dawg",
-        cuisine: "nan",
-        description: "Bar",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["bar"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 42,
-        name: "Coal Bay Coffee & Tea",
-        cuisine: "nan",
-        description: "Cafe",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "Mo-Su 05:00-20:00",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 43,
-        name: "Alibi",
-        cuisine: "nan",
-        description: "Pub",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["pub"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 44,
-        name: "Boombox Cafe",
-        cuisine: "sandwich",
-        description: "The Boombox AK, Homer. 683 likes. Permanently Closed was a great time though",
-        address: "",
-        phone: "nan",
-        website: "http://www.facebook.com/theboomboxak/",
-        hours: "nan",
-        imageURL: "https://scontent-sea5-1.xx.fbcdn.net/v/t39.30808-1/254021802_110176334805084_165117264938448655_n.jpg?stp=dst-jpg_tt6&cstp=mx750x750&ctp=s720x720&_nc_cat=110&ccb=1-7&_nc_sid=3ab345&_nc_ohc=3JYosN4_0rYQ7kNvwH8_1uq&_nc_oc=AdkEsgSqsC2JbOdF3DZYQj6GQElvPOREb6gMF5tx-fCQM0lczYIEc05QpMyK84B4cqs&_nc_zt=24&_nc_ht=scontent-sea5-1.xx&_nc_gid=YHOaWfV271vQ2Q-R5BL6dQ&oh=00_AfU6Bs-5mquwlRFVPhkkS-PMGroHzY3tQ67FKYLmNYKqhw&oe=68B094DC",
-        lat: null,
-        lng: null,
-        menu: "https://www.facebook.com/theboomboxak/menu",
-        tags: ["restaurant", "sandwich", "cafe"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 45,
-        name: "Fireweed Mountain ZenDen Cafe",
-        cuisine: "nan",
-        description: "Cafe",
-        address: "",
-        phone: "+19072995063",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 46,
-        name: "Sunhouse Cafe",
-        cuisine: "nan",
-        description: "Restaurant",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "cafe"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 47,
-        name: "Flagship Creamery",
-        cuisine: "ice_cream",
-        description: "Cuisine: ice_cream",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "ice_cream"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 48,
-        name: "Wild Edge Espresso",
-        cuisine: "coffee_shop",
-        description: "Cuisine: coffee_shop",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "Mo-Su 06:00-20:00",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 49,
-        name: "Captain Pattie's",
-        cuisine: "american",
-        description: "Cuisine: american",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "american", "seafood"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 50,
-        name: "Divinitea",
-        cuisine: "nan",
-        description: "Restaurant",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "cafe", "tea"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 51,
-        name: "Starvin Marvin's Pizza",
-        cuisine: "pizza",
-        description: "Cuisine: pizza",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["fast_food", "pizza"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 52,
-        name: "Homer Brewing Company",
-        cuisine: "nan",
-        description: "Bar",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["bar", "brewery"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 53,
-        name: "Star's Coffee",
-        cuisine: "coffee_shop",
-        description: "Cuisine: coffee_shop",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["cafe", "coffee"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 54,
-        name: "Mike's Alaskan Eatery",
-        cuisine: "sandwich",
-        description: "Cuisine: sandwich",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "sandwich", "american"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 55,
-        name: "Bubbles Sodas & Ice Cream",
-        cuisine: "ice_cream",
-        description: "Cuisine: ice_cream",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["fast_food", "ice_cream"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 56,
-        name: "River Cafe",
-        cuisine: "nan",
-        description: "Restaurant",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "cafe"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 57,
-        name: "Swell Taco",
-        cuisine: "mexican",
-        description: "Cuisine: mexican",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "mexican", "tacos"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 58,
-        name: "Fresh Catch Cafe",
-        cuisine: "american",
-        description: "Cuisine: american",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "american", "seafood"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 59,
-        name: "Lighthouse Grill",
-        cuisine: "american",
-        description: "Cuisine: american",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "nan",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["restaurant", "american", "grill"],
-        rating: null,
-        priceRange: ""
-    },
-    {
-        id: 60,
-        name: "Grace Ridge Brewing",
-        cuisine: "nan",
-        description: "Bar",
-        address: "",
-        phone: "nan",
-        website: "nan",
-        hours: "Mo-Su 12:00-20:00",
-        imageURL: "nan",
-        lat: null,
-        lng: null,
-        menu: "nan",
-        tags: ["bar", "brewery"],
-        rating: null,
-        priceRange: ""
-    }
-];
+// Updated script.js with Supabase integration
+import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2'
+
+// Supabase configuration - Replace with your actual values
+const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Global variables
 let map;
-let currentFilter = null; // Start with no filter selected
+let currentFilter = null;
 let mapMarkers = [];
+let restaurants = []; // This will now be loaded from Supabase
+let currentUser = null;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
 
-function initializeApp() {
+async function initializeApp() {
+    // Check if user is logged in
+    await checkAuthState();
+    
+    // Load restaurants from Supabase
+    await loadRestaurantsFromSupabase();
+    
     populateFilterButtons();
     setupFilterButtons();
     setupRandomButton();
     setupViewToggle();
+    setupAuthButtons();
     renderInitialView();
     initializeMap();
-    loadStoredData();
-    setupSubmissionForm(); // Setup for the submission form
+    setupSubmissionForm();
 }
 
-/**
- * Dynamically creates filter buttons and adds a static "View All" button.
- */
+// Authentication functions
+async function checkAuthState() {
+    const { data: { user } } = await supabase.auth.getUser();
+    currentUser = user;
+    updateAuthUI();
+}
+
+function updateAuthUI() {
+    const authContainer = document.getElementById('authContainer');
+    if (!authContainer) {
+        // Create auth container in navbar
+        const navbar = document.querySelector('nav .flex.items-center.space-x-3');
+        const authDiv = document.createElement('div');
+        authDiv.id = 'authContainer';
+        authDiv.className = 'flex items-center space-x-2';
+        navbar.insertBefore(authDiv, navbar.firstChild);
+    }
+
+    const authContainer = document.getElementById('authContainer');
+    
+    if (currentUser) {
+        authContainer.innerHTML = `
+            <span class="text-white text-sm">Welcome, ${currentUser.email}</span>
+            <button id="logoutBtn" class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
+                Logout
+            </button>
+        `;
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    } else {
+        authContainer.innerHTML = `
+            <button id="loginBtn" class="px-3 py-1 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">
+                Login
+            </button>
+            <button id="signupBtn" class="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">
+                Sign Up
+            </button>
+        `;
+        document.getElementById('loginBtn').addEventListener('click', () => showAuthModal('login'));
+        document.getElementById('signupBtn').addEventListener('click', () => showAuthModal('signup'));
+    }
+}
+
+function setupAuthButtons() {
+    // Auth modal will be created dynamically
+}
+
+async function handleLogin(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+    });
+
+    if (error) {
+        alert('Login failed: ' + error.message);
+    } else {
+        currentUser = data.user;
+        updateAuthUI();
+        closeAuthModal();
+    }
+}
+
+async function handleSignup(email, password, fullName) {
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+            data: {
+                full_name: fullName,
+            }
+        }
+    });
+
+    if (error) {
+        alert('Signup failed: ' + error.message);
+    } else {
+        alert('Please check your email to confirm your account!');
+        closeAuthModal();
+    }
+}
+
+async function handleLogout() {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+        currentUser = null;
+        updateAuthUI();
+    }
+}
+
+// Database functions
+async function loadRestaurantsFromSupabase() {
+    try {
+        const { data, error } = await supabase
+            .from('restaurants')
+            .select('*')
+            .eq('status', 'approved');
+        
+        if (error) throw error;
+        
+        restaurants = data.map(restaurant => ({
+            id: restaurant.id,
+            name: restaurant.name,
+            description: restaurant.description,
+            address: restaurant.address,
+            phone: restaurant.phone,
+            website: restaurant.website,
+            hours: restaurant.hours,
+            imageURL: restaurant.image_url,
+            lat: restaurant.lat,
+            lng: restaurant.lng,
+            menu: restaurant.menu_url,
+            tags: restaurant.tags || [],
+            rating: restaurant.rating,
+            priceRange: restaurant.price_range
+        }));
+        
+        console.log('Loaded', restaurants.length, 'restaurants from Supabase');
+    } catch (error) {
+        console.error('Error loading restaurants:', error);
+        // Fallback to empty array if database fails
+        restaurants = [];
+    }
+}
+
+async function submitRestaurant(formData) {
+    if (!currentUser) {
+        alert('Please log in to submit a restaurant');
+        return false;
+    }
+
+    try {
+        // Upload image if provided
+        let imageUrl = null;
+        const imageFile = formData.get('restaurantImage');
+        
+        if (imageFile && imageFile.size > 0) {
+            const fileName = `${Date.now()}-${imageFile.name}`;
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('restaurant-images')
+                .upload(fileName, imageFile);
+                
+            if (uploadError) throw uploadError;
+            
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('restaurant-images')
+                .getPublicUrl(fileName);
+                
+            imageUrl = publicUrl;
+        }
+
+        // Insert submission
+        const { data, error } = await supabase
+            .from('restaurant_submissions')
+            .insert([
+                {
+                    name: formData.get('restaurantName'),
+                    description: formData.get('restaurantDescription') || '',
+                    address: formData.get('restaurantAddress') || '',
+                    website: formData.get('restaurantWebsite') || '',
+                    submitted_by: currentUser.id,
+                    image_file_name: imageUrl
+                }
+            ]);
+
+        if (error) throw error;
+
+        alert('Thank you for your submission! It will be reviewed by our team.');
+        return true;
+        
+    } catch (error) {
+        console.error('Error submitting restaurant:', error);
+        alert('Error submitting restaurant: ' + error.message);
+        return false;
+    }
+}
+
+// Update the existing submission form handler
+function setupSubmissionForm() {
+    const form = document.getElementById('submissionForm');
+    
+    if (form) {
+        // Update form HTML to include description field
+        const nameField = form.querySelector('input[name="restaurantName"]');
+        if (nameField && !form.querySelector('textarea[name="restaurantDescription"]')) {
+            const descriptionDiv = document.createElement('div');
+            descriptionDiv.innerHTML = `
+                <label for="restaurantDescription" class="block text-sm font-medium text-gray-300">Description</label>
+                <textarea id="restaurantDescription" name="restaurantDescription" rows="3" 
+                    class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm"
+                    placeholder="Brief description of the restaurant..."></textarea>
+            `;
+            nameField.parentElement.after(descriptionDiv);
+        }
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                alert('Please log in to submit a restaurant');
+                showAuthModal('login');
+                return;
+            }
+
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Submitting...';
+
+            const success = await submitRestaurant(formData);
+            
+            if (success) {
+                form.reset();
+                closeSubmissionModal();
+            }
+            
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+        });
+    }
+}
+
+// Auth Modal Functions
+function showAuthModal(type) {
+    const modalHTML = `
+        <div id="authModal" class="fixed inset-0 z-50">
+            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAuthModal()"></div>
+            <div class="fixed inset-0 flex items-center justify-center p-4">
+                <div class="backdrop-blur-2xl bg-slate-800/50 rounded-3xl max-w-md w-full shadow-2xl animate-scale-in border border-white/20">
+                    <div class="relative p-8">
+                        <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                        <h2 class="text-2xl font-bold mb-6 text-white">${type === 'login' ? 'Login' : 'Sign Up'}</h2>
+                        <form id="authForm">
+                            ${type === 'signup' ? `
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-300">Full Name</label>
+                                    <input type="text" name="fullName" required class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
+                                </div>
+                            ` : ''}
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-300">Email</label>
+                                <input type="email" name="email" required class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-300">Password</label>
+                                <input type="password" name="password" required class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
+                            </div>
+                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200">
+                                ${type === 'login' ? 'Login' : 'Sign Up'}
+                            </button>
+                        </form>
+                        <p class="text-center mt-4 text-gray-400">
+                            ${type === 'login' ? "Don't have an account?" : "Already have an account?"}
+                            <button onclick="showAuthModal('${type === 'login' ? 'signup' : 'login'}')" class="text-blue-400 hover:text-blue-300">
+                                ${type === 'login' ? 'Sign Up' : 'Login'}
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal
+    const existingModal = document.getElementById('authModal');
+    if (existingModal) existingModal.remove();
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    const form = document.getElementById('authForm');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        
+        if (type === 'login') {
+            await handleLogin(formData.get('email'), formData.get('password'));
+        } else {
+            await handleSignup(formData.get('email'), formData.get('password'), formData.get('fullName'));
+        }
+    });
+}
+
+function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.remove();
+}
+
+// Keep all your existing functions for UI, filters, etc.
+// ... (rest of your existing code remains the same)
+
 function populateFilterButtons() {
     const filterContainer = document.getElementById('filterButtons');
     filterContainer.innerHTML = '';
@@ -1071,9 +357,6 @@ function populateFilterButtons() {
     });
 }
 
-/**
- * Sets up event listeners for filter buttons and the new submission button.
- */
 function setupFilterButtons() {
     const filterContainer = document.getElementById('filterButtons');
     const submitBtn = document.getElementById('submitRestaurantBtn');
@@ -1095,9 +378,6 @@ function setupFilterButtons() {
     }
 }
 
-/**
- * Sets up the event listener for the random restaurant button.
- */
 function setupRandomButton() {
     const randomBtn = document.getElementById('randomRestaurantBtn');
     if (randomBtn) {
@@ -1111,7 +391,9 @@ function setupRandomButton() {
     }
 }
 
-// Setup view toggle
+// Keep all your existing rendering, modal, and map functions...
+// (The rest remains exactly the same as your current code)
+
 function setupViewToggle() {
     const gridBtn = document.getElementById('gridViewBtn');
     const mapBtn = document.getElementById('mapViewBtn');
@@ -1150,18 +432,12 @@ function setupViewToggle() {
     });
 }
 
-/**
- * Displays a prompt message before a filter is selected.
- */
 function renderInitialView() {
     const container = document.getElementById('categoryContainer');
-    container.innerHTML = ''; // Remove the initial welcome message
+    container.innerHTML = '';
     updateMapMarkers();
 }
 
-/**
- * Helper function to group restaurants by their tags.
- */
 function groupByTag(restaurantList) {
     const grouped = {};
     const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
@@ -1179,9 +455,6 @@ function groupByTag(restaurantList) {
     return grouped;
 }
 
-/**
- * Renders restaurants based on the current filter ('all' or a specific tag).
- */
 function renderCategories() {
     const container = document.getElementById('categoryContainer');
     container.innerHTML = '';
@@ -1214,7 +487,6 @@ function renderCategories() {
     }
 }
 
-// Create a section for a category of restaurants
 function createCategorySection(tag, restaurantList) {
     const section = document.createElement('div');
     section.className = 'animate-slide-up';
@@ -1232,7 +504,6 @@ function createCategorySection(tag, restaurantList) {
     return section;
 }
 
-// Create a single restaurant card
 function createRestaurantCard(restaurant) {
     return `
         <div class="restaurant-card group" onclick="openRestaurantModal(${restaurant.id})">
@@ -1257,12 +528,10 @@ function createRestaurantCard(restaurant) {
     `;
 }
 
-// Format category/tag name for display
 function formatCategoryName(tag) {
     return tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
 }
 
-// Restaurant modal functions
 function openRestaurantModal(restaurantId) {
     const restaurant = restaurants.find(r => r.id === restaurantId);
     if (!restaurant) return;
@@ -1324,7 +593,6 @@ function closeRestaurantModal() {
     document.body.style.overflow = '';
 }
 
-// Map functions
 function initializeMap() {
     map = L.map('map', { zoomControl: false }).setView([59.6426, -151.5377], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
@@ -1332,9 +600,6 @@ function initializeMap() {
     updateMapMarkers();
 }
 
-/**
- * MODIFIED: Updates map markers based on the selected tag ('all' or specific).
- */
 function updateMapMarkers() {
     if (!map) return;
     
@@ -1379,76 +644,6 @@ function updateMapMarkers() {
     }
 }
 
-// Storage functions
-function loadStoredData() {
-    const stored = localStorage.getItem('homerBitesRestaurants');
-    if (stored) {
-        try {
-            restaurants = JSON.parse(stored);
-        } catch (e) {
-            console.error('Error loading stored data:', e);
-        }
-    }
-}
-
-function saveData() {
-    localStorage.setItem('homerBitesRestaurants', JSON.stringify(restaurants));
-}
-
-// Event listeners
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeRestaurantModal();
-    }
-});
-
-// Submission Modal Functions
-function setupSubmissionForm() {
-    const form = document.getElementById('submissionForm');
-    const submitButton = form.querySelector('button[type="submit"]');
-
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent the form from reloading the page
-
-            // --- PASTE YOUR GOOGLE SCRIPT URL HERE ---
-            const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwDGuTaqUFY3XdsnhvezlMa_CxCv6I5Wnjp27_Kf16AO4q8sTcFB2jsjPjW-CgJ1CQ/exec';
-            // -----------------------------------------
-
-            const formData = new FormData(form);
-            const originalButtonText = submitButton.innerHTML;
-            submitButton.disabled = true;
-            submitButton.innerHTML = 'Submitting...';
-
-            fetch(googleScriptURL, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result === 'success') {
-                    alert('Thank you for your suggestion!');
-                    form.reset();
-                    closeSubmissionModal();
-                } else {
-                    // Log the detailed error from the script if available
-                    console.error('Submission Error:', data.error);
-                    alert('An error occurred. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Fetch Error:', error);
-                alert('A network error occurred. Please check your connection and try again.');
-            })
-            .finally(() => {
-                // Re-enable the button and restore its text
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonText;
-            });
-        });
-    }
-}
-
 function openSubmissionModal() {
     const modal = document.getElementById('submissionModal');
     if (modal) {
@@ -1468,9 +663,21 @@ function closeSubmissionModal() {
 // Add event listener to close submission modal with Escape key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-        // We also need to check if the submission modal is open
         if (!document.getElementById('submissionModal').classList.contains('hidden')) {
             closeSubmissionModal();
+        } else if (document.getElementById('authModal')) {
+            closeAuthModal();
         }
+    }
+});
+
+// Listen for auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN') {
+        currentUser = session.user;
+        updateAuthUI();
+    } else if (event === 'SIGNED_OUT') {
+        currentUser = null;
+        updateAuthUI();
     }
 });
