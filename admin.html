@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -54,15 +55,11 @@
         }
         
         // Initialize Supabase with your actual credentials
-window.supabase = window.supabase.createClient(
-    'https://qtjwacufuwkehfkkijsl.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
-);
-        
-        const supabase = window.supabase;
+        const supabase = window.supabase.createClient(
+            'https://qtjwacufuwkehfkkijsl.supabase.co', 
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
+        );
     </script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen font-sans antialiased">
 
@@ -281,6 +278,7 @@ window.supabase = window.supabase.createClient(
 
     <script>
         let currentUser = null;
+        let currentUserProfile = null;
         let currentSubmission = null;
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -290,32 +288,49 @@ window.supabase = window.supabase.createClient(
 
         async function checkAuthState() {
             try {
-                const { data: { user } } = await supabase.auth.getUser();
+                console.log('Checking auth state...');
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                
+                if (userError) {
+                    console.error('Error getting user:', userError);
+                    showLogin();
+                    return;
+                }
                 
                 if (user) {
-                    // Check if user is admin
-                    const { data: profile } = await supabase
+                    console.log('User found:', user.email);
+                    currentUser = user;
+                    
+                    // Get user profile
+                    const { data: profile, error: profileError } = await supabase
                         .from('user_profiles')
-                        .select('is_admin')
+                        .select('*')
                         .eq('id', user.id)
                         .single();
                     
+                    if (profileError) {
+                        console.error('Error getting profile:', profileError);
+                        alert('Error loading user profile. Please try logging in again.');
+                        showLogin();
+                        return;
+                    }
+                    
                     if (profile && profile.is_admin) {
-                        currentUser = user;
+                        console.log('Admin user confirmed:', profile.full_name);
+                        currentUserProfile = profile;
                         showAdminPanel();
                         loadDashboardData();
                     } else {
+                        console.log('User is not admin');
                         alert('Access denied. Admin privileges required.');
-                        // Auto-show login for non-admin users
                         showLogin();
                     }
                 } else {
-                    // Auto-show login for unauthenticated users
+                    console.log('No user found, showing login');
                     showLogin();
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
-                // Auto-show login if there's an error
                 showLogin();
             }
         }
@@ -337,8 +352,11 @@ window.supabase = window.supabase.createClient(
         }
 
         function showAdminPanel() {
+            const displayName = currentUserProfile?.full_name || currentUser?.email || 'Admin';
+            const firstName = displayName.split(' ')[0]; // Get first name
+            
             document.getElementById('adminAuth').innerHTML = `
-                <span class="text-white text-sm mr-4">Welcome, Admin</span>
+                <span class="text-white text-sm mr-4">Welcome, ${firstName}!</span>
                 <button onclick="handleLogout()" class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-medium text-sm hover:from-red-600 hover:to-pink-600 transition-all duration-200 shadow-lg hover:scale-105 active:scale-95">
                     Logout
                 </button>
@@ -358,18 +376,25 @@ window.supabase = window.supabase.createClient(
             submitButton.innerHTML = 'Signing In...';
             
             try {
+                console.log('Attempting login...');
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: formData.get('email'),
                     password: formData.get('password')
                 });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Login error:', error);
+                    throw error;
+                }
 
-                // Login successful, check auth state again
-                await checkAuthState();
+                console.log('Login successful, checking auth...');
+                // Give a moment for the session to be established
+                setTimeout(() => {
+                    checkAuthState();
+                }, 500);
                 
             } catch (error) {
-                console.error('Login error:', error);
+                console.error('Login failed:', error);
                 alert('Login failed: ' + error.message);
                 
                 // Reset button
@@ -379,49 +404,62 @@ window.supabase = window.supabase.createClient(
         }
 
         async function handleLogout() {
-            await supabase.auth.signOut();
-            currentUser = null;
-            document.getElementById('adminContent').classList.add('hidden');
-            document.getElementById('adminAuth').innerHTML = `
-                <button id="loginBtn" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm hover:from-brand-600 hover:to-brand-700 transition-all duration-200 shadow-lg shadow-brand-500/25 hover:scale-105 active:scale-95">
-                    Admin Login
-                </button>
-            `;
-            document.getElementById('loginBtn').addEventListener('click', showLogin);
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                
+                currentUser = null;
+                currentUserProfile = null;
+                document.getElementById('adminContent').classList.add('hidden');
+                document.getElementById('adminAuth').innerHTML = `
+                    <button id="loginBtn" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm hover:from-brand-600 hover:to-brand-700 transition-all duration-200 shadow-lg shadow-brand-500/25 hover:scale-105 active:scale-95">
+                        Admin Login
+                    </button>
+                `;
+                document.getElementById('loginBtn').addEventListener('click', showLogin);
+                showLogin();
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Error logging out: ' + error.message);
+            }
         }
 
         async function loadDashboardData() {
-            // Load total restaurants
-            const { count: restaurantCount } = await supabase
-                .from('restaurants')
-                .select('*', { count: 'exact', head: true })
-                .eq('status', 'approved');
-            
-            document.getElementById('totalRestaurants').textContent = restaurantCount || 0;
+            try {
+                // Load total restaurants
+                const { count: restaurantCount } = await supabase
+                    .from('restaurants')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'approved');
+                
+                document.getElementById('totalRestaurants').textContent = restaurantCount || 0;
 
-            // Load pending submissions
-            const { data: pendingSubmissions, count: pendingCount } = await supabase
-                .from('restaurant_submissions')
-                .select('*', { count: 'exact' })
-                .eq('status', 'pending');
-            
-            document.getElementById('pendingSubmissions').textContent = pendingCount || 0;
+                // Load pending submissions
+                const { data: pendingSubmissions, count: pendingCount } = await supabase
+                    .from('restaurant_submissions')
+                    .select('*', { count: 'exact' })
+                    .eq('status', 'pending');
+                
+                document.getElementById('pendingSubmissions').textContent = pendingCount || 0;
 
-            // Load monthly submissions
-            const startOfMonth = new Date();
-            startOfMonth.setDate(1);
-            startOfMonth.setHours(0, 0, 0, 0);
-            
-            const { count: monthlyCount } = await supabase
-                .from('restaurant_submissions')
-                .select('*', { count: 'exact', head: true })
-                .gte('created_at', startOfMonth.toISOString());
-            
-            document.getElementById('monthlySubmissions').textContent = monthlyCount || 0;
+                // Load monthly submissions
+                const startOfMonth = new Date();
+                startOfMonth.setDate(1);
+                startOfMonth.setHours(0, 0, 0, 0);
+                
+                const { count: monthlyCount } = await supabase
+                    .from('restaurant_submissions')
+                    .select('*', { count: 'exact', head: true })
+                    .gte('created_at', startOfMonth.toISOString());
+                
+                document.getElementById('monthlySubmissions').textContent = monthlyCount || 0;
 
-            // Load lists
-            loadPendingSubmissions(pendingSubmissions);
-            loadRestaurants();
+                // Load lists
+                loadPendingSubmissions(pendingSubmissions);
+                loadRestaurants();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
         }
 
         function loadPendingSubmissions(submissions) {
@@ -461,102 +499,111 @@ window.supabase = window.supabase.createClient(
         }
 
         async function loadRestaurants() {
-            const { data: restaurants } = await supabase
-                .from('restaurants')
-                .select('*')
-                .eq('status', 'approved')
-                .order('name');
+            try {
+                const { data: restaurants } = await supabase
+                    .from('restaurants')
+                    .select('*')
+                    .eq('status', 'approved')
+                    .order('name');
 
-            const container = document.getElementById('restaurantsList');
-            
-            if (!restaurants || restaurants.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span class="text-2xl">🏪</span>
+                const container = document.getElementById('restaurantsList');
+                
+                if (!restaurants || restaurants.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl">🏪</span>
+                            </div>
+                            <p class="text-gray-400">No restaurants found</p>
                         </div>
-                        <p class="text-gray-400">No restaurants found</p>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = restaurants.map(restaurant => `
+                    <div class="backdrop-blur-xl bg-white/5 border border-white/20 rounded-2xl p-4 mb-3 hover:bg-white/10 transition-all duration-200">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-white">${restaurant.name}</h3>
+                                <p class="text-gray-300 text-sm">${restaurant.address || 'No address provided'}</p>
+                                ${restaurant.tags ? `<div class="flex flex-wrap gap-1 mt-2">${restaurant.tags.map(tag => `<span class="px-2 py-1 bg-brand-500/20 text-brand-300 text-xs rounded-lg">${tag}</span>`).join('')}</div>` : ''}
+                            </div>
+                            <div class="ml-4 flex space-x-2">
+                                <button onclick="editRestaurant(${restaurant.id})" 
+                                        class="px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg text-xs font-medium hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 hover:scale-105 active:scale-95">
+                                    Edit
+                                </button>
+                                <button onclick="deleteRestaurant(${restaurant.id})" 
+                                        class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs font-medium hover:from-red-600 hover:to-pink-600 transition-all duration-200 hover:scale-105 active:scale-95">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                `;
-                return;
+                `).join('');
+            } catch (error) {
+                console.error('Error loading restaurants:', error);
             }
-
-            container.innerHTML = restaurants.map(restaurant => `
-                <div class="backdrop-blur-xl bg-white/5 border border-white/20 rounded-2xl p-4 mb-3 hover:bg-white/10 transition-all duration-200">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <h3 class="font-bold text-white">${restaurant.name}</h3>
-                            <p class="text-gray-300 text-sm">${restaurant.address || 'No address provided'}</p>
-                            ${restaurant.tags ? `<div class="flex flex-wrap gap-1 mt-2">${restaurant.tags.map(tag => `<span class="px-2 py-1 bg-brand-500/20 text-brand-300 text-xs rounded-lg">${tag}</span>`).join('')}</div>` : ''}
-                        </div>
-                        <div class="ml-4 flex space-x-2">
-                            <button onclick="editRestaurant(${restaurant.id})" 
-                                    class="px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg text-xs font-medium hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 hover:scale-105 active:scale-95">
-                                Edit
-                            </button>
-                            <button onclick="deleteRestaurant(${restaurant.id})" 
-                                    class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs font-medium hover:from-red-600 hover:to-pink-600 transition-all duration-200 hover:scale-105 active:scale-95">
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
         }
 
         async function reviewSubmission(submissionId) {
-            const { data: submission } = await supabase
-                .from('restaurant_submissions')
-                .select('*')
-                .eq('id', submissionId)
-                .single();
+            try {
+                const { data: submission } = await supabase
+                    .from('restaurant_submissions')
+                    .select('*')
+                    .eq('id', submissionId)
+                    .single();
 
-            currentSubmission = submission;
-            
-            const reviewContent = document.getElementById('reviewContent');
-            reviewContent.innerHTML = `
-                <div class="space-y-6">
-                    <div class="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border border-white/20">
-                        <label class="block font-semibold text-white mb-2">Restaurant Name:</label>
-                        <p class="text-gray-300">${submission.name}</p>
-                    </div>
-                    
-                    <div class="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border border-white/20">
-                        <label class="block font-semibold text-white mb-2">Description:</label>
-                        <p class="text-gray-300">${submission.description || 'No description provided'}</p>
-                    </div>
-                    
-                    <div class="grid md:grid-cols-2 gap-4">
+                currentSubmission = submission;
+                
+                const reviewContent = document.getElementById('reviewContent');
+                reviewContent.innerHTML = `
+                    <div class="space-y-6">
                         <div class="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border border-white/20">
-                            <label class="block font-semibold text-white mb-2">Address:</label>
-                            <p class="text-gray-300">${submission.address || 'Not provided'}</p>
+                            <label class="block font-semibold text-white mb-2">Restaurant Name:</label>
+                            <p class="text-gray-300">${submission.name}</p>
                         </div>
                         
                         <div class="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border border-white/20">
-                            <label class="block font-semibold text-white mb-2">Website:</label>
-                            <p class="text-gray-300">${submission.website || 'Not provided'}</p>
+                            <label class="block font-semibold text-white mb-2">Description:</label>
+                            <p class="text-gray-300">${submission.description || 'No description provided'}</p>
                         </div>
-                    </div>
-                    
-                    <div class="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border border-white/20">
-                        <label class="block font-semibold text-white mb-2">Submitted:</label>
-                        <p class="text-gray-300">${new Date(submission.created_at).toLocaleString()}</p>
-                    </div>
-                    
-                    ${submission.image_file_name ? `
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border border-white/20">
+                                <label class="block font-semibold text-white mb-2">Address:</label>
+                                <p class="text-gray-300">${submission.address || 'Not provided'}</p>
+                            </div>
+                            
+                            <div class="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border border-white/20">
+                                <label class="block font-semibold text-white mb-2">Website:</label>
+                                <p class="text-gray-300">${submission.website || 'Not provided'}</p>
+                            </div>
+                        </div>
+                        
                         <div class="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border border-white/20">
-                            <label class="block font-semibold text-white mb-2">Submitted Image:</label>
-                            <img src="${submission.image_file_name}" alt="Restaurant" class="w-full h-48 object-cover rounded-xl">
+                            <label class="block font-semibold text-white mb-2">Submitted:</label>
+                            <p class="text-gray-300">${new Date(submission.created_at).toLocaleString()}</p>
                         </div>
-                    ` : ''}
-                </div>
-            `;
+                        
+                        ${submission.image_file_name ? `
+                            <div class="backdrop-blur-xl bg-white/5 rounded-2xl p-4 border border-white/20">
+                                <label class="block font-semibold text-white mb-2">Submitted Image:</label>
+                                <img src="${submission.image_file_name}" alt="Restaurant" class="w-full h-48 object-cover rounded-xl">
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
 
-            document.getElementById('reviewModal').classList.remove('hidden');
-            
-            document.getElementById('approveBtn').onclick = () => approveSubmission(submission);
-            document.getElementById('rejectBtn').onclick = () => rejectSubmission(submission);
-            document.getElementById('cancelReviewBtn').onclick = closeReviewModal;
+                document.getElementById('reviewModal').classList.remove('hidden');
+                
+                document.getElementById('approveBtn').onclick = () => approveSubmission(submission);
+                document.getElementById('rejectBtn').onclick = () => rejectSubmission(submission);
+                document.getElementById('cancelReviewBtn').onclick = closeReviewModal;
+            } catch (error) {
+                console.error('Error loading submission:', error);
+                alert('Error loading submission details');
+            }
         }
 
         function closeReviewModal() {
