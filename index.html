@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- Replace the entire <head> section in your index.html with this: -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homer Bites - Discover Local Food in Homer, Alaska</title>
-    <script type="module">
-    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2'
-    
-    // Replace with your actual Supabase credentials
-    window.supabase = createClient('https://qtjwacufuwkehfkkijsl.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc');
-    
-    // Import and run your script
-    import('./script.js');
-</script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    
+    <!-- Supabase from CDN (non-module approach) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
         tailwind.config = {
@@ -66,6 +62,12 @@
                 }
             }
         }
+        
+        // Initialize Supabase - Replace with your actual credentials
+        const supabase = window.supabase.createClient(
+            'https://qtjwacufuwkehfkkijsl.supabase.co', 
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
+        );
     </script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen font-sans antialiased">
