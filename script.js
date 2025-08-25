@@ -275,14 +275,9 @@ async function checkAuthState() {
 function updateAuthUI() {
     let authContainer = document.getElementById('authContainer');
     if (!authContainer) {
-        const navbar = document.querySelector('nav .flex.items-center.space-x-3');
-        const authDiv = document.createElement('div');
-        authDiv.id = 'authContainer';
-        authDiv.className = 'flex items-center space-x-2';
-        navbar.insertBefore(authDiv, navbar.firstChild);
-        authContainer = authDiv;
+        return; 
     }
-    
+
     if (currentUser) {
         const displayName = currentUser.user_metadata?.full_name || currentUser.email;
         const firstName = displayName.split(' ')[0];
@@ -306,6 +301,7 @@ function updateAuthUI() {
         document.getElementById('signupBtn').addEventListener('click', () => showAuthModal('signup'));
     }
 }
+
 
 function setupAuthButtons() {
     // Auth modal will be created dynamically
