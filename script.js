@@ -31,9 +31,8 @@ async function initializeApp() {
     initializeMap();
     setupSubmissionForm();
 
-    // Initial render: Show all restaurants sorted alphabetically
-    currentFilter = 'all';
-    renderAllAlphabetical();
+    // Show an initial welcome message instead of loading all restaurants
+    showInitialMessage();
 }
 
 function initializeWithoutSupabase() {
@@ -45,9 +44,8 @@ function initializeWithoutSupabase() {
     initializeMap();
     setupSubmissionForm();
 
-    // Initial render: Show all restaurants sorted alphabetically
-    currentFilter = 'all';
-    renderAllAlphabetical();
+    // Show an initial welcome message
+    showInitialMessage();
     console.log('Running in fallback mode without Supabase');
 }
 
@@ -91,6 +89,21 @@ function getStaticRestaurants() {
 
 // --- NEW/MODIFIED FUNCTIONS ---
 
+/**
+ * Displays a welcome message in the content area on initial page load.
+ */
+function showInitialMessage() {
+    const container = document.getElementById('categoryContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="text-center py-16 animate-fade-in">
+            <h2 class="text-3xl font-bold text-white mb-4">Welcome to Homer Bites!</h2>
+            <p class="text-xl text-gray-300">Use the search bar above to find a restaurant, or click "View All" to browse the list.</p>
+        </div>
+    `;
+}
+
 function setupSearch() {
     const findBtn = document.getElementById('findBtn');
     const viewAllBtn = document.getElementById('viewAllBtn');
@@ -113,7 +126,7 @@ function setupSearch() {
         viewAllBtn.addEventListener('click', () => {
             currentFilter = 'all';
             searchInput.value = '';
-            renderAllAlphabetical(); // Changed to the new alphabetical sort function
+            renderAllAlphabetical();
             updateMapMarkers();
         });
     }
@@ -130,7 +143,6 @@ function renderAllAlphabetical() {
     const container = document.getElementById('categoryContainer');
     if (!container) return;
 
-    // Create a sorted copy of the restaurants array
     const sortedRestaurants = [...restaurants].sort((a, b) => a.name.localeCompare(b.name));
 
     container.innerHTML = ''; // Clear previous content
@@ -149,7 +161,6 @@ function renderAllAlphabetical() {
             </div>
         `;
     } else {
-        // Fallback message in case restaurants array is empty
         section.innerHTML = `
             <div class="text-center py-16 animate-fade-in">
                 <h2 class="text-3xl font-bold text-white mb-4">No Restaurants Found</h2>
@@ -169,7 +180,7 @@ function populateTagCarousel() {
         .filter(tag => !tagsToIgnore.includes(tag))
         .sort();
 
-    track.innerHTML = ''; // Clear existing
+    track.innerHTML = '';
     
     const tagButtonsHTML = allTags.map(tag => {
         const tagName = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
@@ -284,6 +295,20 @@ function updateMapMarkers(restaurantsToShow) {
             mapMarkers.push(marker);
         }
     });
+}
+
+function initializeMap() {
+    const mapElement = document.getElementById('map');
+    if (!mapElement) return;
+    
+    try {
+        map = L.map('map', { zoomControl: false }).setView([59.6426, -151.5377], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+        L.control.zoom({ position: 'topright' }).addTo(map);
+        // Markers will now be added by search/view all actions, not on initial load
+    } catch (error) {
+        console.error('Map initialization failed:', error);
+    }
 }
 
 
@@ -614,10 +639,6 @@ function createRestaurantCard(restaurant) {
     `;
 }
 
-function formatCategoryName(tag) {
-    return tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
-}
-
 function openRestaurantModal(restaurantId) {
     const restaurant = restaurants.find(r => r.id === restaurantId);
     if (!restaurant) return;
@@ -682,20 +703,6 @@ function closeRestaurantModal() {
     if (modal) {
         modal.classList.add('hidden');
         document.body.style.overflow = '';
-    }
-}
-
-function initializeMap() {
-    const mapElement = document.getElementById('map');
-    if (!mapElement) return;
-    
-    try {
-        map = L.map('map', { zoomControl: false }).setView([59.6426, -151.5377], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
-        L.control.zoom({ position: 'topright' }).addTo(map);
-        updateMapMarkers();
-    } catch (error) {
-        console.error('Map initialization failed:', error);
     }
 }
 
