@@ -13,40 +13,40 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function initializeApp() {
-    // Check if supabase is available
     if (typeof supabase === 'undefined') {
         console.error('Supabase not loaded. Check your credentials.');
-        // Fallback to original static data
         restaurants = getStaticRestaurants();
         initializeWithoutSupabase();
         return;
     }
     
-    // Check if user is logged in
     await checkAuthState();
-    
-    // Load restaurants from Supabase
     await loadRestaurantsFromSupabase();
     
-    populateFilterButtons();
-    setupFilterButtons();
+    populateTagCarousel();
+    setupSearch();
     setupRandomButton();
     setupViewToggle();
     setupAuthButtons();
-    renderInitialView();
     initializeMap();
     setupSubmissionForm();
+
+    // Initial render
+    currentFilter = 'all';
+    renderCategories();
 }
 
 function initializeWithoutSupabase() {
-    // Fallback initialization without Supabase
-    populateFilterButtons();
-    setupFilterButtons();
+    populateTagCarousel();
+    setupSearch();
     setupRandomButton();
     setupViewToggle();
-    renderInitialView();
+    setupAuthButtons();
     initializeMap();
     setupSubmissionForm();
+
+    currentFilter = 'all';
+    renderCategories();
     console.log('Running in fallback mode without Supabase');
 }
 
@@ -85,9 +85,179 @@ function getStaticRestaurants() {
             rating: null,
             priceRange: ""
         },
-        // Add more restaurants here if needed for fallback
     ];
 }
+
+// --- NEW/MODIFIED FUNCTIONS ---
+
+function populateTagCarousel() {
+    const track = document.getElementById('tagCarouselTrack');
+    if (!track) return;
+
+    const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
+    const allTags = [...new Set(restaurants.flatMap(r => r.tags || []))]
+        .filter(tag => !tagsToIgnore.includes(tag))
+        .sort();
+
+    track.innerHTML = ''; // Clear existing
+    
+    // Create buttons for each tag
+    const tagButtonsHTML = allTags.map(tag => {
+        const tagName = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
+        return `<button class="cuisine-filter flex-shrink-0 mx-2" data-tag="${tag}">
+                    <span class="filter-text">${tagName}</span>
+                    <div class="filter-glow"></div>
+                </button>`;
+    }).join('');
+
+    // Duplicate the buttons for the seamless scroll effect
+    track.innerHTML = tagButtonsHTML + tagButtonsHTML;
+
+    // Event listener for clicks on carousel tags
+    track.addEventListener('click', (event) => {
+        const button = event.target.closest('.cuisine-filter');
+        if (button && button.dataset.tag) {
+            const searchInput = document.getElementById('tagSearchInput');
+            searchInput.value = button.dataset.tag;
+            handleSearch();
+        }
+    });
+}
+
+function setupSearch() {
+    const findBtn = document.getElementById('findBtn');
+    const viewAllBtn = document.getElementById('viewAllBtn');
+    const searchInput = document.getElementById('tagSearchInput');
+    const submitBtn = document.getElementById('submitRestaurantBtn');
+
+    if (findBtn) {
+        findBtn.addEventListener('click', handleSearch);
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                handleSearch();
+            }
+        });
+    }
+
+    if (viewAllBtn) {
+        viewAllBtn.addEventListener('click', () => {
+            currentFilter = 'all';
+            searchInput.value = '';
+            renderCategories();
+            updateMapMarkers();
+        });
+    }
+
+    if (submitBtn) {
+        submitBtn.addEventListener('click', openSubmissionModal);
+    }
+}
+
+function handleSearch() {
+    const searchInput = document.getElementById('tagSearchInput');
+    const query = searchInput.value.trim().toLowerCase();
+
+    if (!query) {
+        // If search is empty, just show all
+        currentFilter = 'all';
+        renderCategories();
+        updateMapMarkers();
+        return;
+    }
+
+    // Handle multiple tags separated by commas
+    const searchTerms = query.split(',').map(term => term.trim()).filter(Boolean);
+    
+    const filteredRestaurants = restaurants.filter(restaurant => {
+        const restaurantTags = (restaurant.tags || []).map(t => t.toLowerCase());
+        // Return true if at least one of the restaurant's tags is in our search terms
+        return searchTerms.some(term => restaurantTags.includes(term));
+    });
+    
+    renderSearchResults(filteredRestaurants, query);
+    updateMapMarkers(filteredRestaurants);
+}
+
+function renderSearchResults(results, query) {
+    const container = document.getElementById('categoryContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    const section = document.createElement('div');
+    section.className = 'animate-slide-up';
+
+    if (results.length > 0) {
+        section.innerHTML = `
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-white mb-4">Search Results for "${query}"</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-brand-500 to-accent-500 mx-auto rounded-full"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                ${results.map(restaurant => createRestaurantCard(restaurant)).join('')}
+            </div>
+        `;
+    } else {
+        section.innerHTML = `
+            <div class="text-center py-16 animate-fade-in">
+                <h2 class="text-3xl font-bold text-white mb-4">No Results Found</h2>
+                <p class="text-xl text-gray-300">We couldn't find any restaurants matching "${query}".</p>
+            </div>
+        `;
+    }
+    container.appendChild(section);
+}
+
+function updateMapMarkers(restaurantsToShow) {
+    if (!map) return;
+    
+    mapMarkers.forEach(marker => map.removeLayer(marker));
+    mapMarkers = [];
+    
+    // If no specific list is provided, use the global filter
+    if (!restaurantsToShow) {
+        restaurantsToShow = !currentFilter || currentFilter === 'all'
+            ? restaurants
+            : restaurants.filter(r => r.tags && r.tags.includes(currentFilter));
+    }
+
+    restaurantsToShow.forEach(restaurant => {
+        if (restaurant.lat && restaurant.lng) {
+            const imageUrl = restaurant.imageURL || 'https://placehold.co/64x64/1e293b/ffffff?text=N/A';
+            
+            const marker = L.marker([restaurant.lat, restaurant.lng])
+                .bindPopup(`
+                    <div class="p-4 min-w-64">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <img src="${imageUrl}" alt="${restaurant.name}" class="w-16 h-16 rounded-lg object-cover" onerror="this.src='https://placehold.co/64x64/1e293b/ffffff?text=N/A'; this.onerror=null;">
+                            <div>
+                                <h3 class="font-bold text-gray-900">${restaurant.name}</h3>
+                                <div class="flex items-center space-x-1">
+                                    <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                    <span class="text-sm text-gray-600">${restaurant.rating || 'N/A'}</span>
+                                    <span class="text-sm text-gray-400">•</span>
+                                    <span class="text-sm text-gray-600">${restaurant.priceRange || ''}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">${(restaurant.description || '').substring(0, 100)}...</p>
+                        <button onclick="openRestaurantModal(${restaurant.id})" class="w-full px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-medium rounded-lg hover:from-brand-600 hover:to-brand-700 transition-all duration-200">
+                            View Details
+                        </button>
+                    </div>
+                `);
+            
+            marker.addTo(map);
+            mapMarkers.push(marker);
+        }
+    });
+}
+
+
+// --- EXISTING UNMODIFIED/UTILITY FUNCTIONS ---
 
 // Authentication functions
 async function checkAuthState() {
@@ -105,7 +275,6 @@ async function checkAuthState() {
 function updateAuthUI() {
     let authContainer = document.getElementById('authContainer');
     if (!authContainer) {
-        // Create auth container in navbar
         const navbar = document.querySelector('nav .flex.items-center.space-x-3');
         const authDiv = document.createElement('div');
         authDiv.id = 'authContainer';
@@ -113,10 +282,12 @@ function updateAuthUI() {
         navbar.insertBefore(authDiv, navbar.firstChild);
         authContainer = authDiv;
     }
-    const firstName = displayName.split(' ')[0]; // Get first name
+    
     if (currentUser) {
+        const displayName = currentUser.user_metadata?.full_name || currentUser.email;
+        const firstName = displayName.split(' ')[0];
         authContainer.innerHTML = `
-            <span class="text-white text-sm">Welcome, ${currentUser. $firstName}</span>
+            <span class="text-white text-sm">Welcome, ${firstName}</span>
             <button id="logoutBtn" class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
                 Logout
             </button>
@@ -230,7 +401,6 @@ async function loadRestaurantsFromSupabase() {
         console.log('Loaded', restaurants.length, 'restaurants from Supabase');
     } catch (error) {
         console.error('Error loading restaurants:', error);
-        // Fallback to static data
         restaurants = getStaticRestaurants();
         console.log('Using fallback static data');
     }
@@ -248,7 +418,6 @@ async function submitRestaurant(formData) {
     }
 
     try {
-        // Upload image if provided
         let imageUrl = null;
         const imageFile = formData.get('restaurantImage');
         
@@ -260,7 +429,6 @@ async function submitRestaurant(formData) {
                 
             if (uploadError) throw uploadError;
             
-            // Get public URL
             const { data: { publicUrl } } = supabase.storage
                 .from('restaurant-images')
                 .getPublicUrl(fileName);
@@ -268,7 +436,6 @@ async function submitRestaurant(formData) {
             imageUrl = publicUrl;
         }
 
-        // Insert submission
         const { data, error } = await supabase
             .from('restaurant_submissions')
             .insert([
@@ -294,12 +461,10 @@ async function submitRestaurant(formData) {
     }
 }
 
-// Update the existing submission form handler
 function setupSubmissionForm() {
     const form = document.getElementById('submissionForm');
     
     if (form) {
-        // Update form HTML to include description field
         const nameField = form.querySelector('input[name="restaurantName"]');
         if (nameField && !form.querySelector('textarea[name="restaurantDescription"]')) {
             const descriptionDiv = document.createElement('div');
@@ -343,58 +508,6 @@ function setupSubmissionForm() {
             submitButton.disabled = false;
             submitButton.innerHTML = originalButtonText;
         });
-    }
-}
-
-// Keep all your existing UI functions exactly the same...
-function populateFilterButtons() {
-    const filterContainer = document.getElementById('filterButtons');
-    if (!filterContainer) return;
-    
-    filterContainer.innerHTML = '';
-    
-    const allButton = document.createElement('button');
-    allButton.className = 'cuisine-filter';
-    allButton.dataset.tag = 'all';
-    allButton.innerHTML = `<span class="filter-text">View All</span><div class="filter-glow"></div>`;
-    filterContainer.appendChild(allButton);
-
-    const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
-    const allTags = new Set(restaurants.flatMap(r => r.tags || []));
-    const filteredTags = [...allTags]
-        .filter(tag => !tagsToIgnore.includes(tag))
-        .sort();
-
-    filteredTags.forEach(tag => {
-        const button = document.createElement('button');
-        button.className = 'cuisine-filter';
-        button.dataset.tag = tag;
-        const tagName = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
-        button.innerHTML = `<span class="filter-text">${tagName}</span><div class="filter-glow"></div>`;
-        filterContainer.appendChild(button);
-    });
-}
-
-function setupFilterButtons() {
-    const filterContainer = document.getElementById('filterButtons');
-    const submitBtn = document.getElementById('submitRestaurantBtn');
-
-    if (filterContainer) {
-        filterContainer.addEventListener('click', function(event) {
-            const button = event.target.closest('.cuisine-filter');
-            if (!button) return;
-
-            filterContainer.querySelectorAll('.cuisine-filter').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            currentFilter = button.dataset.tag;
-            
-            renderCategories();
-            updateMapMarkers();
-        });
-    }
-
-    if (submitBtn) {
-        submitBtn.addEventListener('click', openSubmissionModal);
     }
 }
 
@@ -451,14 +564,6 @@ function setupViewToggle() {
     });
 }
 
-function renderInitialView() {
-    const container = document.getElementById('categoryContainer');
-    if (container) {
-        container.innerHTML = '';
-    }
-    updateMapMarkers();
-}
-
 function groupByTag(restaurantList) {
     const grouped = {};
     const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
@@ -484,10 +589,7 @@ function renderCategories() {
     
     container.innerHTML = '';
 
-    if (!currentFilter) {
-        renderInitialView();
-        return;
-    }
+    if (!currentFilter) return;
 
     if (currentFilter === 'all') {
         const groupedRestaurants = groupByTag(restaurants);
@@ -641,52 +743,6 @@ function initializeMap() {
     }
 }
 
-function updateMapMarkers() {
-    if (!map) return;
-    
-    mapMarkers.forEach(marker => map.removeLayer(marker));
-    mapMarkers = [];
-    
-    const restaurantsToShow = !currentFilter || currentFilter === 'all'
-        ? restaurants
-        : restaurants.filter(r => r.tags && r.tags.includes(currentFilter));
-
-    if (!currentFilter) {
-        return;
-    }
-    
-    restaurantsToShow.forEach(restaurant => {
-        if (restaurant.lat && restaurant.lng) {
-            const imageUrl = restaurant.imageURL || 'https://placehold.co/64x64/1e293b/ffffff?text=N/A';
-            
-            const marker = L.marker([restaurant.lat, restaurant.lng])
-                .bindPopup(`
-                    <div class="p-4 min-w-64">
-                        <div class="flex items-center space-x-3 mb-3">
-                            <img src="${imageUrl}" alt="${restaurant.name}" class="w-16 h-16 rounded-lg object-cover" onerror="this.src='https://placehold.co/64x64/1e293b/ffffff?text=N/A'; this.onerror=null;">
-                            <div>
-                                <h3 class="font-bold text-gray-900">${restaurant.name}</h3>
-                                <div class="flex items-center space-x-1">
-                                    <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                                    <span class="text-sm text-gray-600">${restaurant.rating || 'N/A'}</span>
-                                    <span class="text-sm text-gray-400">•</span>
-                                    <span class="text-sm text-gray-600">${restaurant.priceRange || ''}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-3">${(restaurant.description || '').substring(0, 100)}...</p>
-                        <button onclick="openRestaurantModal(${restaurant.id})" class="w-full px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-medium rounded-lg hover:from-brand-600 hover:to-brand-700 transition-all duration-200">
-                            View Details
-                        </button>
-                    </div>
-                `);
-            
-            marker.addTo(map);
-            mapMarkers.push(marker);
-        }
-    });
-}
-
 function openSubmissionModal() {
     const modal = document.getElementById('submissionModal');
     if (modal) {
@@ -703,7 +759,6 @@ function closeSubmissionModal() {
     }
 }
 
-// Auth Modal Functions
 function showAuthModal(type) {
     const modalHTML = `
         <div id="authModal" class="fixed inset-0 z-50">
@@ -748,7 +803,6 @@ function showAuthModal(type) {
         </div>
     `;
     
-    // Remove existing modal
     const existingModal = document.getElementById('authModal');
     if (existingModal) existingModal.remove();
     
@@ -772,7 +826,6 @@ function closeAuthModal() {
     if (modal) modal.remove();
 }
 
-// Event listeners
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         if (!document.getElementById('submissionModal')?.classList.contains('hidden')) {
@@ -785,7 +838,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Listen for auth state changes
 if (typeof supabase !== 'undefined') {
     supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_IN') {
