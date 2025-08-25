@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Replace the entire <head> section in your index.html with this: -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,16 +86,9 @@
                     </div>
                 </div>
 
-                <div class="flex items-center space-x-3">
-                    <button id="gridViewBtn" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm hover:from-brand-600 hover:to-brand-700 transition-all duration-200 shadow-lg shadow-brand-500/25 hover:scale-105 active:scale-95">
-                        Grid View
-                    </button>
-                    <button id="mapViewBtn" class="px-4 py-2 bg-white/10 text-white rounded-xl font-medium text-sm hover:bg-white/20 transition-all duration-200 backdrop-blur-sm">
-                        Map View
-                    </button>
-                    <button id="submitRestaurantBtn" class="px-4 py-2 bg-gradient-to-r from-blue-400 to-accent-500 text-white rounded-xl font-medium text-sm hover:from-blue-500 hover:to-accent-600 transition-all duration-200 shadow-lg shadow-accent-500/25 hover:scale-105 active:scale-95">
-                        Submit a Restaurant
-                    </button>
+                <!-- Keep only auth buttons in top right -->
+                <div id="authContainer" class="flex items-center space-x-3">
+                    <!-- Auth buttons will be populated by JavaScript -->
                 </div>
             </div>
         </div>
@@ -112,6 +104,28 @@
                 
                 <div class="flex flex-wrap justify-center items-center gap-3" id="filterButtons">
                     </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW: View Controls Section - moved here between tags and random button -->
+    <section class="relative z-10 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-6 border border-white/20 shadow-2xl">
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold text-white mb-4">Choose Your View</h3>
+                    <div class="flex flex-wrap justify-center items-center gap-3">
+                        <button id="gridViewBtn" class="px-6 py-3 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm hover:from-brand-600 hover:to-brand-700 transition-all duration-200 shadow-lg shadow-brand-500/25 hover:scale-105 active:scale-95">
+                            🔲 Grid View
+                        </button>
+                        <button id="mapViewBtn" class="px-6 py-3 bg-white/10 text-white rounded-xl font-medium text-sm hover:bg-white/20 transition-all duration-200 backdrop-blur-sm">
+                            🗺️ Map View
+                        </button>
+                        <button id="submitRestaurantBtn" class="px-6 py-3 bg-gradient-to-r from-blue-400 to-accent-500 text-white rounded-xl font-medium text-sm hover:from-blue-500 hover:to-accent-600 transition-all duration-200 shadow-lg shadow-accent-500/25 hover:scale-105 active:scale-95">
+                            ➕ Submit a Restaurant
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
