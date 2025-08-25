@@ -53,11 +53,13 @@
             }
         }
         
-        // Initialize Supabase - Replace with your actual credentials
-        const supabase = window.supabase.createClient(
-            'https://qtjwacufuwkehfkkijsl.supabase.co', 
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
-        );
+        // Initialize Supabase with your actual credentials
+window.supabase = window.supabase.createClient(
+    'https://qtjwacufuwkehfkkijsl.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
+);
+        
+        const supabase = window.supabase;
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -287,25 +289,33 @@
         });
 
         async function checkAuthState() {
-            const { data: { user } } = await supabase.auth.getUser();
-            
-            if (user) {
-                // Check if user is admin
-                const { data: profile } = await supabase
-                    .from('user_profiles')
-                    .select('is_admin')
-                    .eq('id', user.id)
-                    .single();
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
                 
-                if (profile && profile.is_admin) {
-                    currentUser = user;
-                    showAdminPanel();
-                    loadDashboardData();
+                if (user) {
+                    // Check if user is admin
+                    const { data: profile } = await supabase
+                        .from('user_profiles')
+                        .select('is_admin')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    if (profile && profile.is_admin) {
+                        currentUser = user;
+                        showAdminPanel();
+                        loadDashboardData();
+                    } else {
+                        alert('Access denied. Admin privileges required.');
+                        // Auto-show login for non-admin users
+                        showLogin();
+                    }
                 } else {
-                    alert('Access denied. Admin privileges required.');
+                    // Auto-show login for unauthenticated users
                     showLogin();
                 }
-            } else {
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                // Auto-show login if there's an error
                 showLogin();
             }
         }
@@ -340,16 +350,31 @@
         async function handleLogin(e) {
             e.preventDefault();
             const formData = new FormData(e.target);
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
             
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: formData.get('email'),
-                password: formData.get('password')
-            });
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Signing In...';
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: formData.get('email'),
+                    password: formData.get('password')
+                });
 
-            if (error) {
+                if (error) throw error;
+
+                // Login successful, check auth state again
+                await checkAuthState();
+                
+            } catch (error) {
+                console.error('Login error:', error);
                 alert('Login failed: ' + error.message);
-            } else {
-                checkAuthState();
+                
+                // Reset button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
             }
         }
 
