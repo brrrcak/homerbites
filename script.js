@@ -1,5 +1,4 @@
-// Updated script.js with Supabase integration
-const supabase = window.supabase; // Use the global supabase instance
+// Simplified script.js - Remove ALL import statements and use global supabase
 
 // Global variables
 let map;
@@ -14,6 +13,15 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function initializeApp() {
+    // Check if supabase is available
+    if (typeof supabase === 'undefined') {
+        console.error('Supabase not loaded. Check your credentials.');
+        // Fallback to original static data
+        restaurants = getStaticRestaurants();
+        initializeWithoutSupabase();
+        return;
+    }
+    
     // Check if user is logged in
     await checkAuthState();
     
@@ -30,15 +38,72 @@ async function initializeApp() {
     setupSubmissionForm();
 }
 
+function initializeWithoutSupabase() {
+    // Fallback initialization without Supabase
+    populateFilterButtons();
+    setupFilterButtons();
+    setupRandomButton();
+    setupViewToggle();
+    renderInitialView();
+    initializeMap();
+    setupSubmissionForm();
+    console.log('Running in fallback mode without Supabase');
+}
+
+// Fallback static data (your original restaurants)
+function getStaticRestaurants() {
+    return [
+        {
+            id: 1,
+            name: "Cosmic Kitchen",
+            description: "A cozy Homer favorite serving hearty breakfasts, smash burgers, and Mexican-inspired plates with plenty of vegetarian options—all in a laid-back, rustic setting.",
+            address: "510 E Pioneer Ave, Homer, AK 99603",
+            phone: "(907) 235-1301",
+            website: "https://www.cosmickitchenhomer.com/",
+            hours: "Tuesday - Saturday: 11:00AM - 7:00PM",
+            imageURL: "https://scontent-sea1-1.xx.fbcdn.net/v/t39.30808-6/481341661_122129057186592631_7628068687369387549_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=5icgLVwy9UMQ7kNvwFVUR7n&_nc_oc=AdlpuMF-gtAUBXSK4ZhHcZ2df-S--7j_ZJoMQhF64TU6DPSH1H2Sme1eAmANG6YxUY4&_nc_zt=23&_nc_ht=scontent-sea1-1.xx&_nc_gid=OC6MpAtgGyG_Ln-OU_O6zg&oh=00_AfUk8g1iC0r0tpqXDGn_BTQY4thLnN6tGxhCyjYM5Yv_EA&oe=68B08DA0",
+            lat: 59.647521,
+            lng: -151.533005,
+            menu: "https://order.toasttab.com/online/cosmickitchenhomer",
+            tags: ["restaurant", "burgers", "mexican", "breakfast", "vegetarian"],
+            rating: 4,
+            priceRange: "$-$$"
+        },
+        {
+            id: 2,
+            name: "Fat Olive's Restaurant",
+            description: "Italian cuisine featuring pizza and American dishes",
+            address: "",
+            phone: "(907) 235-8488",
+            website: "https://www.fatoliveshomer.com/",
+            hours: "Mo-Su 11:00-20:30",
+            imageURL: "",
+            lat: null,
+            lng: null,
+            menu: "",
+            tags: ["restaurant", "italian", "pizza", "american"],
+            rating: null,
+            priceRange: ""
+        },
+        // Add more restaurants here if needed for fallback
+    ];
+}
+
 // Authentication functions
 async function checkAuthState() {
-    const { data: { user } } = await supabase.auth.getUser();
-    currentUser = user;
-    updateAuthUI();
+    if (typeof supabase === 'undefined') return;
+    
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        currentUser = user;
+        updateAuthUI();
+    } catch (error) {
+        console.error('Auth check failed:', error);
+    }
 }
 
 function updateAuthUI() {
-    const authContainer = document.getElementById('authContainer');
+    let authContainer = document.getElementById('authContainer');
     if (!authContainer) {
         // Create auth container in navbar
         const navbar = document.querySelector('nav .flex.items-center.space-x-3');
@@ -46,9 +111,8 @@ function updateAuthUI() {
         authDiv.id = 'authContainer';
         authDiv.className = 'flex items-center space-x-2';
         navbar.insertBefore(authDiv, navbar.firstChild);
+        authContainer = authDiv;
     }
-
-    const authContainer = document.getElementById('authContainer');
     
     if (currentUser) {
         authContainer.innerHTML = `
@@ -77,6 +141,11 @@ function setupAuthButtons() {
 }
 
 async function handleLogin(email, password) {
+    if (typeof supabase === 'undefined') {
+        alert('Database connection not available');
+        return;
+    }
+    
     const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
@@ -92,6 +161,11 @@ async function handleLogin(email, password) {
 }
 
 async function handleSignup(email, password, fullName) {
+    if (typeof supabase === 'undefined') {
+        alert('Database connection not available');
+        return;
+    }
+    
     const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
@@ -111,6 +185,8 @@ async function handleSignup(email, password, fullName) {
 }
 
 async function handleLogout() {
+    if (typeof supabase === 'undefined') return;
+    
     const { error } = await supabase.auth.signOut();
     if (!error) {
         currentUser = null;
@@ -120,6 +196,12 @@ async function handleLogout() {
 
 // Database functions
 async function loadRestaurantsFromSupabase() {
+    if (typeof supabase === 'undefined') {
+        console.log('Supabase not available, using static data');
+        restaurants = getStaticRestaurants();
+        return;
+    }
+    
     try {
         const { data, error } = await supabase
             .from('restaurants')
@@ -148,12 +230,18 @@ async function loadRestaurantsFromSupabase() {
         console.log('Loaded', restaurants.length, 'restaurants from Supabase');
     } catch (error) {
         console.error('Error loading restaurants:', error);
-        // Fallback to empty array if database fails
-        restaurants = [];
+        // Fallback to static data
+        restaurants = getStaticRestaurants();
+        console.log('Using fallback static data');
     }
 }
 
 async function submitRestaurant(formData) {
+    if (typeof supabase === 'undefined') {
+        alert('Database connection not available');
+        return false;
+    }
+    
     if (!currentUser) {
         alert('Please log in to submit a restaurant');
         return false;
@@ -227,6 +315,11 @@ function setupSubmissionForm() {
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            if (typeof supabase === 'undefined') {
+                alert('Database connection not available. Please try again later.');
+                return;
+            }
+            
             if (!currentUser) {
                 alert('Please log in to submit a restaurant');
                 showAuthModal('login');
@@ -250,6 +343,363 @@ function setupSubmissionForm() {
             submitButton.disabled = false;
             submitButton.innerHTML = originalButtonText;
         });
+    }
+}
+
+// Keep all your existing UI functions exactly the same...
+function populateFilterButtons() {
+    const filterContainer = document.getElementById('filterButtons');
+    if (!filterContainer) return;
+    
+    filterContainer.innerHTML = '';
+    
+    const allButton = document.createElement('button');
+    allButton.className = 'cuisine-filter';
+    allButton.dataset.tag = 'all';
+    allButton.innerHTML = `<span class="filter-text">View All</span><div class="filter-glow"></div>`;
+    filterContainer.appendChild(allButton);
+
+    const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
+    const allTags = new Set(restaurants.flatMap(r => r.tags || []));
+    const filteredTags = [...allTags]
+        .filter(tag => !tagsToIgnore.includes(tag))
+        .sort();
+
+    filteredTags.forEach(tag => {
+        const button = document.createElement('button');
+        button.className = 'cuisine-filter';
+        button.dataset.tag = tag;
+        const tagName = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
+        button.innerHTML = `<span class="filter-text">${tagName}</span><div class="filter-glow"></div>`;
+        filterContainer.appendChild(button);
+    });
+}
+
+function setupFilterButtons() {
+    const filterContainer = document.getElementById('filterButtons');
+    const submitBtn = document.getElementById('submitRestaurantBtn');
+
+    if (filterContainer) {
+        filterContainer.addEventListener('click', function(event) {
+            const button = event.target.closest('.cuisine-filter');
+            if (!button) return;
+
+            filterContainer.querySelectorAll('.cuisine-filter').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            currentFilter = button.dataset.tag;
+            
+            renderCategories();
+            updateMapMarkers();
+        });
+    }
+
+    if (submitBtn) {
+        submitBtn.addEventListener('click', openSubmissionModal);
+    }
+}
+
+function setupRandomButton() {
+    const randomBtn = document.getElementById('randomRestaurantBtn');
+    if (randomBtn) {
+        randomBtn.addEventListener('click', function() {
+            if (restaurants.length > 0) {
+                const randomIndex = Math.floor(Math.random() * restaurants.length);
+                const randomRestaurant = restaurants[randomIndex];
+                openRestaurantModal(randomRestaurant.id);
+            }
+        });
+    }
+}
+
+function setupViewToggle() {
+    const gridBtn = document.getElementById('gridViewBtn');
+    const mapBtn = document.getElementById('mapViewBtn');
+    const gridContent = document.getElementById('gridContent');
+    const mapContent = document.getElementById('mapContent');
+    const randomizerSection = document.getElementById('randomizerSection');
+    
+    if (!gridBtn || !mapBtn) return;
+    
+    gridBtn.addEventListener('click', function() {
+        gridBtn.classList.add('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'text-white', 'shadow-lg');
+        gridBtn.classList.remove('bg-white/10');
+        mapBtn.classList.remove('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'shadow-lg');
+        mapBtn.classList.add('bg-white/10');
+        
+        if (gridContent) gridContent.classList.remove('hidden');
+        if (mapContent) mapContent.classList.add('hidden');
+        if (randomizerSection) randomizerSection.classList.remove('hidden');
+    });
+    
+    mapBtn.addEventListener('click', function() {
+        mapBtn.classList.add('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'text-white', 'shadow-lg');
+        mapBtn.classList.remove('bg-white/10');
+        gridBtn.classList.remove('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'shadow-lg');
+        gridBtn.classList.add('bg-white/10');
+        
+        if (mapContent) mapContent.classList.remove('hidden');
+        if (gridContent) gridContent.classList.add('hidden');
+        if (randomizerSection) randomizerSection.classList.add('hidden');
+        
+        setTimeout(() => {
+            if (map) {
+                map.invalidateSize();
+                map.setView([59.6426, -151.5377], 12);
+                updateMapMarkers();
+            }
+        }, 100);
+    });
+}
+
+function renderInitialView() {
+    const container = document.getElementById('categoryContainer');
+    if (container) {
+        container.innerHTML = '';
+    }
+    updateMapMarkers();
+}
+
+function groupByTag(restaurantList) {
+    const grouped = {};
+    const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
+
+    restaurantList.forEach(restaurant => {
+        if (restaurant.tags) {
+            restaurant.tags.forEach(tag => {
+                if (!tagsToIgnore.includes(tag)) {
+                    if (!grouped[tag]) {
+                        grouped[tag] = [];
+                    }
+                    grouped[tag].push(restaurant);
+                }
+            });
+        }
+    });
+    return grouped;
+}
+
+function renderCategories() {
+    const container = document.getElementById('categoryContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (!currentFilter) {
+        renderInitialView();
+        return;
+    }
+
+    if (currentFilter === 'all') {
+        const groupedRestaurants = groupByTag(restaurants);
+        const sortedTags = Object.keys(groupedRestaurants).sort();
+        if (sortedTags.length === 0) {
+             container.innerHTML = `<div class="text-center py-16 animate-fade-in"><h2 class="text-3xl font-bold text-white mb-4">No categories to display.</h2></div>`;
+             return;
+        }
+        sortedTags.forEach(tag => {
+            const restaurantList = groupedRestaurants[tag];
+            const categorySection = createCategorySection(tag, restaurantList);
+            container.appendChild(categorySection);
+        });
+    } else {
+        const filteredRestaurants = restaurants.filter(r => r.tags && r.tags.includes(currentFilter));
+        if (filteredRestaurants.length > 0) {
+            const categorySection = createCategorySection(currentFilter, filteredRestaurants);
+            container.appendChild(categorySection);
+        } else {
+            container.innerHTML = `<div class="text-center py-16 animate-fade-in"><h2 class="text-3xl font-bold text-white mb-4">No Results Found</h2><p class="text-xl text-gray-300">We couldn't find any restaurants with the tag "#${currentFilter}".</p></div>`;
+        }
+    }
+}
+
+function createCategorySection(tag, restaurantList) {
+    const section = document.createElement('div');
+    section.className = 'animate-slide-up';
+    const categoryName = formatCategoryName(tag);
+    
+    section.innerHTML = `
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-white mb-4">${categoryName}</h2>
+            <div class="w-24 h-1 bg-gradient-to-r from-brand-500 to-accent-500 mx-auto rounded-full"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            ${restaurantList.map(restaurant => createRestaurantCard(restaurant)).join('')}
+        </div>
+    `;
+    return section;
+}
+
+function createRestaurantCard(restaurant) {
+    const imageUrl = restaurant.imageURL || 'https://placehold.co/400x200/1e293b/ffffff?text=Image+Not+Found';
+    const tags = restaurant.tags || [];
+    
+    return `
+        <div class="restaurant-card group" onclick="openRestaurantModal(${restaurant.id})">
+            <div class="restaurant-image">
+                <img src="${imageUrl}" alt="${restaurant.name}" loading="lazy" onerror="this.src='https://placehold.co/400x200/1e293b/ffffff?text=Image+Not+Found'; this.onerror=null;">
+                <div class="restaurant-overlay"></div>
+            </div>
+            <div class="bg-white p-6 rounded-b-3xl">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="text-xl font-bold text-gray-900">${restaurant.name}</h3>
+                    <div class="flex items-center space-x-1 flex-shrink-0 ml-4">
+                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                        <span class="text-sm font-medium text-gray-700">${restaurant.rating || 'N/A'}</span>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4 leading-relaxed">${restaurant.description}</p>
+                <div class="flex flex-wrap gap-2">
+                    ${tags.map(tag => `<span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">${tag}</span>`).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function formatCategoryName(tag) {
+    return tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
+}
+
+function openRestaurantModal(restaurantId) {
+    const restaurant = restaurants.find(r => r.id === restaurantId);
+    if (!restaurant) return;
+    
+    const modal = document.getElementById('restaurantModal');
+    const modalContent = document.getElementById('modalContent');
+    
+    if (!modal || !modalContent) return;
+    
+    const tags = restaurant.tags || [];
+    const tagsDisplay = tags.map(tag => tag.charAt(0).toUpperCase() + tag.slice(1)).join(' • ');
+    const imageUrl = restaurant.imageURL || 'https://placehold.co/600x250/1e293b/ffffff?text=Image+Not+Found';
+
+    modalContent.innerHTML = `
+        <div class="relative">
+            <img src="${imageUrl}" alt="${restaurant.name}" class="w-full h-64 object-cover" onerror="this.src='https://placehold.co/600x250/1e293b/ffffff?text=Image+Not+Found'; this.onerror=null;">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-16">
+                <h1 class="text-3xl font-bold text-white mb-2">${restaurant.name}</h1>
+                <div class="flex items-center space-x-4 text-white">
+                    <div class="flex items-center space-x-1">
+                        <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                        <span class="font-medium">${restaurant.rating || 'N/A'}</span>
+                    </div>
+                    <span class="font-medium">${restaurant.priceRange || ''}</span>
+                </div>
+                 <p class="text-white text-sm mt-2">${tagsDisplay}</p>
+            </div>
+        </div>
+        <div class="p-8">
+            <p class="text-lg text-gray-600 mb-6 leading-relaxed">${restaurant.description}</p>
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
+                        <div><h3 class="font-semibold text-gray-900">Address</h3><p class="text-gray-600">${restaurant.address || 'Address not available'}</p></div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg></div>
+                        <div><h3 class="font-semibold text-gray-900">Phone</h3><a href="tel:${restaurant.phone}" class="text-brand-600 hover:text-brand-700">${restaurant.phone || 'Phone not available'}</a></div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                        <div><h3 class="font-semibold text-gray-900">Hours</h3><p class="text-gray-600">${restaurant.hours || 'Hours not available'}</p></div>
+                    </div>
+                    ${(restaurant.website && restaurant.website !== 'nan') ? `<div class="flex items-start space-x-3"><div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c5 0 9-4 9-9s-4-9-9-9"></path></svg></div><div><h3 class="font-semibold text-gray-900">Website</h3><a href="${restaurant.website}" target="_blank" class="text-brand-600 hover:text-brand-700">Visit Website</a></div></div>` : ''}
+                </div>
+            </div>
+            ${(restaurant.menu && restaurant.menu !== 'nan') ? `<div class="bg-gray-50 rounded-2xl p-6 mb-6"><h3 class="font-bold text-gray-900 mb-3 flex items-center"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>Menu</h3><a href="${restaurant.menu}" target="_blank" class="text-brand-600 hover:text-brand-700">View Menu</a></div>` : ''}
+            <div class="flex flex-wrap gap-2">${tags.map(tag => `<span class="px-4 py-2 bg-gradient-to-r from-brand-100 to-brand-50 text-brand-700 font-medium rounded-xl">${tag}</span>`).join('')}</div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeRestaurantModal() {
+    const modal = document.getElementById('restaurantModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+function initializeMap() {
+    const mapElement = document.getElementById('map');
+    if (!mapElement) return;
+    
+    try {
+        map = L.map('map', { zoomControl: false }).setView([59.6426, -151.5377], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+        L.control.zoom({ position: 'topright' }).addTo(map);
+        updateMapMarkers();
+    } catch (error) {
+        console.error('Map initialization failed:', error);
+    }
+}
+
+function updateMapMarkers() {
+    if (!map) return;
+    
+    mapMarkers.forEach(marker => map.removeLayer(marker));
+    mapMarkers = [];
+    
+    const restaurantsToShow = !currentFilter || currentFilter === 'all'
+        ? restaurants
+        : restaurants.filter(r => r.tags && r.tags.includes(currentFilter));
+
+    if (!currentFilter) {
+        return;
+    }
+    
+    restaurantsToShow.forEach(restaurant => {
+        if (restaurant.lat && restaurant.lng) {
+            const imageUrl = restaurant.imageURL || 'https://placehold.co/64x64/1e293b/ffffff?text=N/A';
+            
+            const marker = L.marker([restaurant.lat, restaurant.lng])
+                .bindPopup(`
+                    <div class="p-4 min-w-64">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <img src="${imageUrl}" alt="${restaurant.name}" class="w-16 h-16 rounded-lg object-cover" onerror="this.src='https://placehold.co/64x64/1e293b/ffffff?text=N/A'; this.onerror=null;">
+                            <div>
+                                <h3 class="font-bold text-gray-900">${restaurant.name}</h3>
+                                <div class="flex items-center space-x-1">
+                                    <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                    <span class="text-sm text-gray-600">${restaurant.rating || 'N/A'}</span>
+                                    <span class="text-sm text-gray-400">•</span>
+                                    <span class="text-sm text-gray-600">${restaurant.priceRange || ''}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">${(restaurant.description || '').substring(0, 100)}...</p>
+                        <button onclick="openRestaurantModal(${restaurant.id})" class="w-full px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-medium rounded-lg hover:from-brand-600 hover:to-brand-700 transition-all duration-200">
+                            View Details
+                        </button>
+                    </div>
+                `);
+            
+            marker.addTo(map);
+            mapMarkers.push(marker);
+        }
+    });
+}
+
+function openSubmissionModal() {
+    const modal = document.getElementById('submissionModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeSubmissionModal() {
+    const modal = document.getElementById('submissionModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
     }
 }
 
@@ -322,356 +772,28 @@ function closeAuthModal() {
     if (modal) modal.remove();
 }
 
-// Keep all your existing functions for UI, filters, etc.
-// ... (rest of your existing code remains the same)
-
-function populateFilterButtons() {
-    const filterContainer = document.getElementById('filterButtons');
-    filterContainer.innerHTML = '';
-    
-    const allButton = document.createElement('button');
-    allButton.className = 'cuisine-filter';
-    allButton.dataset.tag = 'all';
-    allButton.innerHTML = `<span class="filter-text">View All</span><div class="filter-glow"></div>`;
-    filterContainer.appendChild(allButton);
-
-    const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
-    const allTags = new Set(restaurants.flatMap(r => r.tags));
-    const filteredTags = [...allTags]
-        .filter(tag => !tagsToIgnore.includes(tag))
-        .sort();
-
-    filteredTags.forEach(tag => {
-        const button = document.createElement('button');
-        button.className = 'cuisine-filter';
-        button.dataset.tag = tag;
-        const tagName = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
-        button.innerHTML = `<span class="filter-text">${tagName}</span><div class="filter-glow"></div>`;
-        filterContainer.appendChild(button);
-    });
-}
-
-function setupFilterButtons() {
-    const filterContainer = document.getElementById('filterButtons');
-    const submitBtn = document.getElementById('submitRestaurantBtn');
-
-    filterContainer.addEventListener('click', function(event) {
-        const button = event.target.closest('.cuisine-filter');
-        if (!button) return;
-
-        filterContainer.querySelectorAll('.cuisine-filter').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        currentFilter = button.dataset.tag;
-        
-        renderCategories();
-        updateMapMarkers();
-    });
-
-    if (submitBtn) {
-        submitBtn.addEventListener('click', openSubmissionModal);
-    }
-}
-
-function setupRandomButton() {
-    const randomBtn = document.getElementById('randomRestaurantBtn');
-    if (randomBtn) {
-        randomBtn.addEventListener('click', function() {
-            if (restaurants.length > 0) {
-                const randomIndex = Math.floor(Math.random() * restaurants.length);
-                const randomRestaurant = restaurants[randomIndex];
-                openRestaurantModal(randomRestaurant.id);
-            }
-        });
-    }
-}
-
-// Keep all your existing rendering, modal, and map functions...
-// (The rest remains exactly the same as your current code)
-
-function setupViewToggle() {
-    const gridBtn = document.getElementById('gridViewBtn');
-    const mapBtn = document.getElementById('mapViewBtn');
-    const gridContent = document.getElementById('gridContent');
-    const mapContent = document.getElementById('mapContent');
-    const randomizerSection = document.getElementById('randomizerSection');
-    
-    gridBtn.addEventListener('click', function() {
-        gridBtn.classList.add('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'text-white', 'shadow-lg');
-        gridBtn.classList.remove('bg-white/10', 'text-white');
-        mapBtn.classList.remove('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'shadow-lg');
-        mapBtn.classList.add('bg-white/10', 'text-white');
-        
-        gridContent.classList.remove('hidden');
-        mapContent.classList.add('hidden');
-        randomizerSection.classList.remove('hidden');
-    });
-    
-    mapBtn.addEventListener('click', function() {
-        mapBtn.classList.add('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'text-white', 'shadow-lg');
-        mapBtn.classList.remove('bg-white/10', 'text-white');
-        gridBtn.classList.remove('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'shadow-lg');
-        gridBtn.classList.add('bg-white/10', 'text-white');
-        
-        mapContent.classList.remove('hidden');
-        gridContent.classList.add('hidden');
-        randomizerSection.classList.add('hidden');
-        
-        setTimeout(() => {
-            if (map) {
-                map.invalidateSize();
-                map.setView([59.6426, -151.5377], 12);
-                updateMapMarkers();
-            }
-        }, 100);
-    });
-}
-
-function renderInitialView() {
-    const container = document.getElementById('categoryContainer');
-    container.innerHTML = '';
-    updateMapMarkers();
-}
-
-function groupByTag(restaurantList) {
-    const grouped = {};
-    const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
-
-    restaurantList.forEach(restaurant => {
-        restaurant.tags.forEach(tag => {
-            if (!tagsToIgnore.includes(tag)) {
-                if (!grouped[tag]) {
-                    grouped[tag] = [];
-                }
-                grouped[tag].push(restaurant);
-            }
-        });
-    });
-    return grouped;
-}
-
-function renderCategories() {
-    const container = document.getElementById('categoryContainer');
-    container.innerHTML = '';
-
-    if (!currentFilter) {
-        renderInitialView();
-        return;
-    }
-
-    if (currentFilter === 'all') {
-        const groupedRestaurants = groupByTag(restaurants);
-        const sortedTags = Object.keys(groupedRestaurants).sort();
-        if (sortedTags.length === 0) {
-             container.innerHTML = `<div class="text-center py-16 animate-fade-in"><h2 class="text-3xl font-bold text-white mb-4">No categories to display.</h2></div>`;
-             return;
-        }
-        sortedTags.forEach(tag => {
-            const restaurantList = groupedRestaurants[tag];
-            const categorySection = createCategorySection(tag, restaurantList);
-            container.appendChild(categorySection);
-        });
-    } else {
-        const filteredRestaurants = restaurants.filter(r => r.tags.includes(currentFilter));
-        if (filteredRestaurants.length > 0) {
-            const categorySection = createCategorySection(currentFilter, filteredRestaurants);
-            container.appendChild(categorySection);
-        } else {
-            container.innerHTML = `<div class="text-center py-16 animate-fade-in"><h2 class="text-3xl font-bold text-white mb-4">No Results Found</h2><p class="text-xl text-gray-300">We couldn't find any restaurants with the tag "#${currentFilter}".</p></div>`;
-        }
-    }
-}
-
-function createCategorySection(tag, restaurantList) {
-    const section = document.createElement('div');
-    section.className = 'animate-slide-up';
-    const categoryName = formatCategoryName(tag);
-    
-    section.innerHTML = `
-        <div class="text-center mb-12">
-            <h2 class="text-4xl font-bold text-white mb-4">${categoryName}</h2>
-            <div class="w-24 h-1 bg-gradient-to-r from-brand-500 to-accent-500 mx-auto rounded-full"></div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            ${restaurantList.map(restaurant => createRestaurantCard(restaurant)).join('')}
-        </div>
-    `;
-    return section;
-}
-
-function createRestaurantCard(restaurant) {
-    return `
-        <div class="restaurant-card group" onclick="openRestaurantModal(${restaurant.id})">
-            <div class="restaurant-image">
-                <img src="${restaurant.imageURL}" alt="${restaurant.name}" loading="lazy" onerror="this.src='https://placehold.co/400x200/1e293b/ffffff?text=Image+Not+Found'; this.onerror=null;">
-                <div class="restaurant-overlay"></div>
-            </div>
-            <div class="bg-white p-6 rounded-b-3xl">
-                <div class="flex items-start justify-between mb-3">
-                    <h3 class="text-xl font-bold text-gray-900">${restaurant.name}</h3>
-                    <div class="flex items-center space-x-1 flex-shrink-0 ml-4">
-                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                        <span class="text-sm font-medium text-gray-700">${restaurant.rating || 'N/A'}</span>
-                    </div>
-                </div>
-                <p class="text-gray-600 mb-4 leading-relaxed">${restaurant.description}</p>
-                <div class="flex flex-wrap gap-2">
-                    ${restaurant.tags.map(tag => `<span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">${tag}</span>`).join('')}
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function formatCategoryName(tag) {
-    return tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
-}
-
-function openRestaurantModal(restaurantId) {
-    const restaurant = restaurants.find(r => r.id === restaurantId);
-    if (!restaurant) return;
-    
-    const modal = document.getElementById('restaurantModal');
-    const modalContent = document.getElementById('modalContent');
-    
-    const tagsDisplay = restaurant.tags.map(tag => tag.charAt(0).toUpperCase() + tag.slice(1)).join(' • ');
-
-    modalContent.innerHTML = `
-        <div class="relative">
-            <img src="${restaurant.imageURL}" alt="${restaurant.name}" class="w-full h-64 object-cover" onerror="this.src='https://placehold.co/600x250/1e293b/ffffff?text=Image+Not+Found'; this.onerror=null;">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-            <div class="absolute bottom-4 left-4 right-16">
-                <h1 class="text-3xl font-bold text-white mb-2">${restaurant.name}</h1>
-                <div class="flex items-center space-x-4 text-white">
-                    <div class="flex items-center space-x-1">
-                        <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                        <span class="font-medium">${restaurant.rating || 'N/A'}</span>
-                    </div>
-                    <span class="font-medium">${restaurant.priceRange || ''}</span>
-                </div>
-                 <p class="text-white text-sm mt-2">${tagsDisplay}</p>
-            </div>
-        </div>
-        <div class="p-8">
-            <p class="text-lg text-gray-600 mb-6 leading-relaxed">${restaurant.description}</p>
-            <div class="grid md:grid-cols-2 gap-8 mb-8">
-                <div class="space-y-4">
-                    <div class="flex items-start space-x-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
-                        <div><h3 class="font-semibold text-gray-900">Address</h3><p class="text-gray-600">${restaurant.address}</p></div>
-                    </div>
-                    <div class="flex items-start space-x-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg></div>
-                        <div><h3 class="font-semibold text-gray-900">Phone</h3><a href="tel:${restaurant.phone}" class="text-brand-600 hover:text-brand-700">${restaurant.phone}</a></div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <div class="flex items-start space-x-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
-                        <div><h3 class="font-semibold text-gray-900">Hours</h3><p class="text-gray-600">${restaurant.hours}</p></div>
-                    </div>
-                    ${(restaurant.website && restaurant.website !== 'nan') ? `<div class="flex items-start space-x-3"><div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c5 0 9-4 9-9s-4-9-9-9"></path></svg></div><div><h3 class="font-semibold text-gray-900">Website</h3><a href="${restaurant.website}" target="_blank" class="text-brand-600 hover:text-brand-700">Visit Website</a></div></div>` : ''}
-                </div>
-            </div>
-            ${(restaurant.menu && restaurant.menu !== 'nan') ? `<div class="bg-gray-50 rounded-2xl p-6 mb-6"><h3 class="font-bold text-gray-900 mb-3 flex items-center"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>Menu</h3><a href="${restaurant.menu}" target="_blank" class="text-brand-600 hover:text-brand-700">View Menu</a></div>` : ''}
-            <div class="flex flex-wrap gap-2">${restaurant.tags.map(tag => `<span class="px-4 py-2 bg-gradient-to-r from-brand-100 to-brand-50 text-brand-700 font-medium rounded-xl">${tag}</span>`).join('')}</div>
-        </div>
-    `;
-    
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeRestaurantModal() {
-    const modal = document.getElementById('restaurantModal');
-    modal.classList.add('hidden');
-    document.body.style.overflow = '';
-}
-
-function initializeMap() {
-    map = L.map('map', { zoomControl: false }).setView([59.6426, -151.5377], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
-    L.control.zoom({ position: 'topright' }).addTo(map);
-    updateMapMarkers();
-}
-
-function updateMapMarkers() {
-    if (!map) return;
-    
-    mapMarkers.forEach(marker => map.removeLayer(marker));
-    mapMarkers = [];
-    
-    const restaurantsToShow = !currentFilter || currentFilter === 'all'
-        ? restaurants
-        : restaurants.filter(r => r.tags.includes(currentFilter));
-
-    if (!currentFilter) {
-        // Do not show any markers if no filter is selected
-    } else {
-        restaurantsToShow.forEach(restaurant => {
-            if (restaurant.lat && restaurant.lng) {
-                const marker = L.marker([restaurant.lat, restaurant.lng])
-                    .bindPopup(`
-                        <div class="p-4 min-w-64">
-                            <div class="flex items-center space-x-3 mb-3">
-                                <img src="${restaurant.imageURL}" alt="${restaurant.name}" class="w-16 h-16 rounded-lg object-cover" onerror="this.src='https://placehold.co/64x64/1e293b/ffffff?text=N/A'; this.onerror=null;">
-                                <div>
-                                    <h3 class="font-bold text-gray-900">${restaurant.name}</h3>
-                                    <div class="flex items-center space-x-1">
-                                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                                        <span class="text-sm text-gray-600">${restaurant.rating || 'N/A'}</span>
-                                        <span class="text-sm text-gray-400">•</span>
-                                        <span class="text-sm text-gray-600">${restaurant.priceRange || ''}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-sm text-gray-600 mb-3">${restaurant.description.substring(0, 100)}...</p>
-                            <button onclick="openRestaurantModal(${restaurant.id})" class="w-full px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-medium rounded-lg hover:from-brand-600 hover:to-brand-700 transition-all duration-200">
-                                View Details
-                            </button>
-                        </div>
-                    `);
-                
-                marker.addTo(map);
-                mapMarkers.push(marker);
-            }
-        });
-    }
-}
-
-function openSubmissionModal() {
-    const modal = document.getElementById('submissionModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function closeSubmissionModal() {
-    const modal = document.getElementById('submissionModal');
-    if (modal) {
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-}
-
-// Add event listener to close submission modal with Escape key
+// Event listeners
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-        if (!document.getElementById('submissionModal').classList.contains('hidden')) {
+        if (!document.getElementById('submissionModal')?.classList.contains('hidden')) {
             closeSubmissionModal();
         } else if (document.getElementById('authModal')) {
             closeAuthModal();
+        } else {
+            closeRestaurantModal();
         }
     }
 });
 
 // Listen for auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN') {
-        currentUser = session.user;
-        updateAuthUI();
-    } else if (event === 'SIGNED_OUT') {
-        currentUser = null;
-        updateAuthUI();
-    }
-});
+if (typeof supabase !== 'undefined') {
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN') {
+            currentUser = session.user;
+            updateAuthUI();
+        } else if (event === 'SIGNED_OUT') {
+            currentUser = null;
+            updateAuthUI();
+        }
+    });
+}
