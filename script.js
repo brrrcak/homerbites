@@ -1,11 +1,5 @@
 // Updated script.js with Supabase integration
-import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2'
-
-// Supabase configuration - Replace with your actual values
-const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const supabase = window.supabase; // Use the global supabase instance
 
 // Global variables
 let map;
