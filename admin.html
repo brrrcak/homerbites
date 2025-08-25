@@ -17,35 +17,13 @@
                         'sans': ['Inter', 'system-ui', 'sans-serif'],
                     },
                     colors: {
-                        'brand': {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            400: '#38bdf8',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            900: '#1e3a8a',
-                        },
-                        'accent': {
-                            400: '#fb7185',
-                            500: '#f43f5e',
-                            600: '#e11d48',
-                        }
+                        'brand': { 500: '#3b82f6', 600: '#2563eb' },
+                        'accent': { 500: '#f43f5e', 600: '#e11d48' }
                     },
                     animation: {
-                        'slide-up': 'slideUp 0.5s ease-out',
-                        'fade-in': 'fadeIn 0.3s ease-out',
                         'scale-in': 'scaleIn 0.2s ease-out',
                     },
                     keyframes: {
-                        slideUp: {
-                            '0%': { transform: 'translateY(100px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
                         scaleIn: {
                             '0%': { transform: 'scale(0.9)', opacity: '0' },
                             '100%': { transform: 'scale(1)', opacity: '1' },
@@ -54,421 +32,258 @@
                 }
             }
         }
-        
-        // Initialize Supabase - Wait for library to load
-        let supabase;
-        
-        // Check if Supabase loaded, if not wait for window load
-        if (typeof window.supabase !== 'undefined') {
-            supabase = window.supabase.createClient(
-                'https://qtjwacufuwkehfkkijsl.supabase.co', 
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
-            );
-        } else {
-            console.log('Waiting for Supabase to load...');
-        }
     </script>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen font-sans antialiased">
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen font-sans antialiased text-white">
 
     <nav class="relative z-50 backdrop-blur-xl bg-white/10 border-b border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-4">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-accent-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/25">
-                            HB
-                        </div>
-                        <div class="ml-3">
-                            <h1 class="text-xl font-bold text-white">Homer Bites Admin</h1>
-                            <p class="text-xs text-gray-300">Restaurant management panel</p>
-                        </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-accent-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">HB</div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-white">Homer Bites Admin</h1>
+                        <p class="text-xs text-gray-300">Restaurant management panel</p>
                     </div>
                 </div>
-
                 <div id="adminAuth" class="flex items-center space-x-3">
-                    <button id="loginBtn" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm hover:from-brand-600 hover:to-brand-700 transition-all duration-200 shadow-lg shadow-brand-500/25 hover:scale-105 active:scale-95">
-                        Admin Login
-                    </button>
+                    <button id="loginBtn" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm">Admin Login</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div id="adminContent" class="hidden relative z-10 py-8">
-        
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-8 border border-white/20 shadow-2xl">
+    <main id="adminContent" class="hidden relative z-10 py-8">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-8 border border-white/20 shadow-2xl mb-8">
                 <h2 class="text-3xl font-bold text-white mb-6 text-center">Dashboard Overview</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="backdrop-blur-xl bg-white/10 p-6 rounded-2xl border border-white/20">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                                🍽️
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="font-semibold text-white">Total Restaurants</h3>
-                                <p id="totalRestaurants" class="text-3xl font-bold text-blue-400">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="backdrop-blur-xl bg-white/10 p-6 rounded-2xl border border-white/20">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                                ⏳
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="font-semibold text-white">Pending Submissions</h3>
-                                <p id="pendingSubmissions" class="text-3xl font-bold text-yellow-400">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="backdrop-blur-xl bg-white/10 p-6 rounded-2xl border border-white/20">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                                📈
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="font-semibold text-white">This Month</h3>
-                                <p id="monthlySubmissions" class="text-3xl font-bold text-green-400">0</p>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10"><div class="flex items-center"><div class="ml-4"><h3 class="font-semibold text-white">Total Restaurants</h3><p id="totalRestaurants" class="text-3xl font-bold text-blue-400">0</p></div></div></div>
+                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10"><div class="flex items-center"><div class="ml-4"><h3 class="font-semibold text-white">Pending Submissions</h3><p id="pendingSubmissions" class="text-3xl font-bold text-yellow-400">0</p></div></div></div>
+                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10"><div class="flex items-center"><div class="ml-4"><h3 class="font-semibold text-white">This Month</h3><p id="monthlySubmissions" class="text-3xl font-bold text-green-400">0</p></div></div></div>
                 </div>
             </div>
-        </section>
-
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
-                <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl">
-                    <div class="p-6 border-b border-white/20">
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-2xl font-bold text-white">Pending Submissions</h2>
-                            <div class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
-                                <span class="text-white text-sm font-bold">📋</span>
-                            </div>
-                        </div>
-                        <p class="text-gray-300 text-sm mt-2">Review and approve new restaurant submissions</p>
-                    </div>
-                    <div id="pendingSubmissionsList" class="p-6 max-h-96 overflow-y-auto">
-                        </div>
-                </div>
-
-                <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl">
-                    <div class="p-6 border-b border-white/20">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-2xl font-bold text-white">Restaurant Management</h2>
-                                <p class="text-gray-300 text-sm mt-1">Manage approved restaurants</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="restaurantsList" class="p-6 max-h-96 overflow-y-auto">
-                        </div>
-                </div>
-                
+                <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl"><div class="p-6 border-b border-white/20"><h2 class="text-2xl font-bold text-white">Pending Submissions</h2><p class="text-gray-300 text-sm mt-2">Review and approve new submissions</p></div><div id="pendingSubmissionsList" class="p-6 max-h-96 overflow-y-auto"></div></div>
+                <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl"><div class="p-6 border-b border-white/20"><h2 class="text-2xl font-bold text-white">Restaurant Management</h2><p class="text-gray-300 text-sm mt-1">Manage approved restaurants</p></div><div id="restaurantsList" class="p-6 max-h-96 overflow-y-auto"></div></div>
             </div>
         </section>
-    </div>
+    </main>
 
-    <div id="loginModal" class="fixed inset-0 z-50 hidden">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeLoginModal()"></div>
-        <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="backdrop-blur-2xl bg-slate-800/90 rounded-3xl max-w-md w-full shadow-2xl animate-scale-in border border-white/20">
-                <div class="relative p-8">
-                    </div>
-            </div>
-        </div>
-    </div>
+    <div id="loginModal" class="fixed inset-0 z-50 hidden"><div class="fixed inset-0 bg-black/50 backdrop-blur-sm"></div><div class="fixed inset-0 flex items-center justify-center p-4"><div class="backdrop-blur-2xl bg-slate-800/90 rounded-3xl max-w-md w-full shadow-2xl animate-scale-in border border-white/20"><div class="relative p-8"><button type="button" onclick="closeLoginModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">&times;</button><h2 class="text-2xl font-bold text-white mb-6">Admin Login</h2><form id="loginForm"><div class="space-y-4"><div><label class="block text-sm font-medium text-gray-300 mb-2">Email</label><input type="email" name="email" required class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl"></div><div><label class="block text-sm font-medium text-gray-300 mb-2">Password</label><input type="password" name="password" required class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl"></div></div><button type="submit" class="w-full mt-8 px-6 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl">Login</button></form></div></div></div></div>
 
-    <div id="reviewModal" class="fixed inset-0 z-50 hidden">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeReviewModal()"></div>
-        <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="backdrop-blur-2xl bg-slate-800/90 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in border border-white/20">
-                </div>
-        </div>
-    </div>
+    <div id="reviewModal" class="fixed inset-0 z-50 hidden"><div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeReviewModal()"></div><div class="fixed inset-0 flex items-center justify-center p-4"><div class="backdrop-blur-2xl bg-slate-800/90 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in border border-white/20"><div class="relative p-8"><button type="button" onclick="closeReviewModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">&times;</button><h2 class="text-2xl font-bold text-white mb-6">Review Submission</h2><div id="reviewContent"></div><div class="flex gap-4 mt-8"><button id="approveBtn" class="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-xl">Approve</button><button id="rejectBtn" class="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold rounded-xl">Reject</button></div></div></div></div></div>
 
-    <div id="editRestaurantModal" class="fixed inset-0 z-50 hidden">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeEditModal()"></div>
-        <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="backdrop-blur-2xl bg-slate-800/90 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in border border-white/20">
-                <form id="editRestaurantForm" class="relative p-8">
-                    <button type="button" onclick="closeEditModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                    
-                    <h2 class="text-2xl font-bold text-white mb-6">Edit Restaurant</h2>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                        <div>
-                            <label for="edit-name" class="block text-sm font-medium text-gray-300">Name</label>
-                            <input type="text" id="edit-name" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div>
-                            <label for="edit-address" class="block text-sm font-medium text-gray-300">Address</label>
-                            <input type="text" id="edit-address" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="edit-description" class="block text-sm font-medium text-gray-300">Description</label>
-                            <textarea id="edit-description" rows="3" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white"></textarea>
-                        </div>
-                        <div>
-                            <label for="edit-phone" class="block text-sm font-medium text-gray-300">Phone</label>
-                            <input type="tel" id="edit-phone" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div>
-                            <label for="edit-hours" class="block text-sm font-medium text-gray-300">Hours</label>
-                            <input type="text" id="edit-hours" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div>
-                            <label for="edit-website" class="block text-sm font-medium text-gray-300">Website URL</label>
-                            <input type="url" id="edit-website" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                         <div>
-                            <label for="edit-menu_url" class="block text-sm font-medium text-gray-300">Menu URL</label>
-                            <input type="url" id="edit-menu_url" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="edit-image_url" class="block text-sm font-medium text-gray-300">Image URL</label>
-                            <input type="url" id="edit-image_url" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div>
-                            <label for="edit-lat" class="block text-sm font-medium text-gray-300">Latitude</label>
-                            <input type="number" step="any" id="edit-lat" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div>
-                            <label for="edit-lng" class="block text-sm font-medium text-gray-300">Longitude</label>
-                            <input type="number" step="any" id="edit-lng" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div>
-                            <label for="edit-rating" class="block text-sm font-medium text-gray-300">Rating (0-5)</label>
-                            <input type="number" step="0.1" min="0" max="5" id="edit-rating" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div>
-                            <label for="edit-price_range" class="block text-sm font-medium text-gray-300">Price Range (e.g., $-$$)</label>
-                            <input type="text" id="edit-price_range" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="edit-tags" class="block text-sm font-medium text-gray-300">Tags (comma-separated)</label>
-                            <input type="text" id="edit-tags" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white">
-                        </div>
-                    </div>
-
-                    <div class="flex gap-4 mt-8">
-                        <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:from-brand-600 hover:to-accent-600 transition-all duration-200 shadow-lg hover:scale-105 active:scale-95">
-                            Save Changes
-                        </button>
-                        <button type="button" onclick="closeEditModal()" class="flex-1 px-6 py-3 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-all duration-200">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <footer class="relative z-10 py-12 mt-16">
-        </footer>
+    <div id="editRestaurantModal" class="fixed inset-0 z-50 hidden"><div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeEditModal()"></div><div class="fixed inset-0 flex items-center justify-center p-4"><div class="backdrop-blur-2xl bg-slate-800/90 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in border border-white/20"><form id="editRestaurantForm" class="relative p-8"><button type="button" onclick="closeEditModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">&times;</button><h2 class="text-2xl font-bold text-white mb-6">Edit Restaurant</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm"><div class="md:col-span-2"><label for="edit-name" class="block font-medium text-gray-300">Name</label><input type="text" id="edit-name" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div class="md:col-span-2"><label for="edit-description" class="block font-medium text-gray-300">Description</label><textarea id="edit-description" rows="3" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></textarea></div><div><label for="edit-address" class="block font-medium text-gray-300">Address</label><input type="text" id="edit-address" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-phone" class="block font-medium text-gray-300">Phone</label><input type="tel" id="edit-phone" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-website" class="block font-medium text-gray-300">Website URL</label><input type="url" id="edit-website" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-hours" class="block font-medium text-gray-300">Hours</label><input type="text" id="edit-hours" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div class="md:col-span-2"><label for="edit-image_url" class="block font-medium text-gray-300">Image URL</label><input type="url" id="edit-image_url" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-menu_url" class="block font-medium text-gray-300">Menu URL</label><input type="url" id="edit-menu_url" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-price_range" class="block font-medium text-gray-300">Price Range</label><input type="text" id="edit-price_range" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-lat" class="block font-medium text-gray-300">Latitude</label><input type="number" step="any" id="edit-lat" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-lng" class="block font-medium text-gray-300">Longitude</label><input type="number" step="any" id="edit-lng" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-rating" class="block font-medium text-gray-300">Rating</label><input type="number" step="0.1" id="edit-rating" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div class="md:col-span-2"><label for="edit-tags" class="block font-medium text-gray-300">Tags (comma-separated)</label><input type="text" id="edit-tags" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div></div><div class="flex gap-4 mt-8"><button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-brand-500 to-accent-500 font-semibold rounded-xl">Save Changes</button><button type="button" onclick="closeEditModal()" class="flex-1 px-6 py-3 bg-white/10 font-semibold rounded-xl">Cancel</button></div></form></div></div></div>
 
     <script>
+        const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         let currentUser = null;
         let currentUserProfile = null;
-        let currentSubmission = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof window.supabase !== 'undefined') {
-                initializeSupabase();
-            } else {
-                setTimeout(() => {
-                    if (typeof window.supabase !== 'undefined') {
-                        initializeSupabase();
-                    } else {
-                        console.error('Supabase failed to load');
-                        alert('Error: Database connection failed. Please refresh the page.');
-                    }
-                }, 1000);
-            }
-        });
+        document.addEventListener('DOMContentLoaded', initializeApp);
 
-        function initializeSupabase() {
-            try {
-                if (!supabase) {
-                    supabase = window.supabase.createClient(
-                        'https://qtjwacufuwkehfkkijsl.supabase.co', 
-                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
-                    );
-                }
-                
-                console.log('Supabase initialized successfully');
-                checkAuthState();
-                setupEventListeners();
-            } catch (error) {
-                console.error('Error initializing Supabase:', error);
-                alert('Error: Failed to connect to database. Please refresh the page.');
-            }
+        async function initializeApp() {
+            setupEventListeners();
+            await checkAuthState();
         }
 
+        function setupEventListeners() {
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) loginBtn.addEventListener('click', showLogin);
+            
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) loginForm.addEventListener('submit', handleLogin);
+
+            const editRestaurantForm = document.getElementById('editRestaurantForm');
+            if (editRestaurantForm) editRestaurantForm.addEventListener('submit', handleUpdateRestaurant);
+        }
+        
         async function checkAuthState() {
             try {
                 const { data: { user } } = await supabase.auth.getUser();
-                
-                if (user) {
-                    const { data: profile } = await supabase.from('user_profiles').select('*').eq('id', user.id).single();
-                    
-                    if (profile && profile.is_admin) {
-                        currentUser = user;
-                        currentUserProfile = profile;
-                        showAdminPanel();
-                        loadDashboardData();
-                    } else {
-                        alert('Access denied. Admin privileges required.');
-                        showLogin();
-                    }
-                } else {
-                    showLogin();
+                if (!user) return showLogin();
+
+                const { data: profile } = await supabase.from('user_profiles').select('*').eq('id', user.id).single();
+                if (!profile || !profile.is_admin) {
+                    alert('Access denied. Admin privileges required.');
+                    return showLogin();
                 }
+
+                currentUser = user;
+                currentUserProfile = profile;
+                showAdminPanel();
+                loadDashboardData();
             } catch (error) {
                 console.error('Auth check failed:', error);
                 showLogin();
             }
         }
 
-        function setupEventListeners() {
-            document.getElementById('loginBtn').addEventListener('click', showLogin);
-            document.getElementById('loginForm').addEventListener('submit', handleLogin);
-            // START: ADDED event listener for the new edit form
-            document.getElementById('editRestaurantForm').addEventListener('submit', handleUpdateRestaurant);
-            // END: ADDED event listener
+        // --- UI VISIBILITY ---
+        const showLogin = () => document.getElementById('loginModal').classList.remove('hidden');
+        const closeLoginModal = () => document.getElementById('loginModal').classList.add('hidden');
+        const closeReviewModal = () => document.getElementById('reviewModal').classList.add('hidden');
+        const closeEditModal = () => document.getElementById('editRestaurantModal').classList.add('hidden');
+
+        function showAdminPanel() {
+            const displayName = currentUserProfile?.full_name || currentUser?.email || 'Admin';
+            document.getElementById('adminAuth').innerHTML = `
+                <span class="text-white text-sm mr-4">Welcome, ${displayName.split(' ')[0]}!</span>
+                <button onclick="handleLogout()" class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl text-sm">Logout</button>
+            `;
+            document.getElementById('adminContent').classList.remove('hidden');
+            closeLoginModal();
+        }
+
+        // --- AUTH HANDLERS ---
+        async function handleLogin(e) {
+            e.preventDefault();
+            const { email, password } = Object.fromEntries(new FormData(e.target));
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) return alert('Login failed: ' + error.message);
+            initializeApp();
+        }
+
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            currentUserProfile = null;
+            document.getElementById('adminContent').classList.add('hidden');
+            document.getElementById('adminAuth').innerHTML = `<button id="loginBtn" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm">Admin Login</button>`;
+            setupEventListeners(); // Re-attach listener to the new login button
+            showLogin();
+        }
+
+        // --- DATA LOADING & RENDERING ---
+        async function loadDashboardData() {
+            const { count: restaurantCount } = await supabase.from('restaurants').select('*', { count: 'exact', head: true }).eq('status', 'approved');
+            document.getElementById('totalRestaurants').textContent = restaurantCount || 0;
+
+            const { data: pendingSubmissions, count: pendingCount } = await supabase.from('restaurant_submissions').select('*', { count: 'exact' }).eq('status', 'pending');
+            document.getElementById('pendingSubmissions').textContent = pendingCount || 0;
+            
+            loadPendingSubmissions(pendingSubmissions);
+            loadRestaurants();
+        }
+
+        function loadPendingSubmissions(submissions) {
+            const container = document.getElementById('pendingSubmissionsList');
+            if (!submissions || submissions.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-center py-8">No pending submissions.</p>`;
+                return;
+            }
+            container.innerHTML = submissions.map(sub => `
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-3 flex justify-between items-center">
+                    <div><h3 class="font-bold text-white">${sub.name}</h3><p class="text-gray-300 text-sm">${new Date(sub.created_at).toLocaleDateString()}</p></div>
+                    <button onclick="reviewSubmission(${sub.id})" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-500 text-white rounded-xl text-sm">Review</button>
+                </div>
+            `).join('');
         }
         
-        // --- START: NEW MODAL FUNCTIONS ---
-        function closeEditModal() {
-            document.getElementById('editRestaurantModal').classList.add('hidden');
+        async function loadRestaurants() {
+            const { data: restaurants } = await supabase.from('restaurants').select('*').eq('status', 'approved').order('name');
+            const container = document.getElementById('restaurantsList');
+            if (!restaurants || restaurants.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-center py-8">No approved restaurants found.</p>`;
+                return;
+            }
+            container.innerHTML = restaurants.map(r => `
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-3 flex justify-between items-center">
+                    <div><h3 class="font-bold text-white">${r.name}</h3><p class="text-gray-300 text-sm">${r.address || 'No address'}</p></div>
+                    <div class="flex space-x-2"><button onclick="editRestaurant(${r.id})" class="px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg text-xs">Edit</button><button onclick="deleteRestaurant(${r.id})" class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs">Delete</button></div>
+                </div>
+            `).join('');
         }
-        
+
+        // --- ACTIONS ---
+        async function reviewSubmission(id) {
+            const { data: sub } = await supabase.from('restaurant_submissions').select('*').eq('id', id).single();
+            document.getElementById('reviewContent').innerHTML = `<div class="space-y-2 text-sm"><p><strong>Name:</strong> ${sub.name}</p><p><strong>Description:</strong> ${sub.description || 'N/A'}</p><p><strong>Address:</strong> ${sub.address || 'N/A'}</p><p><strong>Website:</strong> ${sub.website || 'N/A'}</p>${sub.image_file_name ? `<img src="${sub.image_file_name}" class="mt-4 rounded-lg w-full h-48 object-cover">` : ''}</div>`;
+            document.getElementById('reviewModal').classList.remove('hidden');
+            document.getElementById('approveBtn').onclick = () => approveSubmission(sub);
+            document.getElementById('rejectBtn').onclick = () => rejectSubmission(sub);
+        }
+
+        async function approveSubmission(submission) {
+            await supabase.from('restaurants').insert([{ name: submission.name, description: submission.description, address: submission.address, website: submission.website, image_url: submission.image_file_name, status: 'approved', submitted_by: submission.submitted_by }]);
+            await supabase.from('restaurant_submissions').update({ status: 'approved', reviewed_by: currentUser.id }).eq('id', submission.id);
+            alert('Submission approved!');
+            closeReviewModal();
+            loadDashboardData();
+        }
+
+        async function rejectSubmission(submission) {
+            await supabase.from('restaurant_submissions').update({ status: 'rejected', reviewed_by: currentUser.id }).eq('id', submission.id);
+            alert('Submission rejected.');
+            closeReviewModal();
+            loadDashboardData();
+        }
+
+        async function editRestaurant(id) {
+            const { data: r } = await supabase.from('restaurants').select('*').eq('id', id).single();
+            if (!r) return alert('Error: Restaurant not found.');
+
+            document.getElementById('edit-name').value = r.name || '';
+            document.getElementById('edit-description').value = r.description || '';
+            document.getElementById('edit-address').value = r.address || '';
+            document.getElementById('edit-phone').value = r.phone || '';
+            document.getElementById('edit-website').value = r.website || '';
+            document.getElementById('edit-hours').value = r.hours || '';
+            document.getElementById('edit-image_url').value = r.image_url || '';
+            document.getElementById('edit-menu_url').value = r.menu_url || '';
+            document.getElementById('edit-lat').value = r.lat ?? '';
+            document.getElementById('edit-lng').value = r.lng ?? '';
+            document.getElementById('edit-rating').value = r.rating ?? '';
+            document.getElementById('edit-price_range').value = r.price_range || '';
+            document.getElementById('edit-tags').value = (r.tags || []).join(', ');
+            document.getElementById('editRestaurantForm').dataset.editingId = r.id;
+            
+            document.getElementById('editRestaurantModal').classList.remove('hidden');
+        }
+
         async function handleUpdateRestaurant(e) {
             e.preventDefault();
             const form = e.target;
-            const restaurantId = form.dataset.editingId;
-            const submitButton = form.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.innerHTML;
-
-            if (!restaurantId) {
-                alert('Error: No restaurant ID found. Cannot save.');
-                return;
-            }
-
-            submitButton.disabled = true;
-            submitButton.innerHTML = 'Saving...';
+            const id = form.dataset.editingId;
+            const tags = form.querySelector('#edit-tags').value.split(',').map(t => t.trim()).filter(Boolean);
             
-            try {
-                const tagsString = document.getElementById('edit-tags').value || '';
+            const updateData = {
+                name: form.querySelector('#edit-name').value,
+                description: form.querySelector('#edit-description').value,
+                address: form.querySelector('#edit-address').value,
+                phone: form.querySelector('#edit-phone').value,
+                website: form.querySelector('#edit-website').value,
+                hours: form.querySelector('#edit-hours').value,
+                image_url: form.querySelector('#edit-image_url').value,
+                menu_url: form.querySelector('#edit-menu_url').value,
+                price_range: form.querySelector('#edit-price_range').value,
+                lat: form.querySelector('#edit-lat').value ? parseFloat(form.querySelector('#edit-lat').value) : null,
+                lng: form.querySelector('#edit-lng').value ? parseFloat(form.querySelector('#edit-lng').value) : null,
+                rating: form.querySelector('#edit-rating').value ? parseFloat(form.querySelector('#edit-rating').value) : null,
+                tags: tags
+            };
 
-                // Build the object with all fields to update
-                const updateData = {
-                    name: document.getElementById('edit-name').value,
-                    description: document.getElementById('edit-description').value,
-                    address: document.getElementById('edit-address').value,
-                    phone: document.getElementById('edit-phone').value,
-                    website: document.getElementById('edit-website').value,
-                    hours: document.getElementById('edit-hours').value,
-                    image_url: document.getElementById('edit-image_url').value,
-                    menu_url: document.getElementById('edit-menu_url').value,
-                    price_range: document.getElementById('edit-price_range').value,
-                    // Handle numbers and nulls correctly
-                    lat: document.getElementById('edit-lat').value ? parseFloat(document.getElementById('edit-lat').value) : null,
-                    lng: document.getElementById('edit-lng').value ? parseFloat(document.getElementById('edit-lng').value) : null,
-                    rating: document.getElementById('edit-rating').value ? parseFloat(document.getElementById('edit-rating').value) : null,
-                    // Convert comma-separated string to a PostgreSQL array of text
-                    tags: tagsString.split(',').map(tag => tag.trim()).filter(Boolean)
-                };
-
-                const { error } = await supabase
-                    .from('restaurants')
-                    .update(updateData)
-                    .eq('id', restaurantId);
-
-                if (error) throw error;
-
-                alert('✅ Restaurant updated successfully!');
-                closeEditModal();
-                loadRestaurants();
-
-            } catch (error) {
-                console.error('Error updating restaurant:', error);
-                alert('❌ Error updating restaurant: ' + error.message);
-            } finally {
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonText;
-            }
+            const { error } = await supabase.from('restaurants').update(updateData).eq('id', id);
+            if (error) return alert('Error updating restaurant: ' + error.message);
+            
+            alert('Restaurant updated successfully!');
+            closeEditModal();
+            loadRestaurants();
         }
-        // --- END: NEW MODAL FUNCTIONS ---
-
-        // --- START: MODIFIED editRestaurant FUNCTION ---
-        async function editRestaurant(restaurantId) {
-            try {
-                // Fetch the full restaurant data from Supabase
-                const { data: restaurant, error } = await supabase
-                    .from('restaurants')
-                    .select('*')
-                    .eq('id', restaurantId)
-                    .single();
-
-                if (error) throw error;
-                if (!restaurant) throw new Error('Restaurant not found.');
-
-                // Populate the form fields in the modal
-                document.getElementById('edit-name').value = restaurant.name || '';
-                document.getElementById('edit-description').value = restaurant.description || '';
-                document.getElementById('edit-address').value = restaurant.address || '';
-                document.getElementById('edit-phone').value = restaurant.phone || '';
-                document.getElementById('edit-website').value = restaurant.website || '';
-                document.getElementById('edit-hours').value = restaurant.hours || '';
-                document.getElementById('edit-image_url').value = restaurant.image_url || '';
-                document.getElementById('edit-menu_url').value = restaurant.menu_url || '';
-                document.getElementById('edit-lat').value = restaurant.lat;
-                document.getElementById('edit-lng').value = restaurant.lng;
-                document.getElementById('edit-rating').value = restaurant.rating;
-                document.getElementById('edit-price_range').value = restaurant.price_range || '';
-                // Convert tags array to a comma-separated string for the input field
-                document.getElementById('edit-tags').value = (restaurant.tags || []).join(', ');
-
-                // Store the ID on the form for the submit handler
-                document.getElementById('editRestaurantForm').dataset.editingId = restaurant.id;
-                
-                // Show the modal
-                document.getElementById('editRestaurantModal').classList.remove('hidden');
-
-            } catch (error) {
-                console.error('Error fetching restaurant for editing:', error);
-                alert('❌ Could not load restaurant data to edit: ' + error.message);
-            }
-        }
-        // --- END: MODIFIED editRestaurant FUNCTION ---
-
-
-        // --- UNCHANGED FUNCTIONS BELOW ---
-
-        function showLogin() { /* ... */ }
-        function closeLoginModal() { /* ... */ }
-        function showAdminPanel() { /* ... */ }
-        async function handleLogin(e) { /* ... */ }
-        async function handleLogout() { /* ... */ }
-        async function loadDashboardData() { /* ... */ }
-        function loadPendingSubmissions(submissions) { /* ... */ }
-        async function loadRestaurants() { /* ... */ }
-        async function reviewSubmission(submissionId) { /* ... */ }
-        function closeReviewModal() { /* ... */ }
-        async function approveSubmission(submission) { /* ... */ }
-        async function rejectSubmission(submission) { /* ... */ }
-        async function deleteRestaurant(restaurantId) { /* ... */ }
         
-        // To save space, I've hidden the unchanged functions. The full code is provided.
-        // Copy the full script block to ensure all functions are present.
+        async function deleteRestaurant(id) {
+            if (!confirm('Are you sure you want to delete this restaurant?')) return;
+            const { error } = await supabase.from('restaurants').delete().eq('id', id);
+            if (error) return alert('Error deleting restaurant: ' + error.message);
+            alert('Restaurant deleted.');
+            loadDashboardData();
+        }
+
     </script>
-    
-    </body>
+</body>
 </html>
