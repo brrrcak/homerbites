@@ -2,7 +2,7 @@
 
 // --- SPECIAL CONFIGURATION FOR YOUR MOM ---
 // <-- 1. Replace this with the email your mom will use to sign up.
-const MOMS_EMAIL = 'moms-email@example.com'; 
+const MOMS_EMAIL = 'freedomliving21@gmail.com'; 
 // <-- 2. Replace this with the special message you want to show her.
 const MOMS_MESSAGE = "Hi Mom! ❤️ Thanks for checking out my website. I love you! - Your Favorite Child";
 // -----------------------------------------
