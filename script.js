@@ -31,9 +31,9 @@ async function initializeApp() {
     initializeMap();
     setupSubmissionForm();
 
-    // Initial render
+    // Initial render: Show all restaurants sorted alphabetically
     currentFilter = 'all';
-    renderCategories();
+    renderAllAlphabetical();
 }
 
 function initializeWithoutSupabase() {
@@ -45,12 +45,13 @@ function initializeWithoutSupabase() {
     initializeMap();
     setupSubmissionForm();
 
+    // Initial render: Show all restaurants sorted alphabetically
     currentFilter = 'all';
-    renderCategories();
+    renderAllAlphabetical();
     console.log('Running in fallback mode without Supabase');
 }
 
-// Fallback static data (your original restaurants)
+// Fallback static data
 function getStaticRestaurants() {
     return [
         {
@@ -90,40 +91,6 @@ function getStaticRestaurants() {
 
 // --- NEW/MODIFIED FUNCTIONS ---
 
-function populateTagCarousel() {
-    const track = document.getElementById('tagCarouselTrack');
-    if (!track) return;
-
-    const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
-    const allTags = [...new Set(restaurants.flatMap(r => r.tags || []))]
-        .filter(tag => !tagsToIgnore.includes(tag))
-        .sort();
-
-    track.innerHTML = ''; // Clear existing
-    
-    // Create buttons for each tag
-    const tagButtonsHTML = allTags.map(tag => {
-        const tagName = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
-        return `<button class="cuisine-filter flex-shrink-0 mx-2" data-tag="${tag}">
-                    <span class="filter-text">${tagName}</span>
-                    <div class="filter-glow"></div>
-                </button>`;
-    }).join('');
-
-    // Duplicate the buttons for the seamless scroll effect
-    track.innerHTML = tagButtonsHTML + tagButtonsHTML;
-
-    // Event listener for clicks on carousel tags
-    track.addEventListener('click', (event) => {
-        const button = event.target.closest('.cuisine-filter');
-        if (button && button.dataset.tag) {
-            const searchInput = document.getElementById('tagSearchInput');
-            searchInput.value = button.dataset.tag;
-            handleSearch();
-        }
-    });
-}
-
 function setupSearch() {
     const findBtn = document.getElementById('findBtn');
     const viewAllBtn = document.getElementById('viewAllBtn');
@@ -146,7 +113,7 @@ function setupSearch() {
         viewAllBtn.addEventListener('click', () => {
             currentFilter = 'all';
             searchInput.value = '';
-            renderCategories();
+            renderAllAlphabetical(); // Changed to the new alphabetical sort function
             updateMapMarkers();
         });
     }
@@ -156,24 +123,88 @@ function setupSearch() {
     }
 }
 
+/**
+ * Renders all restaurants in a single grid, sorted alphabetically by name.
+ */
+function renderAllAlphabetical() {
+    const container = document.getElementById('categoryContainer');
+    if (!container) return;
+
+    // Create a sorted copy of the restaurants array
+    const sortedRestaurants = [...restaurants].sort((a, b) => a.name.localeCompare(b.name));
+
+    container.innerHTML = ''; // Clear previous content
+
+    const section = document.createElement('div');
+    section.className = 'animate-slide-up';
+
+    if (sortedRestaurants.length > 0) {
+        section.innerHTML = `
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-white mb-4">All Restaurants</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-brand-500 to-accent-500 mx-auto rounded-full"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                ${sortedRestaurants.map(restaurant => createRestaurantCard(restaurant)).join('')}
+            </div>
+        `;
+    } else {
+        // Fallback message in case restaurants array is empty
+        section.innerHTML = `
+            <div class="text-center py-16 animate-fade-in">
+                <h2 class="text-3xl font-bold text-white mb-4">No Restaurants Found</h2>
+                <p class="text-xl text-gray-300">There are currently no restaurants to display.</p>
+            </div>
+        `;
+    }
+    container.appendChild(section);
+}
+
+function populateTagCarousel() {
+    const track = document.getElementById('tagCarouselTrack');
+    if (!track) return;
+
+    const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
+    const allTags = [...new Set(restaurants.flatMap(r => r.tags || []))]
+        .filter(tag => !tagsToIgnore.includes(tag))
+        .sort();
+
+    track.innerHTML = ''; // Clear existing
+    
+    const tagButtonsHTML = allTags.map(tag => {
+        const tagName = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
+        return `<button class="cuisine-filter flex-shrink-0 mx-2" data-tag="${tag}">
+                    <span class="filter-text">${tagName}</span>
+                    <div class="filter-glow"></div>
+                </button>`;
+    }).join('');
+
+    track.innerHTML = tagButtonsHTML + tagButtonsHTML;
+
+    track.addEventListener('click', (event) => {
+        const button = event.target.closest('.cuisine-filter');
+        if (button && button.dataset.tag) {
+            const searchInput = document.getElementById('tagSearchInput');
+            searchInput.value = button.dataset.tag;
+            handleSearch();
+        }
+    });
+}
+
 function handleSearch() {
     const searchInput = document.getElementById('tagSearchInput');
     const query = searchInput.value.trim().toLowerCase();
 
     if (!query) {
-        // If search is empty, just show all
-        currentFilter = 'all';
-        renderCategories();
+        renderAllAlphabetical();
         updateMapMarkers();
         return;
     }
 
-    // Handle multiple tags separated by commas
     const searchTerms = query.split(',').map(term => term.trim()).filter(Boolean);
     
     const filteredRestaurants = restaurants.filter(restaurant => {
         const restaurantTags = (restaurant.tags || []).map(t => t.toLowerCase());
-        // Return true if at least one of the restaurant's tags is in our search terms
         return searchTerms.some(term => restaurantTags.includes(term));
     });
     
@@ -217,7 +248,6 @@ function updateMapMarkers(restaurantsToShow) {
     mapMarkers.forEach(marker => map.removeLayer(marker));
     mapMarkers = [];
     
-    // If no specific list is provided, use the global filter
     if (!restaurantsToShow) {
         restaurantsToShow = !currentFilter || currentFilter === 'all'
             ? restaurants
@@ -257,9 +287,8 @@ function updateMapMarkers(restaurantsToShow) {
 }
 
 
-// --- EXISTING UNMODIFIED/UTILITY FUNCTIONS ---
+// --- AUTHENTICATION & DATA FUNCTIONS ---
 
-// Authentication functions
 async function checkAuthState() {
     if (typeof supabase === 'undefined') return;
     
@@ -361,7 +390,6 @@ async function handleLogout() {
     }
 }
 
-// Database functions
 async function loadRestaurantsFromSupabase() {
     if (typeof supabase === 'undefined') {
         console.log('Supabase not available, using static data');
@@ -457,6 +485,8 @@ async function submitRestaurant(formData) {
     }
 }
 
+// --- UI & UTILITY FUNCTIONS ---
+
 function setupSubmissionForm() {
     const form = document.getElementById('submissionForm');
     
@@ -525,7 +555,6 @@ function setupViewToggle() {
     const mapBtn = document.getElementById('mapViewBtn');
     const gridContent = document.getElementById('gridContent');
     const mapContent = document.getElementById('mapContent');
-    const randomizerSection = document.getElementById('randomizerSection');
     
     if (!gridBtn || !mapBtn) return;
     
@@ -537,7 +566,6 @@ function setupViewToggle() {
         
         if (gridContent) gridContent.classList.remove('hidden');
         if (mapContent) mapContent.classList.add('hidden');
-        if (randomizerSection) randomizerSection.classList.remove('hidden');
     });
     
     mapBtn.addEventListener('click', function() {
@@ -548,7 +576,6 @@ function setupViewToggle() {
         
         if (mapContent) mapContent.classList.remove('hidden');
         if (gridContent) gridContent.classList.add('hidden');
-        if (randomizerSection) randomizerSection.classList.add('hidden');
         
         setTimeout(() => {
             if (map) {
@@ -558,73 +585,6 @@ function setupViewToggle() {
             }
         }, 100);
     });
-}
-
-function groupByTag(restaurantList) {
-    const grouped = {};
-    const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
-
-    restaurantList.forEach(restaurant => {
-        if (restaurant.tags) {
-            restaurant.tags.forEach(tag => {
-                if (!tagsToIgnore.includes(tag)) {
-                    if (!grouped[tag]) {
-                        grouped[tag] = [];
-                    }
-                    grouped[tag].push(restaurant);
-                }
-            });
-        }
-    });
-    return grouped;
-}
-
-function renderCategories() {
-    const container = document.getElementById('categoryContainer');
-    if (!container) return;
-    
-    container.innerHTML = '';
-
-    if (!currentFilter) return;
-
-    if (currentFilter === 'all') {
-        const groupedRestaurants = groupByTag(restaurants);
-        const sortedTags = Object.keys(groupedRestaurants).sort();
-        if (sortedTags.length === 0) {
-             container.innerHTML = `<div class="text-center py-16 animate-fade-in"><h2 class="text-3xl font-bold text-white mb-4">No categories to display.</h2></div>`;
-             return;
-        }
-        sortedTags.forEach(tag => {
-            const restaurantList = groupedRestaurants[tag];
-            const categorySection = createCategorySection(tag, restaurantList);
-            container.appendChild(categorySection);
-        });
-    } else {
-        const filteredRestaurants = restaurants.filter(r => r.tags && r.tags.includes(currentFilter));
-        if (filteredRestaurants.length > 0) {
-            const categorySection = createCategorySection(currentFilter, filteredRestaurants);
-            container.appendChild(categorySection);
-        } else {
-            container.innerHTML = `<div class="text-center py-16 animate-fade-in"><h2 class="text-3xl font-bold text-white mb-4">No Results Found</h2><p class="text-xl text-gray-300">We couldn't find any restaurants with the tag "#${currentFilter}".</p></div>`;
-        }
-    }
-}
-
-function createCategorySection(tag, restaurantList) {
-    const section = document.createElement('div');
-    section.className = 'animate-slide-up';
-    const categoryName = formatCategoryName(tag);
-    
-    section.innerHTML = `
-        <div class="text-center mb-12">
-            <h2 class="text-4xl font-bold text-white mb-4">${categoryName}</h2>
-            <div class="w-24 h-1 bg-gradient-to-r from-brand-500 to-accent-500 mx-auto rounded-full"></div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            ${restaurantList.map(restaurant => createRestaurantCard(restaurant)).join('')}
-        </div>
-    `;
-    return section;
 }
 
 function createRestaurantCard(restaurant) {
