@@ -116,7 +116,7 @@ function updateAuthUI() {
     const firstName = displayName.split(' ')[0]; // Get first name
     if (currentUser) {
         authContainer.innerHTML = `
-            <span class="text-white text-sm">Welcome, ${currentUser. ${firstName}!}</span>
+            <span class="text-white text-sm">Welcome, ${currentUser. $firstName}</span>
             <button id="logoutBtn" class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
                 Logout
             </button>
