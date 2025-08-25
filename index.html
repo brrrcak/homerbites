@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     
-    <!-- Supabase from CDN (non-module approach) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
@@ -86,10 +85,8 @@
                     </div>
                 </div>
 
-                <!-- Keep only auth buttons in top right -->
                 <div id="authContainer" class="flex items-center space-x-3">
-                    <!-- Auth buttons will be populated by JavaScript -->
-                </div>
+                    </div>
             </div>
         </div>
     </nav>
@@ -101,7 +98,6 @@
                     <h2 class="text-2xl font-bold text-white mb-2">Explore by #Tag</h2>
                     <p class="text-gray-300 mb-6">Discover amazing restaurants by food type</p>
                     
-                    <!-- View Controls integrated here -->
                     <div class="flex flex-wrap justify-center items-center gap-3 mb-8 pb-6 border-b border-white/20">
                         <button id="gridViewBtn" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm hover:from-brand-600 hover:to-brand-700 transition-all duration-200 shadow-lg shadow-brand-500/25 hover:scale-105 active:scale-95">
                             🔲 Grid View
@@ -115,8 +111,16 @@
                     </div>
                 </div>
                 
-                <div class="flex flex-wrap justify-center items-center gap-3" id="filterButtons">
-                    </div>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+                    <input type="text" id="tagSearchInput" placeholder="e.g.: burgers, pizza, seafood, etc.." class="w-full sm:w-1/2 px-4 py-3 bg-white/5 border border-white/20 rounded-xl shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all">
+                    <button id="findBtn" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-semibold rounded-xl hover:from-accent-600 hover:to-accent-700 transition-all duration-200 shadow-lg shadow-accent-500/25">Find</button>
+                    <button id="viewAllBtn" class="w-full sm:w-auto px-6 py-3 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-all duration-200 backdrop-blur-sm">View All</button>
+                </div>
+
+                <div id="tagCarousel" class="relative h-12 flex items-center overflow-hidden mask-gradient">
+                    <div class="flex animate-scroll" id="tagCarouselTrack">
+                        </div>
+                </div>
             </div>
         </div>
     </section>
@@ -372,6 +376,19 @@
         .random-btn:active .front {
           transform: translateY(0%);
           box-shadow: 0 0;
+        }
+
+        /* Carousel styles */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-scroll {
+            animation: scroll 40s linear infinite;
+        }
+        .mask-gradient {
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
         }
     </style>
 </body>
