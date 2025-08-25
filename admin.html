@@ -7,7 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- Load Supabase first -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -54,11 +56,18 @@
             }
         }
         
-        // Initialize Supabase with your actual credentials
-        const supabase = window.supabase.createClient(
-            'https://qtjwacufuwkehfkkijsl.supabase.co', 
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
-        );
+        // Initialize Supabase - Wait for library to load
+        let supabase;
+        
+        // Check if Supabase loaded, if not wait for window load
+        if (typeof window.supabase !== 'undefined') {
+            supabase = window.supabase.createClient(
+                'https://qtjwacufuwkehfkkijsl.supabase.co', 
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
+            );
+        } else {
+            console.log('Waiting for Supabase to load...');
+        }
     </script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen font-sans antialiased">
@@ -282,9 +291,40 @@
         let currentSubmission = null;
 
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuthState();
-            setupEventListeners();
+            // Wait for Supabase to be available
+            if (typeof window.supabase !== 'undefined') {
+                initializeSupabase();
+            } else {
+                // Wait a bit more for Supabase to load
+                setTimeout(() => {
+                    if (typeof window.supabase !== 'undefined') {
+                        initializeSupabase();
+                    } else {
+                        console.error('Supabase failed to load');
+                        alert('Error: Database connection failed. Please refresh the page.');
+                    }
+                }, 1000);
+            }
         });
+
+        function initializeSupabase() {
+            try {
+                // Initialize Supabase client
+                if (!supabase) {
+                    supabase = window.supabase.createClient(
+                        'https://qtjwacufuwkehfkkijsl.supabase.co', 
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
+                    );
+                }
+                
+                console.log('Supabase initialized successfully');
+                checkAuthState();
+                setupEventListeners();
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                alert('Error: Failed to connect to database. Please refresh the page.');
+            }
+        }
 
         async function checkAuthState() {
             try {
