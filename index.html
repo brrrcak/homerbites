@@ -4,9 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homer Bites - Discover Local Food in Homer, Alaska</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="script.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <script type="module">
+    // This needs to be a module to use imports
+    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2'
+    
+    // Make Supabase available globally
+    window.supabase = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+</script>
     
     <script>
         tailwind.config = {
