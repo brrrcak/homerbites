@@ -148,6 +148,12 @@ function renderAllAlphabetical() {
 
     container.innerHTML = '';
 
+    // Show view toggle buttons when results are displayed
+    const viewToggleSection = document.getElementById('viewToggleSection');
+    if (viewToggleSection) {
+        viewToggleSection.classList.remove('hidden');
+    }
+
     const section = document.createElement('div');
     section.className = 'animate-slide-up';
 
@@ -173,28 +179,32 @@ function renderAllAlphabetical() {
 }
 
 function populateTagCarousel() {
-    const track = document.getElementById('tagCarouselTrack');
-    if (!track) return;
+    // This function is now renamed and repurposed for static tags
+    populateStaticTags();
+}
+
+function populateStaticTags() {
+    const container = document.getElementById('staticTagsContainer');
+    if (!container) return;
 
     const tagsToIgnore = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'diner', 'bistro', 'grill', 'brewery', 'regional', 'international'];
     const allTags = [...new Set(restaurants.flatMap(r => r.tags || []))]
         .filter(tag => !tagsToIgnore.includes(tag))
         .sort();
 
-    track.innerHTML = '';
+    container.innerHTML = '';
     
     const tagButtonsHTML = allTags.map(tag => {
         const tagName = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/_/g, ' ');
-        return `<button class="cuisine-filter flex-shrink-0 mx-2" data-tag="${tag}">
-                    <span class="filter-text">${tagName}</span>
-                    <div class="filter-glow"></div>
+        return `<button class="static-tag-button" data-tag="${tag}">
+                    ${tagName}
                 </button>`;
     }).join('');
 
-    track.innerHTML = tagButtonsHTML + tagButtonsHTML;
+    container.innerHTML = tagButtonsHTML;
 
-    track.addEventListener('click', (event) => {
-        const button = event.target.closest('.cuisine-filter');
+    container.addEventListener('click', (event) => {
+        const button = event.target.closest('.static-tag-button');
         if (button && button.dataset.tag) {
             const searchInput = document.getElementById('tagSearchInput');
             searchInput.value = button.dataset.tag;
@@ -230,6 +240,12 @@ function renderSearchResults(results, query) {
     
     container.innerHTML = '';
 
+    // Show view toggle buttons when results are displayed
+    const viewToggleSection = document.getElementById('viewToggleSection');
+    if (viewToggleSection) {
+        viewToggleSection.classList.remove('hidden');
+    }
+
     const section = document.createElement('div');
     section.className = 'animate-slide-up';
 
@@ -252,6 +268,24 @@ function renderSearchResults(results, query) {
         `;
     }
     container.appendChild(section);
+}
+
+function showInitialMessage() {
+    const container = document.getElementById('categoryContainer');
+    if (!container) return;
+
+    // Hide view toggle buttons on initial load
+    const viewToggleSection = document.getElementById('viewToggleSection');
+    if (viewToggleSection) {
+        viewToggleSection.classList.add('hidden');
+    }
+
+    container.innerHTML = `
+        <div class="text-center py-16 animate-fade-in">
+            <h2 class="text-3xl font-bold text-white mb-4">Welcome to Homer Bites!</h2>
+            <p class="text-xl text-gray-300">Use the search bar above to find a restaurant, or click "View All" to browse the list.</p>
+        </div>
+    `;
 }
 
 function updateMapMarkers(restaurantsToShow) {
