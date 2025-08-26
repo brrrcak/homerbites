@@ -1,12 +1,12 @@
-// Simplified script.js - All modal functions have been moved to modals.js
+console.log("Homer Bites Script Version 1.4 Loaded");
 
 // Global variables
 let map;
 let currentFilter = null;
 let mapMarkers = [];
-let restaurants = []; // This will now be loaded from Supabase
+let restaurants = [];
 let currentUser = null;
-let userFavorites = new Set(); // To store IDs of favorited restaurants
+let userFavorites = new Set();
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
@@ -20,48 +20,36 @@ async function initializeApp() {
         initializeWithoutSupabase();
         return;
     }
-    
-    await checkAuthState(); // Sets currentUser
-    if(currentUser) {
-        await loadUserFavorites(); // Loads favorites if user is logged in
+    await checkAuthState();
+    if (currentUser) {
+        await loadUserFavorites();
     }
     await loadRestaurantsFromSupabase();
-    
     populateTagCarousel();
     setupSearch();
     setupRandomButton();
     setupViewToggle();
     initializeMap();
     setupSubmissionForm();
-
     showInitialMessage();
 }
-
-// --- CORE FUNCTIONS (MODIFIED) ---
 
 function showInitialMessage() {
     const container = document.getElementById('categoryContainer');
     if (!container) return;
-
-    // Hide view toggle buttons on initial load
     const viewToggleSection = document.getElementById('viewToggleSection');
     if (viewToggleSection) {
         viewToggleSection.classList.add('hidden');
     }
-    
-    // Clear the main container so no message is shown
     container.innerHTML = '';
 }
-
-
-// --- AUTHENTICATION & DATA FUNCTIONS (MODIFIED) ---
 
 async function checkAuthState() {
     if (typeof supabase === 'undefined') return;
     try {
         const { data: { user } } = await supabase.auth.getUser();
         currentUser = user;
-        updateAuthUI(); // Update UI based on auth state
+        updateAuthUI();
     } catch (error) {
         console.error('Auth check failed:', error);
     }
@@ -73,26 +61,22 @@ async function loadUserFavorites() {
         .from('user_favorites')
         .select('restaurant_id')
         .eq('user_id', currentUser.id);
-
     if (error) {
         console.error("Error loading favorites:", error);
         return;
     }
-    // Create a Set for quick lookups
     userFavorites = new Set(data.map(fav => fav.restaurant_id));
 }
 
 function updateAuthUI() {
     let authContainer = document.getElementById('authContainer');
-    if (!authContainer) return; 
-
+    if (!authContainer) return;
     if (currentUser) {
         authContainer.innerHTML = `
-            <a href="profile.html" class="glow-button glow-button-purple text-xs">Profile</a>
+            <a href="/profile.html" class="glow-button glow-button-purple text-xs">Profile</a>
             <button id="logoutBtn" class="glow-button glow-button-red text-xs">Logout</button>
             <div class="h-6 w-px bg-white/20"></div>
-            <button id="submitRestaurantBtn" class="glow-button glow-button-red text-xs">Submit Restaurant</button>
-        `;
+            <button id="submitRestaurantBtn" class="glow-button glow-button-red text-xs">Submit Restaurant</button>`;
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         document.getElementById('submitRestaurantBtn').addEventListener('click', openSubmissionModal);
     } else {
@@ -100,8 +84,7 @@ function updateAuthUI() {
             <button id="loginBtn" class="glow-button glow-button-green text-xs">Login</button>
             <button id="signupBtn" class="glow-button glow-button-blue text-xs">Sign Up</button>
             <div class="h-6 w-px bg-white/20"></div>
-            <button id="submitRestaurantBtn" class="glow-button glow-button-red text-xs">Submit Restaurant</button>
-        `;
+            <button id="submitRestaurantBtn" class="glow-button glow-button-red text-xs">Submit Restaurant</button>`;
         document.getElementById('loginBtn').addEventListener('click', () => showAuthModal('login'));
         document.getElementById('signupBtn').addEventListener('click', () => showAuthModal('signup'));
         document.getElementById('submitRestaurantBtn').addEventListener('click', openSubmissionModal);
@@ -113,45 +96,32 @@ async function handleLogout() {
     const { error } = await supabase.auth.signOut();
     if (!error) {
         currentUser = null;
-        userFavorites.clear(); // Clear favorites on logout
+        userFavorites.clear();
         updateAuthUI();
     }
 }
 
-// --- FAVORITING LOGIC ---
-
 async function toggleFavorite(event, restaurantId) {
-    event.stopPropagation(); // Prevents the card's onclick from firing
-
+    event.stopPropagation();
     if (!currentUser) {
         showCustomAlert('Please log in to save your favorites!');
         showAuthModal('login');
         return;
     }
-
     const isFavorited = userFavorites.has(restaurantId);
     const heartIcon = document.querySelector(`.fav-btn[data-id="${restaurantId}"] svg`);
-
     if (isFavorited) {
-        // --- Remove from favorites ---
         const { error } = await supabase.from('user_favorites').delete().match({ user_id: currentUser.id, restaurant_id: restaurantId });
-        if (error) {
-            console.error('Error removing favorite:', error);
-        } else {
+        if (!error) {
             userFavorites.delete(restaurantId);
-            // Update heart icon to outlined
             heartIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>`;
             heartIcon.classList.remove('text-red-500', 'fill-current');
             heartIcon.classList.add('text-gray-500');
         }
     } else {
-        // --- Add to favorites ---
         const { error } = await supabase.from('user_favorites').insert({ user_id: currentUser.id, restaurant_id: restaurantId });
-        if (error) {
-            console.error('Error adding favorite:', error);
-        } else {
+        if (!error) {
             userFavorites.add(restaurantId);
-            // Update heart icon to filled
             heartIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>`;
             heartIcon.classList.remove('text-gray-500');
             heartIcon.classList.add('text-red-500', 'fill-current');
@@ -159,14 +129,9 @@ async function toggleFavorite(event, restaurantId) {
     }
 }
 
-
-// --- UI & CARD FUNCTIONS (MODIFIED) ---
-
 function createRestaurantCard(restaurant) {
     const imageUrl = restaurant.imageURL || 'https://placehold.co/400x200/1e293b/ffffff?text=Image+Not+Found';
     const isFavorited = userFavorites.has(restaurant.id);
-    
-    // Heart SVG changes based on favorite status
     const heartIconSVG = isFavorited
         ? `<svg class="w-6 h-6 text-red-500 fill-current" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>`
         : `<svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>`;
@@ -189,21 +154,18 @@ function createRestaurantCard(restaurant) {
                     <p class="text-gray-600 mb-4 leading-relaxed line-clamp-3">${restaurant.description}</p>
                 </div>
                 <div class="mt-auto pt-4 border-t border-gray-200 flex justify-between items-center gap-2">
-                    <button onclick="openRestaurantModal(${restaurant.id})" class="flex-grow px-4 py-2 bg-brand-500 text-white font-semibold rounded-lg hover:bg-brand-600 transition-colors text-center text-sm">
+                    <button type="button" onclick="event.stopPropagation(); openRestaurantModal(${restaurant.id})" class="flex-grow px-4 py-2 bg-brand-500 text-white font-semibold rounded-lg hover:bg-brand-600 transition-colors text-center text-sm">
                         View Details
                     </button>
-                    <button class="fav-btn p-2 rounded-lg hover:bg-gray-200" data-id="${restaurant.id}" onclick="toggleFavorite(event, ${restaurant.id})">
+                    <button type="button" class="fav-btn p-2 rounded-lg hover:bg-gray-200" data-id="${restaurant.id}" onclick="toggleFavorite(event, ${restaurant.id})">
                         ${heartIconSVG}
                     </button>
                 </div>
             </div>
-        </div>
-    `;
+        </div>`;
 }
 
-// --- ALL OTHER FUNCTIONS ---
-// (The rest of your script.js file follows, unchanged)
-
+// --- ALL OTHER UNCHANGED FUNCTIONS ---
 function initializeWithoutSupabase() {populateTagCarousel();setupSearch();setupRandomButton();setupViewToggle();updateAuthUI();initializeMap();setupSubmissionForm();showInitialMessage();console.log('Running in fallback mode without Supabase');}
 function getStaticRestaurants() {return [{id:1,name:"Cosmic Kitchen",description:"A cozy Homer favorite serving hearty breakfasts, smash burgers, and Mexican-inspired plates with plenty of vegetarian options—all in a laid-back, rustic setting.",address:"510 E Pioneer Ave, Homer, AK 99603",phone:"(907) 235-1301",website:"https://www.cosmickitchenhomer.com/",hours:"Tuesday - Saturday: 11:00AM - 7:00PM",imageURL:"https://scontent-sea1-1.xx.fbcdn.net/v/t39.30808-6/481341661_122129057186592631_7628068687369387549_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=5icgLVwy9UMQ7kNvwFVUR7n&_nc_oc=AdlpuMF-gtAUBXSK4ZhHcZ2df-S--7j_ZJoMQhF64TU6DPSH1H2Sme1eAmANG6YxUY4&_nc_zt=23&_nc_ht=scontent-sea1-1.xx&_nc_gid=OC6MpAtgGyG_Ln-OU_O6zg&oh=00_AfUk8g1iC0r0tpqXDGn_BTQY4thLnN6tGxhCyjYM5Yv_EA&oe=68B08DA0",lat:59.647521,lng:-151.533005,menu:"https://order.toasttab.com/online/cosmickitchenhomer",tags:["restaurant","burgers","mexican","breakfast","vegetarian"],rating:4,priceRange:"$-$$"},{id:2,name:"Fat Olive's Restaurant",description:"Italian cuisine featuring pizza and American dishes",address:"",phone:"(907) 235-8488",website:"https://www.fatoliveshomer.com/",hours:"Mo-Su 11:00-20:30",imageURL:"",lat:null,lng:null,menu:"",tags:["restaurant","italian","pizza","american"],rating:null,priceRange:""},];}
 function setupSearch(){const findBtn=document.getElementById('findBtn');const viewAllBtn=document.getElementById('viewAllBtn');const searchInput=document.getElementById('tagSearchInput');const submitBtn=document.getElementById('submitRestaurantBtn');if(findBtn){findBtn.addEventListener('click',handleSearch);}
