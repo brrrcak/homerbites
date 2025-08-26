@@ -16,11 +16,19 @@
                         'brand': { 500: '#3b82f6', 600: '#2563eb' },
                         'accent': { 500: '#f43f5e', 600: '#e11d48' }
                     },
-                    animation: { 'scale-in': 'scaleIn 0.2s ease-out' },
+                    animation: { 
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'glow-shine': 'glowShine 0.5s 0s linear'
+                    },
                     keyframes: {
                         scaleIn: {
                             '0%': { transform: 'scale(0.9)', opacity: '0' },
                             '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        glowShine: {
+                            'from': { opacity: '0', left: '0%' },
+                            '50%': { opacity: '1' },
+                            'to': { opacity: '0', left: '100%' }
                         }
                     }
                 }
@@ -45,7 +53,7 @@
                         </div>
                     </div>
                     <div id="adminAuth" class="flex items-center space-x-3">
-                        <button id="loginBtn" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm">Admin Login</button>
+                        <button id="loginBtn" class="glow-button glow-button-blue">Admin Login</button>
                     </div>
                 </div>
             </div>
@@ -74,17 +82,132 @@
         </section>
     </main>
 
-    <div id="loginModal" class="fixed inset-0 z-50 hidden"><div class="fixed inset-0 bg-black/50"></div><div class="fixed inset-0 flex items-center justify-center p-4"><div class="liquidGlass-wrapper rounded-3xl shadow-2xl animate-scale-in max-w-md w-full"><div class="liquidGlass-effect rounded-3xl"></div><div class="liquidGlass-tint rounded-3xl !bg-slate-800/50"></div><div class="liquidGlass-shine rounded-3xl"></div><div class="liquidGlass-text relative p-8"><button type="button" onclick="closeLoginModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">&times;</button><h2 class="text-2xl font-bold text-white mb-6">Admin Login</h2><form id="loginForm"><div class="space-y-4"><div><label class="block text-sm font-medium text-gray-300 mb-2">Email</label><input type="email" name="email" required class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl"></div><div><label class="block text-sm font-medium text-gray-300 mb-2">Password</label><input type="password" name="password" required class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl"></div></div><button type="submit" class="w-full mt-8 px-6 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl">Login</button></form></div></div></div></div>
+    <div id="loginModal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black/50"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="liquidGlass-wrapper rounded-3xl shadow-2xl animate-scale-in max-w-md w-full">
+                <div class="liquidGlass-effect rounded-3xl"></div>
+                <div class="liquidGlass-tint rounded-3xl !bg-slate-800/50"></div>
+                <div class="liquidGlass-shine rounded-3xl"></div>
+                <div class="liquidGlass-text relative p-8">
+                    <button type="button" onclick="closeLoginModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">&times;</button>
+                    <h2 class="text-2xl font-bold text-white mb-6">Admin Login</h2>
+                    <form id="loginForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                                <input type="email" name="email" required class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                                <input type="password" name="password" required class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl">
+                            </div>
+                        </div>
+                        <button type="submit" class="glow-button glow-button-blue w-full mt-8">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div id="reviewModal" class="fixed inset-0 z-50 hidden"><div class="fixed inset-0 bg-black/50"></div><div class="fixed inset-0 flex items-center justify-center p-4"><div class="liquidGlass-wrapper rounded-3xl shadow-2xl animate-scale-in max-w-2xl w-full"><div class="liquidGlass-effect rounded-3xl"></div><div class="liquidGlass-tint rounded-3xl !bg-slate-800/50"></div><div class="liquidGlass-shine rounded-3xl"></div><div class="liquidGlass-text relative p-8 max-h-[90vh] overflow-y-auto"><button type="button" onclick="closeReviewModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">&times;</button><h2 class="text-2xl font-bold text-white mb-6">Review Submission</h2><div id="reviewContent"></div><div class="flex gap-4 mt-8"><button id="approveBtn" class="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-xl">Approve</button><button id="rejectBtn" class="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold rounded-xl">Reject</button></div></div></div></div></div>
+    <div id="reviewModal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black/50"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="liquidGlass-wrapper rounded-3xl shadow-2xl animate-scale-in max-w-2xl w-full">
+                <div class="liquidGlass-effect rounded-3xl"></div>
+                <div class="liquidGlass-tint rounded-3xl !bg-slate-800/50"></div>
+                <div class="liquidGlass-shine rounded-3xl"></div>
+                <div class="liquidGlass-text relative p-8 max-h-[90vh] overflow-y-auto">
+                    <button type="button" onclick="closeReviewModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">&times;</button>
+                    <h2 class="text-2xl font-bold text-white mb-6">Review Submission</h2>
+                    <div id="reviewContent"></div>
+                    <div class="flex gap-4 mt-8">
+                        <button id="approveBtn" class="glow-button glow-button-green flex-1">Approve</button>
+                        <button id="rejectBtn" class="glow-button glow-button-red flex-1">Reject</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div id="editRestaurantModal" class="fixed inset-0 z-50 hidden"><div class="fixed inset-0 bg-black/50"></div><div class="fixed inset-0 flex items-center justify-center p-4"><div class="liquidGlass-wrapper rounded-3xl shadow-2xl animate-scale-in max-w-4xl w-full"><div class="liquidGlass-effect rounded-3xl"></div><div class="liquidGlass-tint rounded-3xl !bg-slate-800/50"></div><div class="liquidGlass-shine rounded-3xl"></div><form id="editRestaurantForm" class="liquidGlass-text relative p-8 max-h-[90vh] overflow-y-auto"><button type="button" onclick="closeEditModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">&times;</button><h2 class="text-2xl font-bold text-white mb-6">Edit Restaurant</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm"><div class="md:col-span-2"><label for="edit-name" class="block font-medium text-gray-300">Name</label><input type="text" id="edit-name" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div class="md:col-span-2"><label for="edit-description" class="block font-medium text-gray-300">Description</label><textarea id="edit-description" rows="3" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></textarea></div><div><label for="edit-address" class="block font-medium text-gray-300">Address</label><input type="text" id="edit-address" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-phone" class="block font-medium text-gray-300">Phone</label><input type="tel" id="edit-phone" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-website" class="block font-medium text-gray-300">Website URL</label><input type="url" id="edit-website" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-hours" class="block font-medium text-gray-300">Hours</label><input type="text" id="edit-hours" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div class="md:col-span-2"><label for="edit-image_url" class="block font-medium text-gray-300">Image URL</label><input type="url" id="edit-image_url" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-menu_url" class="block font-medium text-gray-300">Menu URL</label><input type="url" id="edit-menu_url" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-price_range" class="block font-medium text-gray-300">Price Range</label><input type="text" id="edit-price_range" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-lat" class="block font-medium text-gray-300">Latitude</label><input type="number" step="any" id="edit-lat" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-lng" class="block font-medium text-gray-300">Longitude</label><input type="number" step="any" id="edit-lng" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div><label for="edit-rating" class="block font-medium text-gray-300">Rating</label><input type="number" step="0.1" id="edit-rating" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div><div class="md:col-span-2"><label for="edit-tags" class="block font-medium text-gray-300">Tags (comma-separated)</label><input type="text" id="edit-tags" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></div></div><div class="flex gap-4 mt-8"><button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-brand-500 to-accent-500 font-semibold rounded-xl">Save Changes</button><button type="button" onclick="closeEditModal()" class="flex-1 px-6 py-3 bg-white/10 font-semibold rounded-xl">Cancel</button></div></form></div></div></div>
+    <div id="editRestaurantModal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black/50"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="liquidGlass-wrapper rounded-3xl shadow-2xl animate-scale-in max-w-4xl w-full">
+                <div class="liquidGlass-effect rounded-3xl"></div>
+                <div class="liquidGlass-tint rounded-3xl !bg-slate-800/50"></div>
+                <div class="liquidGlass-shine rounded-3xl"></div>
+                <form id="editRestaurantForm" class="liquidGlass-text relative p-8 max-h-[90vh] overflow-y-auto">
+                    <button type="button" onclick="closeEditModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">&times;</button>
+                    <h2 class="text-2xl font-bold text-white mb-6">Edit Restaurant</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                        <div class="md:col-span-2">
+                            <label for="edit-name" class="block font-medium text-gray-300">Name</label>
+                            <input type="text" id="edit-name" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="edit-description" class="block font-medium text-gray-300">Description</label>
+                            <textarea id="edit-description" rows="3" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md"></textarea>
+                        </div>
+                        <div>
+                            <label for="edit-address" class="block font-medium text-gray-300">Address</label>
+                            <input type="text" id="edit-address" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div>
+                            <label for="edit-phone" class="block font-medium text-gray-300">Phone</label>
+                            <input type="tel" id="edit-phone" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div>
+                            <label for="edit-website" class="block font-medium text-gray-300">Website URL</label>
+                            <input type="url" id="edit-website" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div>
+                            <label for="edit-hours" class="block font-medium text-gray-300">Hours</label>
+                            <input type="text" id="edit-hours" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="edit-image_url" class="block font-medium text-gray-300">Image URL</label>
+                            <input type="url" id="edit-image_url" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div>
+                            <label for="edit-menu_url" class="block font-medium text-gray-300">Menu URL</label>
+                            <input type="url" id="edit-menu_url" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div>
+                            <label for="edit-price_range" class="block font-medium text-gray-300">Price Range</label>
+                            <input type="text" id="edit-price_range" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div>
+                            <label for="edit-lat" class="block font-medium text-gray-300">Latitude</label>
+                            <input type="number" step="any" id="edit-lat" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div>
+                            <label for="edit-lng" class="block font-medium text-gray-300">Longitude</label>
+                            <input type="number" step="any" id="edit-lng" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div>
+                            <label for="edit-rating" class="block font-medium text-gray-300">Rating</label>
+                            <input type="number" step="0.1" id="edit-rating" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="edit-tags" class="block font-medium text-gray-300">Tags (comma-separated)</label>
+                            <input type="text" id="edit-tags" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md">
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mt-8">
+                        <button type="submit" class="glow-button glow-button-blue flex-1">Save Changes</button>
+                        <button type="button" onclick="closeEditModal()" class="glow-button glow-button-gray flex-1">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <svg style="display: none"><filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox"><feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="5" result="turbulence" /><feDisplacementMap in="SourceGraphic" in2="turbulence" scale="50" xChannelSelector="R" yChannelSelector="G" /></filter></svg>
 
     <script>
         const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MVY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null, currentUserProfile = null;
 
@@ -132,17 +255,17 @@
 
         function showAdminPanel() {
             const displayName = currentUserProfile?.full_name || currentUser?.email || 'Admin';
-            document.getElementById('adminAuth').innerHTML = `<span class="text-white text-sm mr-4">Welcome, ${displayName.split(' ')[0]}!</span><button onclick="handleLogout()" class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl text-sm">Logout</button>`;
+            document.getElementById('adminAuth').innerHTML = `<span class="text-white text-sm mr-4">Welcome, ${displayName.split(' ')[0]}!</span><button onclick="handleLogout()" class="glow-button glow-button-red">Logout</button>`;
             document.getElementById('adminContent').classList.remove('hidden');
             closeLoginModal();
         }
 
         async function handleLogin(e) { e.preventDefault(); const { email, password } = Object.fromEntries(new FormData(e.target)); const { error } = await supabase.auth.signInWithPassword({ email, password }); if (error) return alert('Login failed: ' + error.message); initializeApp(); }
-        async function handleLogout() { await supabase.auth.signOut(); currentUser = null; currentUserProfile = null; document.getElementById('adminContent').classList.add('hidden'); document.getElementById('adminAuth').innerHTML = `<button id="loginBtn" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-medium text-sm">Admin Login</button>`; setupEventListeners(); showLogin(); }
+        async function handleLogout() { await supabase.auth.signOut(); currentUser = null; currentUserProfile = null; document.getElementById('adminContent').classList.add('hidden'); document.getElementById('adminAuth').innerHTML = `<button id="loginBtn" class="glow-button glow-button-blue">Admin Login</button>`; setupEventListeners(); showLogin(); }
         
         async function loadDashboardData() { const { count: restaurantCount } = await supabase.from('restaurants').select('*', { count: 'exact', head: true }).eq('status', 'approved'); document.getElementById('totalRestaurants').textContent = restaurantCount || 0; const { data: pendingSubmissions, count: pendingCount } = await supabase.from('restaurant_submissions').select('*', { count: 'exact' }).eq('status', 'pending'); document.getElementById('pendingSubmissions').textContent = pendingCount || 0; loadPendingSubmissions(pendingSubmissions); loadRestaurants(); }
-        function loadPendingSubmissions(submissions) { const container = document.getElementById('pendingSubmissionsList'); if (!submissions || submissions.length === 0) { container.innerHTML = `<p class="text-gray-400 text-center py-8">No pending submissions.</p>`; return; } container.innerHTML = submissions.map(sub => `<div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-3 flex justify-between items-center"><div><h3 class="font-bold text-white">${sub.name}</h3><p class="text-gray-300 text-sm">${new Date(sub.created_at).toLocaleDateString()}</p></div><button onclick="reviewSubmission(${sub.id})" class="px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-500 text-white rounded-xl text-sm">Review</button></div>`).join(''); }
-        async function loadRestaurants() { const { data: restaurants } = await supabase.from('restaurants').select('*').eq('status', 'approved').order('name'); const container = document.getElementById('restaurantsList'); if (!restaurants || restaurants.length === 0) { container.innerHTML = `<p class="text-gray-400 text-center py-8">No approved restaurants found.</p>`; return; } container.innerHTML = restaurants.map(r => `<div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-3 flex justify-between items-center"><div><h3 class="font-bold text-white">${r.name}</h3><p class="text-gray-300 text-sm">${r.address || 'No address'}</p></div><div class="flex space-x-2"><button onclick="editRestaurant(${r.id})" class="px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg text-xs">Edit</button><button onclick="deleteRestaurant(${r.id})" class="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg text-xs">Delete</button></div></div>`).join(''); }
+        function loadPendingSubmissions(submissions) { const container = document.getElementById('pendingSubmissionsList'); if (!submissions || submissions.length === 0) { container.innerHTML = `<p class="text-gray-400 text-center py-8">No pending submissions.</p>`; return; } container.innerHTML = submissions.map(sub => `<div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-3 flex justify-between items-center"><div><h3 class="font-bold text-white">${sub.name}</h3><p class="text-gray-300 text-sm">${new Date(sub.created_at).toLocaleDateString()}</p></div><button onclick="reviewSubmission(${sub.id})" class="glow-button glow-button-blue text-xs">Review</button></div>`).join(''); }
+        async function loadRestaurants() { const { data: restaurants } = await supabase.from('restaurants').select('*').eq('status', 'approved').order('name'); const container = document.getElementById('restaurantsList'); if (!restaurants || restaurants.length === 0) { container.innerHTML = `<p class="text-gray-400 text-center py-8">No approved restaurants found.</p>`; return; } container.innerHTML = restaurants.map(r => `<div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-3 flex justify-between items-center"><div><h3 class="font-bold text-white">${r.name}</h3><p class="text-gray-300 text-sm">${r.address || 'No address'}</p></div><div class="flex space-x-2"><button onclick="editRestaurant(${r.id})" class="glow-button glow-button-purple text-xs">Edit</button><button onclick="deleteRestaurant(${r.id})" class="glow-button glow-button-red text-xs">Delete</button></div></div>`).join(''); }
         async function reviewSubmission(id) { const { data: sub } = await supabase.from('restaurant_submissions').select('*').eq('id', id).single(); document.getElementById('reviewContent').innerHTML = `<div class="space-y-2 text-sm"><p><strong>Name:</strong> ${sub.name}</p><p><strong>Description:</strong> ${sub.description || 'N/A'}</p><p><strong>Address:</strong> ${sub.address || 'N/A'}</p><p><strong>Website:</strong> ${sub.website || 'N/A'}</p>${sub.image_file_name ? `<img src="${sub.image_file_name}" class="mt-4 rounded-lg w-full h-48 object-cover">` : ''}</div>`; document.getElementById('reviewModal').classList.remove('hidden'); document.getElementById('approveBtn').onclick = () => approveSubmission(sub); document.getElementById('rejectBtn').onclick = () => rejectSubmission(sub); }
         async function approveSubmission(submission) { await supabase.from('restaurants').insert([{ name: submission.name, description: submission.description, address: submission.address, website: submission.website, image_url: submission.image_file_name, status: 'approved', submitted_by: submission.submitted_by }]); await supabase.from('restaurant_submissions').update({ status: 'approved', reviewed_by: currentUser.id }).eq('id', submission.id); alert('Submission approved!'); closeReviewModal(); loadDashboardData(); }
         async function rejectSubmission(submission) { await supabase.from('restaurant_submissions').update({ status: 'rejected', reviewed_by: currentUser.id }).eq('id', submission.id); alert('Submission rejected.'); closeReviewModal(); loadDashboardData(); }
@@ -191,6 +314,118 @@
         .liquidGlass-text { z-index: 3; color: inherit; width: 100%; }
         .liquidGlass-wrapper > div { border-radius: inherit; }
         ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); } ::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.6); border-radius: 4px; }
+        
+        /* Glow Button Styles */
+        .glow-button {
+            position: relative;
+            padding: 10px 20px;
+            border-radius: 7px;
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: transparent;
+            color: #fff;
+            overflow: hidden;
+            box-shadow: 0 0 0 0 transparent;
+            transition: all 0.2s ease-in;
+            border: 1px solid;
+            cursor: pointer;
+        }
+
+        /* Blue buttons */
+        .glow-button-blue {
+            border-color: rgb(59, 130, 246);
+        }
+        .glow-button-blue:hover {
+            background: rgb(59, 130, 246);
+            box-shadow: 0 0 30px 5px rgba(59, 130, 246, 0.815);
+            transition: all 0.2s ease-out;
+        }
+
+        /* Red buttons */
+        .glow-button-red {
+            border-color: rgb(244, 63, 94);
+        }
+        .glow-button-red:hover {
+            background: rgb(244, 63, 94);
+            box-shadow: 0 0 30px 5px rgba(244, 63, 94, 0.815);
+            transition: all 0.2s ease-out;
+        }
+
+        /* Green buttons */
+        .glow-button-green {
+            border-color: rgb(34, 197, 94);
+        }
+        .glow-button-green:hover {
+            background: rgb(34, 197, 94);
+            box-shadow: 0 0 30px 5px rgba(34, 197, 94, 0.815);
+            transition: all 0.2s ease-out;
+        }
+
+        /* Gray buttons */
+        .glow-button-gray {
+            border-color: rgb(156, 163, 175);
+        }
+        .glow-button-gray:hover {
+            background: rgb(156, 163, 175);
+            box-shadow: 0 0 30px 5px rgba(156, 163, 175, 0.815);
+            transition: all 0.2s ease-out;
+        }
+
+        /* Purple buttons */
+        .glow-button-purple {
+            border-color: rgb(147, 51, 234);
+        }
+        .glow-button-purple:hover {
+            background: rgb(147, 51, 234);
+            box-shadow: 0 0 30px 5px rgba(147, 51, 234, 0.815);
+            transition: all 0.2s ease-out;
+        }
+
+        .glow-button:hover::before {
+            animation: glowShine 0.5s 0s linear;
+        }
+
+        .glow-button::before {
+            content: '';
+            display: block;
+            width: 0px;
+            height: 86%;
+            position: absolute;
+            top: 7%;
+            left: 0%;
+            opacity: 0;
+            background: #fff;
+            box-shadow: 0 0 50px 30px #fff;
+            transform: skewX(-20deg);
+        }
+
+        @keyframes glowShine {
+            from {
+                opacity: 0;
+                left: 0%;
+            }
+            50% {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                left: 100%;
+            }
+        }
+
+        .glow-button:active {
+            box-shadow: 0 0 0 0 transparent;
+            transition: box-shadow 0.2s ease-in;
+        }
+
+        /* Smaller button styles for admin panel */
+        .glow-button.text-xs {
+            padding: 6px 12px;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
     </style>
 </body>
 </html>
