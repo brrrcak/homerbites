@@ -1,11 +1,6 @@
 // Simplified script.js - Remove ALL import statements and use global supabase
 
-// --- SPECIAL CONFIGURATION FOR YOUR MOM ---
-// <-- 1. Replace this with the email your mom will use to sign up.
-const MOMS_EMAIL = 'freedomliving21@gmail.com'; 
-// <-- 2. Replace this with the special message you want to show her.
-const MOMS_MESSAGE = "Hi Mom! ❤️ Thanks for checking out my website. I love you! - Your Favorite Child";
-// -----------------------------------------
+
 
 // Global variables
 let map;
@@ -412,12 +407,6 @@ async function handleLogin(email, password) {
         currentUser = data.user;
         updateAuthUI();
         closeAuthModal();
-
-        // Check for the special user (your mom!)
-        if (currentUser.email.toLowerCase() === MOMS_EMAIL.toLowerCase()) {
-            // Use a short delay to make sure the login modal is gone
-            setTimeout(showSpecialMessage, 500);
-        }
     }
 }
 
@@ -888,38 +877,10 @@ function closeAuthModal() {
     if (modal) modal.remove();
 }
 
-// Special message modal for your mom
-function showSpecialMessage() {
-    // First, ensure no other modals are open
-    closeSpecialMessageModal();
-
-    const modalHTML = `
-        <div id="specialMessageModal" class="fixed inset-0 z-[60]">
-            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeSpecialMessageModal()"></div>
-            <div class="fixed inset-0 flex items-center justify-center p-4">
-                <div class="backdrop-blur-2xl bg-gradient-to-br from-purple-900 to-slate-800 rounded-3xl max-w-md w-full shadow-2xl animate-scale-in border border-white/20 text-white p-8 text-center">
-                    <p class="text-xl leading-relaxed font-medium">${MOMS_MESSAGE}</p>
-                    <button onclick="closeSpecialMessageModal()" class="glow-button glow-button-red mt-8">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-}
-
-function closeSpecialMessageModal() {
-    const modal = document.getElementById('specialMessageModal');
-    if (modal) modal.remove();
-}
-
 // Event Listeners
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-        if (document.getElementById('specialMessageModal')) {
-            closeSpecialMessageModal();
-        } else if (!document.getElementById('submissionModal')?.classList.contains('hidden')) {
+        if (!document.getElementById('submissionModal')?.classList.contains('hidden')) {
             closeSubmissionModal();
         } else if (document.getElementById('authModal')) {
             closeAuthModal();
