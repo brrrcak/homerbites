@@ -1,26 +1,38 @@
 // Supabase initialization
 const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI_T5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        // If no user is logged in, redirect to the homepage
+// This function will run once the user's session is confirmed
+function initializePage(session) {
+    // If no session, redirect to the homepage
+    if (!session) {
         window.location.href = 'index.html';
         return;
     }
 
-    currentUser = user;
+    // Make the page visible
+    document.body.classList.remove('opacity-0');
+
+    currentUser = session.user;
     loadUserProfile();
     loadUserFavorites();
 
     const profileForm = document.getElementById('profileForm');
     profileForm.addEventListener('submit', handleProfileUpdate);
+}
+
+// Listen for authentication state changes
+supabase.auth.onAuthStateChange((event, session) => {
+    // The 'INITIAL_SESSION' event fires once when the client first loads.
+    // This is the ideal time to check for a user and initialize the page.
+    if (event === 'INITIAL_SESSION') {
+        initializePage(session);
+    }
 });
+
 
 async function loadUserProfile() {
     document.getElementById('email').value = currentUser.email;
