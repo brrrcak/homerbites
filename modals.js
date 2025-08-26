@@ -1,5 +1,6 @@
-// A shared library for creating styled, site-wide pop-up modals.
+console.log("modals.js v1.4 Loaded");
 
+// A shared library for creating styled, site-wide pop-up modals.
 function showCustomAlert(message, type = 'info') {
     // Remove any existing alert first
     const existingAlert = document.getElementById('custom-alert-overlay');
