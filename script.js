@@ -40,6 +40,23 @@ async function initializeApp() {
     showInitialMessage();
 }
 
+// --- CORE FUNCTIONS (MODIFIED) ---
+
+function showInitialMessage() {
+    const container = document.getElementById('categoryContainer');
+    if (!container) return;
+
+    // Hide view toggle buttons on initial load
+    const viewToggleSection = document.getElementById('viewToggleSection');
+    if (viewToggleSection) {
+        viewToggleSection.classList.add('hidden');
+    }
+    
+    // Clear the main container so no message is shown
+    container.innerHTML = '';
+}
+
+
 // --- AUTHENTICATION & DATA FUNCTIONS (MODIFIED) ---
 
 async function checkAuthState() {
@@ -187,18 +204,10 @@ function createRestaurantCard(restaurant) {
     `;
 }
 
-// All other functions (search, modals, map, etc.) remain the same as before.
-// I've omitted them here for brevity but they should remain in your script.
-// Make sure to replace the old createRestaurantCard and auth functions with these new ones.
-// Full script below for clarity
+// All other functions (search, modals, map, etc.) remain the same as the previous version.
+// I have included them below so you can replace the entire file.
 function initializeWithoutSupabase() {populateTagCarousel();setupSearch();setupRandomButton();setupViewToggle();updateAuthUI();initializeMap();setupSubmissionForm();showInitialMessage();console.log('Running in fallback mode without Supabase');}
 function getStaticRestaurants() {return [{id:1,name:"Cosmic Kitchen",description:"A cozy Homer favorite serving hearty breakfasts, smash burgers, and Mexican-inspired plates with plenty of vegetarian options—all in a laid-back, rustic setting.",address:"510 E Pioneer Ave, Homer, AK 99603",phone:"(907) 235-1301",website:"https://www.cosmickitchenhomer.com/",hours:"Tuesday - Saturday: 11:00AM - 7:00PM",imageURL:"https://scontent-sea1-1.xx.fbcdn.net/v/t39.30808-6/481341661_122129057186592631_7628068687369387549_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=5icgLVwy9UMQ7kNvwFVUR7n&_nc_oc=AdlpuMF-gtAUBXSK4ZhHcZ2df-S--7j_ZJoMQhF64TU6DPSH1H2Sme1eAmANG6YxUY4&_nc_zt=23&_nc_ht=scontent-sea1-1.xx&_nc_gid=OC6MpAtgGyG_Ln-OU_O6zg&oh=00_AfUk8g1iC0r0tpqXDGn_BTQY4thLnN6tGxhCyjYM5Yv_EA&oe=68B08DA0",lat:59.647521,lng:-151.533005,menu:"https://order.toasttab.com/online/cosmickitchenhomer",tags:["restaurant","burgers","mexican","breakfast","vegetarian"],rating:4,priceRange:"$-$$"},{id:2,name:"Fat Olive's Restaurant",description:"Italian cuisine featuring pizza and American dishes",address:"",phone:"(907) 235-8488",website:"https://www.fatoliveshomer.com/",hours:"Mo-Su 11:00-20:30",imageURL:"",lat:null,lng:null,menu:"",tags:["restaurant","italian","pizza","american"],rating:null,priceRange:""},];}
-function showInitialMessage() {const container=document.getElementById('categoryContainer');if(!container)return;container.innerHTML=`
-        <div class="text-center py-16 animate-fade-in">
-            <h2 class="text-3xl font-bold text-white mb-4">Welcome to Homer Bites!</h2>
-            <p class="text-xl text-gray-300">Use the search bar above to find a restaurant, or click "View All" to browse the list.</p>
-        </div>
-    `;}
 function setupSearch(){const findBtn=document.getElementById('findBtn');const viewAllBtn=document.getElementById('viewAllBtn');const searchInput=document.getElementById('tagSearchInput');const submitBtn=document.getElementById('submitRestaurantBtn');if(findBtn){findBtn.addEventListener('click',handleSearch);}
 if(searchInput){searchInput.addEventListener('keypress',(event)=>{if(event.key==='Enter'){handleSearch();}});}
 if(viewAllBtn){viewAllBtn.addEventListener('click',()=>{currentFilter='all';searchInput.value='';renderAllAlphabetical();updateMapMarkers();});}
