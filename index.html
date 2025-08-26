@@ -92,7 +92,11 @@
                 </div>
 
                 <div id="authContainer" class="flex items-center space-x-3">
-                    </div>
+                    <div class="h-6 w-px bg-white/20"></div>
+                    <button id="submitRestaurantBtn" class="glow-button glow-button-red text-xs">
+                        Submit Restaurant
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -113,35 +117,23 @@
                         </div>
                     </div>
                     
-                    <div id="staticTagsContainer" class="flex flex-wrap justify-center gap-2 mb-6">
+                    <div id="staticTagsContainer" class="flex flex-wrap justify-center gap-2">
                         <!-- Static tag buttons will be populated here -->
-                    </div>
-
-                    <div class="text-center pt-6 border-t border-white/20">
-                        <p class="text-gray-300 mb-4">Can't decide? Press the button for a random suggestion!</p>
-                        <button class="random-btn" id="randomRestaurantBtn">
-                          <span class="back"></span>
-                          <span class="front"></span>
-                        </button>
                     </div>
                 </div>
 
-                <!-- Submit Restaurant Card - 40% width (2/5 columns) -->
+                <!-- Random Restaurant Card - 40% width (2/5 columns) -->
                 <div class="lg:col-span-2 backdrop-blur-xl bg-white/10 rounded-3xl p-6 border border-white/20 shadow-2xl">
                     <div class="text-center h-full flex flex-col justify-center">
                         <div class="mb-6">
-                            <div class="w-16 h-16 bg-gradient-to-r from-accent-500 to-accent-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-xl font-bold text-white mb-3">Missing a Restaurant?</h3>
+                            <h3 class="text-xl font-bold text-white mb-3">Can't Decide?</h3>
                             <p class="text-gray-300 text-sm leading-relaxed mb-6">
-                                Not seeing a restaurant you know is there? Let us know so we can verify and add it to our directory!
+                                Press the button for a random restaurant suggestion!
                             </p>
                         </div>
-                        <button id="submitRestaurantBtn" class="glow-button glow-button-red w-full">
-                            Submit Restaurant
+                        <button class="random-btn mx-auto" id="randomRestaurantBtn">
+                          <span class="back"></span>
+                          <span class="front"></span>
                         </button>
                     </div>
                 </div>
