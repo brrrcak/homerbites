@@ -207,7 +207,7 @@
 
     <script>
         const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MVY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null, currentUserProfile = null;
 
@@ -255,7 +255,7 @@
 
         function showAdminPanel() {
             const displayName = currentUserProfile?.full_name || currentUser?.email || 'Admin';
-document.getElementById('adminAuth').innerHTML = `<span class="text-white text-sm mr-4">Welcome, ${displayName.split(' ')[0]}!</span><button onclick="handleLogout()" class="glow-button glow-button-red text-xs">Logout</button>`;
+            document.getElementById('adminAuth').innerHTML = `<span class="text-white text-sm mr-4">Welcome, ${displayName.split(' ')[0]}!</span><button onclick="handleLogout()" class="glow-button glow-button-red text-xs">Logout</button>`;
             document.getElementById('adminContent').classList.remove('hidden');
             closeLoginModal();
         }
