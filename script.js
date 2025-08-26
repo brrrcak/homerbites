@@ -10,6 +10,71 @@ let restaurants = []; // This will now be loaded from Supabase
 let currentUser = null;
 let userFavorites = new Set(); // To store IDs of favorited restaurants
 
+// --- CUSTOM MODAL FUNCTIONS ---
+
+function showCustomAlert(message, type = 'info') {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'custom-alert-overlay';
+    overlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in';
+    
+    // Create modal content
+    const modalHTML = `
+        <div class="popup-border-wrap rounded-3xl shadow-2xl animate-scale-in max-w-sm w-full">
+            <div class="backdrop-blur-2xl bg-slate-800/50 rounded-3xl p-8 text-center text-white">
+                <p class="mb-6">${message}</p>
+                <button id="custom-alert-ok" class="glow-button glow-button-blue">OK</button>
+            </div>
+        </div>
+    `;
+    
+    overlay.innerHTML = modalHTML;
+    document.body.appendChild(overlay);
+
+    // Add event listener to OK button
+    document.getElementById('custom-alert-ok').addEventListener('click', () => {
+        overlay.remove();
+    });
+}
+
+function showCustomConfirm(message) {
+    return new Promise(resolve => {
+        const overlay = document.createElement('div');
+        overlay.id = 'custom-confirm-overlay';
+        overlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in';
+        overlay.style.zIndex = '101';
+        
+        const modalHTML = `
+            <div class="popup-border-wrap rounded-3xl shadow-2xl animate-scale-in max-w-sm w-full">
+                <div class="backdrop-blur-2xl bg-slate-800/50 rounded-3xl p-8 text-center text-white">
+                    <p class="mb-6">${message}</p>
+                    <div class="flex gap-4">
+                        <button id="custom-confirm-cancel" class="glow-button glow-button-gray flex-1">Cancel</button>
+                        <button id="custom-confirm-ok" class="glow-button glow-button-red flex-1">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        overlay.innerHTML = modalHTML;
+        document.body.appendChild(overlay);
+
+        const okButton = document.getElementById('custom-confirm-ok');
+        const cancelButton = document.getElementById('custom-confirm-cancel');
+
+        okButton.addEventListener('click', () => {
+            overlay.remove();
+            resolve(true);
+        });
+
+        cancelButton.addEventListener('click', () => {
+            overlay.remove();
+            resolve(false);
+        });
+    });
+}
+
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
@@ -127,7 +192,7 @@ async function toggleFavorite(event, restaurantId) {
     event.stopPropagation(); // Prevents the card's onclick from firing
 
     if (!currentUser) {
-        alert('Please log in to save your favorites!');
+        showCustomAlert('Please log in to save your favorites!');
         showAuthModal('login');
         return;
     }
@@ -273,26 +338,26 @@ restaurantsToShow.forEach(restaurant=>{if(restaurant.lat&&restaurant.lng){const 
                     </div>
                 `);marker.addTo(map);mapMarkers.push(marker);}});}
 function initializeMap(){const mapElement=document.getElementById('map');if(!mapElement)return;try{map=L.map('map',{zoomControl:false}).setView([59.6426,-151.5377],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map);L.control.zoom({position:'topright'}).addTo(map);}catch(error){console.error('Map initialization failed:',error);}}
-async function handleLogin(email,password){if(typeof supabase==='undefined'){alert('Database connection not available');return;}
-const{data,error}=await supabase.auth.signInWithPassword({email:email,password:password,});if(error){alert('Login failed: '+error.message);}else{currentUser=data.user;updateAuthUI();closeAuthModal();await loadUserFavorites();renderAllAlphabetical();}}
-async function handleSignup(email,password,fullName){if(typeof supabase==='undefined'){alert('Database connection not available');return;}
-const{data,error}=await supabase.auth.signUp({email:email,password:password,options:{data:{full_name:fullName,}}});if(error){alert('Signup failed: '+error.message);}else{alert('Please check your email to confirm your account!');closeAuthModal();}}
-async function handlePasswordReset(email){if(typeof supabase==='undefined'){alert('Database connection not available');return;}
-const{data,error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.href,});if(error){alert('Error: '+error.message);}else{alert('Password reset link sent! Please check your email.');closeAuthModal();}}
+async function handleLogin(email,password){if(typeof supabase==='undefined'){await showCustomAlert('Database connection not available.','error');return;}
+const{data,error}=await supabase.auth.signInWithPassword({email:email,password:password,});if(error){await showCustomAlert('Login failed: '+error.message,'error');}else{currentUser=data.user;updateAuthUI();closeAuthModal();await loadUserFavorites();renderAllAlphabetical();}}
+async function handleSignup(email,password,fullName){if(typeof supabase==='undefined'){await showCustomAlert('Database connection not available.','error');return;}
+const{data,error}=await supabase.auth.signUp({email:email,password:password,options:{data:{full_name:fullName,}}});if(error){await showCustomAlert('Signup failed: '+error.message,'error');}else{await showCustomAlert('Please check your email to confirm your account!');closeAuthModal();}}
+async function handlePasswordReset(email){if(typeof supabase==='undefined'){await showCustomAlert('Database connection not available.','error');return;}
+const{data,error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.href,});if(error){await showCustomAlert('Error: '+error.message,'error');}else{await showCustomAlert('Password reset link sent! Please check your email.');closeAuthModal();}}
 async function loadRestaurantsFromSupabase(){if(typeof supabase==='undefined'){console.log('Supabase not available, using static data');restaurants=getStaticRestaurants();return;}
 try{const{data,error}=await supabase.from('restaurants').select('*').eq('status','approved');if(error)throw error;restaurants=data.map(restaurant=>({id:restaurant.id,name:restaurant.name,description:restaurant.description,address:restaurant.address,phone:restaurant.phone,website:restaurant.website,hours:restaurant.hours,imageURL:restaurant.image_url,lat:restaurant.lat,lng:restaurant.lng,menu:restaurant.menu_url,tags:restaurant.tags||[],rating:restaurant.rating,priceRange:restaurant.price_range}));console.log('Loaded',restaurants.length,'restaurants from Supabase');}catch(error){console.error('Error loading restaurants:',error);restaurants=getStaticRestaurants();console.log('Using fallback static data');}}
-async function submitRestaurant(formData){if(typeof supabase==='undefined'){alert('Database connection not available');return false;}
-if(!currentUser){alert('Please log in to submit a restaurant');return false;}
+async function submitRestaurant(formData){if(typeof supabase==='undefined'){await showCustomAlert('Database connection not available.','error');return false;}
+if(!currentUser){await showCustomAlert('Please log in to submit a restaurant.');return false;}
 try{let imageUrl=null;const imageFile=formData.get('restaurantImage');if(imageFile&&imageFile.size>0){const fileName=`${Date.now()}-${imageFile.name}`;const{data:uploadData,error:uploadError}=await supabase.storage.from('restaurant-images').upload(fileName,imageFile);if(uploadError)throw uploadError;const{data:{publicUrl}}=supabase.storage.from('restaurant-images').getPublicUrl(fileName);imageUrl=publicUrl;}
-const{data,error}=await supabase.from('restaurant_submissions').insert([{name:formData.get('restaurantName'),description:formData.get('restaurantDescription')||'',address:formData.get('restaurantAddress')||'',website:formData.get('restaurantWebsite')||'',submitted_by:currentUser.id,image_file_name:imageUrl}]);if(error)throw error;alert('Thank you for your submission! It will be reviewed by our team.');return true;}catch(error){console.error('Error submitting restaurant:',error);alert('Error submitting restaurant: '+error.message);return false;}}
+const{data,error}=await supabase.from('restaurant_submissions').insert([{name:formData.get('restaurantName'),description:formData.get('restaurantDescription')||'',address:formData.get('restaurantAddress')||'',website:formData.get('restaurantWebsite')||'',submitted_by:currentUser.id,image_file_name:imageUrl}]);if(error)throw error;await showCustomAlert('Thank you for your submission! It will be reviewed by our team.','success');return true;}catch(error){console.error('Error submitting restaurant:',error);await showCustomAlert('Error submitting restaurant: '+error.message,'error');return false;}}
 function setupSubmissionForm(){const form=document.getElementById('submissionForm');if(form){const nameField=form.querySelector('input[name="restaurantName"]');if(nameField&&!form.querySelector('textarea[name="restaurantDescription"]')){const descriptionDiv=document.createElement('div');descriptionDiv.innerHTML=`
                 <label for="restaurantDescription" class="block text-sm font-medium text-gray-300">Description</label>
                 <textarea id="restaurantDescription" name="restaurantDescription" rows="3" 
                     class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm"
                     placeholder="Brief description of the restaurant..."></textarea>
             `;nameField.parentElement.after(descriptionDiv);}
-form.addEventListener('submit',async function(e){e.preventDefault();if(typeof supabase==='undefined'){alert('Database connection not available. Please try again later.');return;}
-if(!currentUser){alert('Please log in to submit a restaurant');showAuthModal('login');return;}
+form.addEventListener('submit',async function(e){e.preventDefault();if(typeof supabase==='undefined'){await showCustomAlert('Database connection not available. Please try again later.','error');return;}
+if(!currentUser){await showCustomAlert('Please log in to submit a restaurant');showAuthModal('login');return;}
 const formData=new FormData(form);const submitButton=form.querySelector('button[type="submit"]');const originalButtonText=submitButton.innerHTML;submitButton.disabled=true;submitButton.innerHTML='Submitting...';const success=await submitRestaurant(formData);if(success){form.reset();closeSubmissionModal();}
 submitButton.disabled=false;submitButton.innerHTML=originalButtonText;});}}
 function setupRandomButton(){const randomBtn=document.getElementById('randomRestaurantBtn');if(randomBtn){randomBtn.addEventListener('click',function(){if(restaurants.length>0){const randomIndex=Math.floor(Math.random()*restaurants.length);const randomRestaurant=restaurants[randomIndex];openRestaurantModal(randomRestaurant.id);}});}}
