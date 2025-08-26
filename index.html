@@ -263,6 +263,11 @@
           to   { --angle: 360deg; }
         }
 
+        /* Styles for Custom Alert */
+        #custom-alert-overlay {
+            z-index: 100;
+        }
+        
         /* Glow Button Styles */
         .glow-button {
             position: relative;
@@ -498,6 +503,13 @@
             opacity: 1;
         }
 
+        .fav-btn svg {
+            transition: all 0.2s ease-in-out;
+        }
+        .fav-btn:hover svg {
+            transform: scale(1.2);
+        }
+
         /* From Uiverse.io by catraco */
         .random-btn {
          --primary: 255, 90, 120;
@@ -550,13 +562,6 @@
          transform: translateY(0%);
          box-shadow: 0 0;
         }
-
-        .fav-btn svg {
-        transition: all 0.2s ease-in-out;
-    }
-    .fav-btn:hover svg {
-        transform: scale(1.2);
-    }
     </style>
 </body>
 </html>
