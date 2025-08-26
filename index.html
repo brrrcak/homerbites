@@ -375,52 +375,60 @@
             box-shadow: 0 8px 32px rgba(59, 130, 246, 0.25);
         }
 
+        /* Static tag buttons - smaller size with glow animations */
         .static-tag-button {
-    position: relative;
-    padding: 8px 16px;
-    border-radius: 12px;
-    font-weight: 500;
-    font-size: 12px;
-    transition: all 0.2s ease-in;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    cursor: pointer;
-    overflow: hidden;
-    text-transform: capitalize;
-}
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 12px;
+            transition: all 0.2s ease-in;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            overflow: hidden;
+            text-transform: capitalize;
+        }
 
-.static-tag-button:hover {
-    transform: scale(1.05);
-    background: linear-gradient(to right, #3b82f6, #2563eb);
-    border-color: rgb(59, 130, 246);
-    box-shadow: 0 0 20px 3px rgba(59, 130, 246, 0.6);
-    transition: all 0.2s ease-out;
-}
+        .static-tag-button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            border-color: rgb(59, 130, 246);
+            box-shadow: 0 0 20px 3px rgba(59, 130, 246, 0.6);
+            transition: all 0.2s ease-out;
+        }
 
-.static-tag-button:hover::before {
-    animation: glowShine 0.5s 0s linear;
-}
+        .static-tag-button:hover::before {
+            animation: glowShine 0.5s 0s linear;
+        }
 
-.static-tag-button::before {
-    content: '';
-    display: block;
-    width: 0px;
-    height: 86%;
-    position: absolute;
-    top: 7%;
-    left: 0%;
-    opacity: 0;
-    background: #fff;
-    box-shadow: 0 0 30px 20px #fff;
-    transform: skewX(-20deg);
-}
+        .static-tag-button::before {
+            content: '';
+            display: block;
+            width: 0px;
+            height: 86%;
+            position: absolute;
+            top: 7%;
+            left: 0%;
+            opacity: 0;
+            background: #fff;
+            box-shadow: 0 0 30px 20px #fff;
+            transform: skewX(-20deg);
+        }
 
-.static-tag-button:active {
-    box-shadow: 0 0 0 0 transparent;
-    transition: box-shadow 0.2s ease-in;
-}
+        .static-tag-button:active {
+            box-shadow: 0 0 0 0 transparent;
+            transition: box-shadow 0.2s ease-in;
+        }
+
+        .static-tag-button.selected {
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            border-color: rgb(59, 130, 246);
+            box-shadow: 0 0 20px 3px rgba(59, 130, 246, 0.6);
+            transform: scale(1.05);
+        }
 
         .restaurant-card {
             background: white;
