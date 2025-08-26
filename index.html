@@ -103,39 +103,20 @@
 
     <section class="relative z-10 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                <!-- Main Explore Card - 60% width (3/5 columns) -->
-                <div class="lg:col-span-3 backdrop-blur-xl bg-white/10 rounded-3xl p-6 border border-white/20 shadow-2xl">
-                    <div class="text-center mb-6">
-                        <h2 class="text-2xl font-bold text-white mb-2">Explore by #Tag</h2>
-                        <p class="text-gray-300 mb-6">Discover amazing restaurants by food type</p>
-                        
-                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
-                            <input type="text" id="tagSearchInput" placeholder="e.g.: burgers, pizza, seafood, etc.." class="w-full sm:w-3/4 px-4 py-3 bg-white/5 border border-white/20 rounded-xl shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all">
-                            <button id="findBtn" class="glow-button glow-button-red w-full sm:w-auto">Find</button>
-                            <button id="viewAllBtn" class="glow-button glow-button-gray w-full sm:w-auto">View All</button>
-                        </div>
-                    </div>
+            <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-6 border border-white/20 shadow-2xl">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-white mb-2">Explore by #Tag</h2>
+                    <p class="text-gray-300 mb-6">Discover amazing restaurants by food type</p>
                     
-                    <div id="staticTagsContainer" class="flex flex-wrap justify-center gap-2">
-                        <!-- Static tag buttons will be populated here -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+                        <input type="text" id="tagSearchInput" placeholder="e.g.: burgers, pizza, seafood, etc.." class="w-full sm:w-1/2 px-4 py-3 bg-white/5 border border-white/20 rounded-xl shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all">
+                        <button id="findBtn" class="glow-button glow-button-red w-full sm:w-auto">Find</button>
+                        <button id="viewAllBtn" class="glow-button glow-button-gray w-full sm:w-auto">View All</button>
                     </div>
                 </div>
-
-                <!-- Random Restaurant Card - 40% width (2/5 columns) -->
-                <div class="lg:col-span-2 backdrop-blur-xl bg-white/10 rounded-3xl p-6 border border-white/20 shadow-2xl">
-                    <div class="text-center h-full flex flex-col justify-center">
-                        <div class="mb-6">
-                            <h3 class="text-xl font-bold text-white mb-3">Can't Decide?</h3>
-                            <p class="text-gray-300 text-sm leading-relaxed mb-6">
-                                Press the button for a random restaurant suggestion!
-                            </p>
-                        </div>
-                        <button class="random-btn mx-auto" id="randomRestaurantBtn">
-                          <span class="back"></span>
-                          <span class="front"></span>
-                        </button>
-                    </div>
+                
+                <div id="staticTagsContainer" class="flex flex-wrap justify-center gap-2">
+                    <!-- Static tag buttons will be populated here -->
                 </div>
             </div>
         </div>
@@ -156,6 +137,17 @@
         <div id="gridContent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div id="categoryContainer" class="space-y-16">
                 </div>
+        </div>
+
+        <div id="randomButtonSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+            <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-8 border border-white/20 shadow-2xl text-center">
+                <h3 class="text-xl font-bold text-white mb-3">Still Can't Decide?</h3>
+                <p class="text-gray-300 mb-6">Press this button and we'll choose for you!</p>
+                <button class="random-btn mx-auto" id="randomRestaurantBtn">
+                  <span class="back"></span>
+                  <span class="front"></span>
+                </button>
+            </div>
         </div>
 
         <div id="mapContent" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
