@@ -70,7 +70,7 @@
         // Initialize Supabase - Replace with your actual credentials
         const supabase = window.supabase.createClient(
             'https://qtjwacufuwkehfkkijsl.supabase.co', 
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MVY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
         );
     </script>
 </head>
@@ -104,28 +104,16 @@
                     <h2 class="text-2xl font-bold text-white mb-2">Explore by #Tag</h2>
                     <p class="text-gray-300 mb-6">Discover amazing restaurants by food type</p>
                     
-                    <div class="flex flex-wrap justify-center items-center gap-3 mb-8 pb-6 border-b border-white/20">
-                        <button id="gridViewBtn" class="glow-button glow-button-blue">
-                            Grid View
-                        </button>
-                        <button id="mapViewBtn" class="glow-button glow-button-gray">
-                            Map View
-                        </button>
-                        <button id="submitRestaurantBtn" class="glow-button glow-button-red">
-                            Submit Restaurant
-                        </button>
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+                        <input type="text" id="tagSearchInput" placeholder="e.g.: burgers, pizza, seafood, etc.." class="w-full sm:w-1/2 px-4 py-3 bg-white/5 border border-white/20 rounded-xl shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all">
+                        <button id="findBtn" class="glow-button glow-button-red w-full sm:w-auto">Find</button>
+                        <button id="viewAllBtn" class="glow-button glow-button-gray w-full sm:w-auto">View All</button>
+                        <button id="submitRestaurantBtn" class="glow-button glow-button-red w-full sm:w-auto">Submit Restaurant</button>
                     </div>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
-                    <input type="text" id="tagSearchInput" placeholder="e.g.: burgers, pizza, seafood, etc.." class="w-full sm:w-1/2 px-4 py-3 bg-white/5 border border-white/20 rounded-xl shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all">
-                    <button id="findBtn" class="glow-button glow-button-red w-full sm:w-auto">Find</button>
-                    <button id="viewAllBtn" class="glow-button glow-button-gray w-full sm:w-auto">View All</button>
-                </div>
-
-                <div id="tagCarousel" class="relative h-12 flex items-center overflow-hidden mask-gradient">
-                    <div class="flex animate-scroll" id="tagCarouselTrack">
-                        </div>
+                <div id="staticTagsContainer" class="flex flex-wrap justify-center gap-2 mb-6">
+                    <!-- Static tag buttons will be populated here -->
                 </div>
 
                 <div class="text-center mt-6 pt-6 border-t border-white/20">
@@ -140,6 +128,17 @@
     </section>
 
     <main class="relative z-10 pb-16">
+        <div id="viewToggleSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+            <div class="flex justify-center gap-3">
+                <button id="gridViewBtn" class="glow-button glow-button-blue">
+                    Grid View
+                </button>
+                <button id="mapViewBtn" class="glow-button glow-button-gray">
+                    Map View
+                </button>
+            </div>
+        </div>
+
         <div id="gridContent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div id="categoryContainer" class="space-y-16">
                 </div>
@@ -368,6 +367,30 @@
             background: linear-gradient(to right, #3b82f6, #2563eb);
             border-color: #3b82f6;
             box-shadow: 0 8px 32px rgba(59, 130, 246, 0.25);
+        }
+
+        /* Static tag buttons - smaller size */
+        .static-tag-button {
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 12px;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            overflow: hidden;
+            text-transform: capitalize;
+        }
+
+        .static-tag-button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            border-color: #3b82f6;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
         }
 
         .filter-glow {
