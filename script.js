@@ -143,14 +143,10 @@ function renderAllAlphabetical() {
 
     container.innerHTML = '';
 
-    // Show view toggle buttons and random button section when results are displayed
+    // Show view toggle buttons when results are displayed
     const viewToggleSection = document.getElementById('viewToggleSection');
-    const randomButtonSection = document.getElementById('randomButtonSection');
     if (viewToggleSection) {
         viewToggleSection.classList.remove('hidden');
-    }
-    if (randomButtonSection) {
-        randomButtonSection.classList.remove('hidden');
     }
 
     const section = document.createElement('div');
@@ -252,14 +248,10 @@ function renderSearchResults(results, query) {
     
     container.innerHTML = '';
 
-    // Show view toggle buttons and random button section when results are displayed
+    // Show view toggle buttons when results are displayed
     const viewToggleSection = document.getElementById('viewToggleSection');
-    const randomButtonSection = document.getElementById('randomButtonSection');
     if (viewToggleSection) {
         viewToggleSection.classList.remove('hidden');
-    }
-    if (randomButtonSection) {
-        randomButtonSection.classList.remove('hidden');
     }
 
     const section = document.createElement('div');
@@ -290,14 +282,10 @@ function showInitialMessage() {
     const container = document.getElementById('categoryContainer');
     if (!container) return;
 
-    // Hide view toggle buttons and random button section on initial load
+    // Hide view toggle buttons on initial load
     const viewToggleSection = document.getElementById('viewToggleSection');
-    const randomButtonSection = document.getElementById('randomButtonSection');
     if (viewToggleSection) {
         viewToggleSection.classList.add('hidden');
-    }
-    if (randomButtonSection) {
-        randomButtonSection.classList.add('hidden');
     }
 
     container.innerHTML = '';
