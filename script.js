@@ -366,22 +366,32 @@ function updateAuthUI() {
         const firstName = displayName.split(' ')[0];
         authContainer.innerHTML = `
             <span class="text-white text-sm">Welcome, ${firstName}</span>
-            <button id="logoutBtn" class="glow-button glow-button-red">
+            <button id="logoutBtn" class="glow-button glow-button-red text-xs">
                 Logout
+            </button>
+            <div class="h-6 w-px bg-white/20"></div>
+            <button id="submitRestaurantBtn" class="glow-button glow-button-red text-xs">
+                Submit Restaurant
             </button>
         `;
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        document.getElementById('submitRestaurantBtn').addEventListener('click', openSubmissionModal);
     } else {
         authContainer.innerHTML = `
-            <button id="loginBtn" class="glow-button glow-button-green">
+            <button id="loginBtn" class="glow-button glow-button-green text-xs">
                 Login
             </button>
-            <button id="signupBtn" class="glow-button glow-button-blue">
+            <button id="signupBtn" class="glow-button glow-button-blue text-xs">
                 Sign Up
+            </button>
+            <div class="h-6 w-px bg-white/20"></div>
+            <button id="submitRestaurantBtn" class="glow-button glow-button-red text-xs">
+                Submit Restaurant
             </button>
         `;
         document.getElementById('loginBtn').addEventListener('click', () => showAuthModal('login'));
         document.getElementById('signupBtn').addEventListener('click', () => showAuthModal('signup'));
+        document.getElementById('submitRestaurantBtn').addEventListener('click', openSubmissionModal);
     }
 }
 
