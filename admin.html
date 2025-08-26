@@ -255,7 +255,7 @@
 
         function showAdminPanel() {
             const displayName = currentUserProfile?.full_name || currentUser?.email || 'Admin';
-            document.getElementById('adminAuth').innerHTML = `<span class="text-white text-sm mr-4">Welcome, ${displayName.split(' ')[0]}!</span><button onclick="handleLogout()" class="glow-button glow-button-red">Logout</button>`;
+document.getElementById('adminAuth').innerHTML = `<span class="text-white text-sm mr-4">Welcome, ${displayName.split(' ')[0]}!</span><button onclick="handleLogout()" class="glow-button glow-button-red text-xs">Logout</button>`;
             document.getElementById('adminContent').classList.remove('hidden');
             closeLoginModal();
         }
