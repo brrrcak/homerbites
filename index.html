@@ -72,7 +72,7 @@
             }
         }
         
-        // Initialize Supabase - Replace with your actual credentials
+        // Initialize Supabase
         const supabase = window.supabase.createClient(
             'https://qtjwacufuwkehfkkijsl.supabase.co', 
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
@@ -97,11 +97,7 @@
                 </div>
 
                 <div id="authContainer" class="flex items-center space-x-3">
-                    <div class="h-6 w-px bg-white/20"></div>
-                    <button id="submitRestaurantBtn" class="glow-button glow-button-red text-xs">
-                        Submit Restaurant
-                    </button>
-                </div>
+                    </div>
             </div>
         </div>
     </nav>
@@ -110,7 +106,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-6 border border-white/20 shadow-2xl">
                 <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-white mb-4">Welcome to Homer Bites!</h2>
+                    <h2 class="text-2xl font-bold text-white mb-4">Find Your Next Meal</h2>
                     <div class="text-gray-300 text-sm mb-6 space-y-1">
                         <p>Feeling picky? <strong class="text-white">Use the search!</strong></p>
                         <p>Feeling indecisive? <strong class="text-white">Use the tags!</strong></p>
@@ -226,7 +222,8 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="script.js"></script>
+    <script src="modals.js?v=1.2"></script>
+    <script src="script.js?v=1.2"></script>
 
     <style>
         /* Fallback styles and custom components */
