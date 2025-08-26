@@ -1,6 +1,4 @@
-// Simplified script.js - Remove ALL import statements and use global supabase
-
-
+// Simplified script.js - All modal functions have been moved to modals.js
 
 // Global variables
 let map;
@@ -9,71 +7,6 @@ let mapMarkers = [];
 let restaurants = []; // This will now be loaded from Supabase
 let currentUser = null;
 let userFavorites = new Set(); // To store IDs of favorited restaurants
-
-// --- CUSTOM MODAL FUNCTIONS ---
-
-function showCustomAlert(message, type = 'info') {
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.id = 'custom-alert-overlay';
-    overlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in';
-    
-    // Create modal content
-    const modalHTML = `
-        <div class="popup-border-wrap rounded-3xl shadow-2xl animate-scale-in max-w-sm w-full">
-            <div class="backdrop-blur-2xl bg-slate-800/50 rounded-3xl p-8 text-center text-white">
-                <p class="mb-6">${message}</p>
-                <button id="custom-alert-ok" class="glow-button glow-button-blue">OK</button>
-            </div>
-        </div>
-    `;
-    
-    overlay.innerHTML = modalHTML;
-    document.body.appendChild(overlay);
-
-    // Add event listener to OK button
-    document.getElementById('custom-alert-ok').addEventListener('click', () => {
-        overlay.remove();
-    });
-}
-
-function showCustomConfirm(message) {
-    return new Promise(resolve => {
-        const overlay = document.createElement('div');
-        overlay.id = 'custom-confirm-overlay';
-        overlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in';
-        overlay.style.zIndex = '101';
-        
-        const modalHTML = `
-            <div class="popup-border-wrap rounded-3xl shadow-2xl animate-scale-in max-w-sm w-full">
-                <div class="backdrop-blur-2xl bg-slate-800/50 rounded-3xl p-8 text-center text-white">
-                    <p class="mb-6">${message}</p>
-                    <div class="flex gap-4">
-                        <button id="custom-confirm-cancel" class="glow-button glow-button-gray flex-1">Cancel</button>
-                        <button id="custom-confirm-ok" class="glow-button glow-button-red flex-1">Confirm</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        overlay.innerHTML = modalHTML;
-        document.body.appendChild(overlay);
-
-        const okButton = document.getElementById('custom-confirm-ok');
-        const cancelButton = document.getElementById('custom-confirm-cancel');
-
-        okButton.addEventListener('click', () => {
-            overlay.remove();
-            resolve(true);
-        });
-
-        cancelButton.addEventListener('click', () => {
-            overlay.remove();
-            resolve(false);
-        });
-    });
-}
-
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
@@ -269,6 +202,7 @@ function createRestaurantCard(restaurant) {
 }
 
 // --- ALL OTHER FUNCTIONS ---
+// (The rest of your script.js file follows, unchanged)
 
 function initializeWithoutSupabase() {populateTagCarousel();setupSearch();setupRandomButton();setupViewToggle();updateAuthUI();initializeMap();setupSubmissionForm();showInitialMessage();console.log('Running in fallback mode without Supabase');}
 function getStaticRestaurants() {return [{id:1,name:"Cosmic Kitchen",description:"A cozy Homer favorite serving hearty breakfasts, smash burgers, and Mexican-inspired plates with plenty of vegetarian options—all in a laid-back, rustic setting.",address:"510 E Pioneer Ave, Homer, AK 99603",phone:"(907) 235-1301",website:"https://www.cosmickitchenhomer.com/",hours:"Tuesday - Saturday: 11:00AM - 7:00PM",imageURL:"https://scontent-sea1-1.xx.fbcdn.net/v/t39.30808-6/481341661_122129057186592631_7628068687369387549_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=5icgLVwy9UMQ7kNvwFVUR7n&_nc_oc=AdlpuMF-gtAUBXSK4ZhHcZ2df-S--7j_ZJoMQhF64TU6DPSH1H2Sme1eAmANG6YxUY4&_nc_zt=23&_nc_ht=scontent-sea1-1.xx&_nc_gid=OC6MpAtgGyG_Ln-OU_O6zg&oh=00_AfUk8g1iC0r0tpqXDGn_BTQY4thLnN6tGxhCyjYM5Yv_EA&oe=68B08DA0",lat:59.647521,lng:-151.533005,menu:"https://order.toasttab.com/online/cosmickitchenhomer",tags:["restaurant","burgers","mexican","breakfast","vegetarian"],rating:4,priceRange:"$-$$"},{id:2,name:"Fat Olive's Restaurant",description:"Italian cuisine featuring pizza and American dishes",address:"",phone:"(907) 235-8488",website:"https://www.fatoliveshomer.com/",hours:"Mo-Su 11:00-20:30",imageURL:"",lat:null,lng:null,menu:"",tags:["restaurant","italian","pizza","american"],rating:null,priceRange:""},];}
