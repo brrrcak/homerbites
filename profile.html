@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile - Homer Bites</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'sans': ['Inter', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        'brand': { 500: '#3b82f6', 600: '#2563eb' },
+                        'accent': { 500: '#f43f5e', 600: '#e11d48' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen font-sans antialiased text-white">
+
+    <nav class="relative z-50 backdrop-blur-xl bg-white/10 border-b border-white/10 sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-accent-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">HB</div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-white">Homer Bites</h1>
+                        <p class="text-xs text-gray-300">Discover local food in Homer, Alaska</p>
+                    </div>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <a href="index.html" class="glow-button glow-button-gray text-xs">Back to Restaurants</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-8 border border-white/20 shadow-2xl space-y-12">
+                
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-6">Profile Settings</h2>
+                    <form id="profileForm" class="space-y-4">
+                        <div>
+                            <label for="fullName" class="block text-sm font-medium text-gray-300">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md shadow-sm text-white">
+                        </div>
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-300">Username</label>
+                            <input type="text" id="username" name="username" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md shadow-sm text-white">
+                        </div>
+                         <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
+                            <input type="email" id="email" name="email" disabled class="mt-1 block w-full px-3 py-2 bg-black/20 border border-white/10 rounded-md shadow-sm text-gray-400 cursor-not-allowed">
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" class="glow-button glow-button-blue">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="w-full h-px bg-white/10"></div>
+
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-6">Your Favorites</h2>
+                    <div id="favoritesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+    
+    <script src="profile.js"></script>
+
+    <style>
+         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .glow-button {
+            position: relative; padding: 10px 20px; border-radius: 7px;
+            font-size: 14px; text-transform: uppercase; font-weight: 600;
+            letter-spacing: 2px; background: transparent; color: #fff;
+            overflow: hidden; box-shadow: 0 0 0 0 transparent;
+            transition: all 0.2s ease-in; border: 1px solid; cursor: pointer;
+        }
+        .glow-button-blue { border-color: rgb(59, 130, 246); }
+        .glow-button-blue:hover { background: rgb(59, 130, 246); box-shadow: 0 0 30px 5px rgba(59, 130, 246, 0.815); }
+        .glow-button-gray { border-color: rgb(156, 163, 175); }
+        .glow-button-gray:hover { background: rgb(156, 163, 175); box-shadow: 0 0 30px 5px rgba(156, 163, 175, 0.815); }
+        .glow-button.text-xs { padding: 6px 12px; font-size: 11px; letter-spacing: 1px; }
+    </style>
+</body>
+</html>
