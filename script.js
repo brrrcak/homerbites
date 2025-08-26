@@ -337,17 +337,17 @@ function updateAuthUI() {
         const firstName = displayName.split(' ')[0];
         authContainer.innerHTML = `
             <span class="text-white text-sm">Welcome, ${firstName}</span>
-            <button id="logoutBtn" class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
+            <button id="logoutBtn" class="glow-button glow-button-red">
                 Logout
             </button>
         `;
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     } else {
         authContainer.innerHTML = `
-            <button id="loginBtn" class="px-3 py-1 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">
+            <button id="loginBtn" class="glow-button glow-button-green">
                 Login
             </button>
-            <button id="signupBtn" class="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">
+            <button id="signupBtn" class="glow-button glow-button-blue">
                 Sign Up
             </button>
         `;
@@ -609,20 +609,16 @@ function setupViewToggle() {
     if (!gridBtn || !mapBtn) return;
     
     gridBtn.addEventListener('click', function() {
-        gridBtn.classList.add('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'text-white', 'shadow-lg');
-        gridBtn.classList.remove('bg-white/10');
-        mapBtn.classList.remove('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'shadow-lg');
-        mapBtn.classList.add('bg-white/10');
+        gridBtn.className = 'glow-button glow-button-blue';
+        mapBtn.className = 'glow-button glow-button-gray';
         
         if (gridContent) gridContent.classList.remove('hidden');
         if (mapContent) mapContent.classList.add('hidden');
     });
     
     mapBtn.addEventListener('click', function() {
-        mapBtn.classList.add('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'text-white', 'shadow-lg');
-        mapBtn.classList.remove('bg-white/10');
-        gridBtn.classList.remove('bg-gradient-to-r', 'from-brand-500', 'to-brand-600', 'shadow-lg');
-        gridBtn.classList.add('bg-white/10');
+        mapBtn.className = 'glow-button glow-button-blue';
+        gridBtn.className = 'glow-button glow-button-gray';
         
         if (mapContent) mapContent.classList.remove('hidden');
         if (gridContent) gridContent.classList.add('hidden');
@@ -755,7 +751,6 @@ function showAuthModal(type) {
 
     // Define CSS classes for reuse
     const inputClasses = "mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white focus:outline-none focus:ring-accent-500 focus:border-accent-500";
-    const buttonClasses = "w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200";
     const linkClasses = "text-blue-400 hover:text-blue-300";
 
     if (type === 'login') {
@@ -773,7 +768,7 @@ function showAuthModal(type) {
                         <button type="button" onclick="showAuthModal('reset_password')" class="text-sm ${linkClasses}">Forgot Password?</button>
                     </div>
                 </div>
-                <button type="submit" class="${buttonClasses}">Login</button>
+                <button type="submit" class="glow-button glow-button-blue w-full">Login</button>
             </form>
             <p class="text-center mt-4 text-gray-400">
                 Don't have an account? <button onclick="showAuthModal('signup')" class="${linkClasses}">Sign Up</button>
@@ -795,7 +790,7 @@ function showAuthModal(type) {
                     <label class="block text-sm font-medium text-gray-300">Password</label>
                     <input type="password" name="password" required class="${inputClasses}">
                 </div>
-                <button type="submit" class="${buttonClasses}">Sign Up</button>
+                <button type="submit" class="glow-button glow-button-blue w-full">Sign Up</button>
             </form>
             <p class="text-center mt-4 text-gray-400">
                 Already have an account? <button onclick="showAuthModal('login')" class="${linkClasses}">Login</button>
@@ -810,7 +805,7 @@ function showAuthModal(type) {
                     <label class="block text-sm font-medium text-gray-300">Email</label>
                     <input type="email" name="email" required class="${inputClasses}">
                 </div>
-                <button type="submit" class="${buttonClasses}">Send Reset Link</button>
+                <button type="submit" class="glow-button glow-button-blue w-full">Send Reset Link</button>
             </form>
             <p class="text-center mt-4 text-gray-400">
                 Remember your password? <button onclick="showAuthModal('login')" class="${linkClasses}">Login</button>
@@ -870,7 +865,7 @@ function showSpecialMessage() {
             <div class="fixed inset-0 flex items-center justify-center p-4">
                 <div class="backdrop-blur-2xl bg-gradient-to-br from-purple-900 to-slate-800 rounded-3xl max-w-md w-full shadow-2xl animate-scale-in border border-white/20 text-white p-8 text-center">
                     <p class="text-xl leading-relaxed font-medium">${MOMS_MESSAGE}</p>
-                    <button onclick="closeSpecialMessageModal()" class="mt-8 px-8 py-3 bg-gradient-to-r from-accent-500 to-accent-600 font-semibold rounded-xl hover:from-accent-600 hover:to-accent-700 transition-all duration-200 shadow-lg shadow-accent-500/25">
+                    <button onclick="closeSpecialMessageModal()" class="glow-button glow-button-red mt-8">
                         Close
                     </button>
                 </div>
