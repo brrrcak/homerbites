@@ -206,8 +206,21 @@ function populateStaticTags() {
         const button = event.target.closest('.static-tag-button');
         if (button && button.dataset.tag) {
             const searchInput = document.getElementById('tagSearchInput');
-            searchInput.value = button.dataset.tag;
-            handleSearch();
+            const currentTags = searchInput.value.split(',').map(t => t.trim()).filter(Boolean);
+            const clickedTag = button.dataset.tag;
+            
+            // Toggle tag selection
+            if (currentTags.includes(clickedTag)) {
+                // Remove tag
+                const newTags = currentTags.filter(tag => tag !== clickedTag);
+                searchInput.value = newTags.join(', ');
+                button.classList.remove('selected');
+            } else {
+                // Add tag
+                currentTags.push(clickedTag);
+                searchInput.value = currentTags.join(', ');
+                button.classList.add('selected');
+            }
         }
     });
 }
@@ -222,11 +235,11 @@ function handleSearch() {
         return;
     }
 
-    const searchTerms = query.split(',').map(term => term.trim()).filter(Boolean);
+    const searchTerms = query.split(',').map(term => term.trim().toLowerCase()).filter(Boolean);
     
     const filteredRestaurants = restaurants.filter(restaurant => {
         const restaurantTags = (restaurant.tags || []).map(t => t.toLowerCase());
-        return searchTerms.some(term => restaurantTags.includes(term));
+        return searchTerms.every(term => restaurantTags.includes(term)); // Changed to 'every' for AND logic
     });
     
     renderSearchResults(filteredRestaurants, query);
