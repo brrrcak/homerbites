@@ -239,7 +239,7 @@ function handleSearch() {
     
     const filteredRestaurants = restaurants.filter(restaurant => {
         const restaurantTags = (restaurant.tags || []).map(t => t.toLowerCase());
-        return searchTerms.every(term => restaurantTags.includes(term)); // Changed to 'every' for AND logic
+        return searchTerms.some(term => restaurantTags.includes(term)); // Changed back to 'some' for OR logic
     });
     
     renderSearchResults(filteredRestaurants, query);
@@ -300,12 +300,7 @@ function showInitialMessage() {
         randomButtonSection.classList.add('hidden');
     }
 
-    container.innerHTML = `
-        <div class="text-center py-16 animate-fade-in">
-            <h2 class="text-3xl font-bold text-white mb-4">Welcome to Homer Bites!</h2>
-            <p class="text-xl text-gray-300">Use the search bar above to find a restaurant, or click "View All" to browse the list.</p>
-        </div>
-    `;
+    container.innerHTML = '';
 }
 
 function updateMapMarkers(restaurantsToShow) {
