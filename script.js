@@ -858,12 +858,15 @@ function showAuthModal(type) {
         <div id="authModal" class="fixed inset-0 z-50">
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAuthModal()"></div>
             <div class="fixed inset-0 flex items-center justify-center p-4">
-                <div class="backdrop-blur-2xl bg-slate-800/50 rounded-3xl max-w-md w-full shadow-2xl animate-scale-in border border-white/20">
-                    <div class="relative p-8">
-                        <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
-                        ${modalContentHTML}
+                <div class="relative max-w-md w-full">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-brand-500 via-accent-500 to-purple-600 rounded-3xl blur opacity-75 animate-rotate-border"></div>
+                    <div class="relative backdrop-blur-2xl bg-slate-800/20 rounded-3xl shadow-2xl animate-scale-in border border-white/10">
+                        <div class="relative p-8">
+                            <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                            ${modalContentHTML}
+                        </div>
                     </div>
                 </div>
             </div>
