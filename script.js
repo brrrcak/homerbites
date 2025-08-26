@@ -98,7 +98,6 @@ async function initializeApp() {
     setupSearch();
     setupRandomButton();
     setupViewToggle();
-    // setupAuthButtons is now handled by updateAuthUI
     initializeMap();
     setupSubmissionForm();
 
@@ -269,8 +268,8 @@ function createRestaurantCard(restaurant) {
     `;
 }
 
-// All other functions (search, modals, map, etc.) remain the same as the previous version.
-// I have included them below so you can replace the entire file.
+// --- ALL OTHER FUNCTIONS ---
+
 function initializeWithoutSupabase() {populateTagCarousel();setupSearch();setupRandomButton();setupViewToggle();updateAuthUI();initializeMap();setupSubmissionForm();showInitialMessage();console.log('Running in fallback mode without Supabase');}
 function getStaticRestaurants() {return [{id:1,name:"Cosmic Kitchen",description:"A cozy Homer favorite serving hearty breakfasts, smash burgers, and Mexican-inspired plates with plenty of vegetarian options—all in a laid-back, rustic setting.",address:"510 E Pioneer Ave, Homer, AK 99603",phone:"(907) 235-1301",website:"https://www.cosmickitchenhomer.com/",hours:"Tuesday - Saturday: 11:00AM - 7:00PM",imageURL:"https://scontent-sea1-1.xx.fbcdn.net/v/t39.30808-6/481341661_122129057186592631_7628068687369387549_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=5icgLVwy9UMQ7kNvwFVUR7n&_nc_oc=AdlpuMF-gtAUBXSK4ZhHcZ2df-S--7j_ZJoMQhF64TU6DPSH1H2Sme1eAmANG6YxUY4&_nc_zt=23&_nc_ht=scontent-sea1-1.xx&_nc_gid=OC6MpAtgGyG_Ln-OU_O6zg&oh=00_AfUk8g1iC0r0tpqXDGn_BTQY4thLnN6tGxhCyjYM5Yv_EA&oe=68B08DA0",lat:59.647521,lng:-151.533005,menu:"https://order.toasttab.com/online/cosmickitchenhomer",tags:["restaurant","burgers","mexican","breakfast","vegetarian"],rating:4,priceRange:"$-$$"},{id:2,name:"Fat Olive's Restaurant",description:"Italian cuisine featuring pizza and American dishes",address:"",phone:"(907) 235-8488",website:"https://www.fatoliveshomer.com/",hours:"Mo-Su 11:00-20:30",imageURL:"",lat:null,lng:null,menu:"",tags:["restaurant","italian","pizza","american"],rating:null,priceRange:""},];}
 function setupSearch(){const findBtn=document.getElementById('findBtn');const viewAllBtn=document.getElementById('viewAllBtn');const searchInput=document.getElementById('tagSearchInput');const submitBtn=document.getElementById('submitRestaurantBtn');if(findBtn){findBtn.addEventListener('click',handleSearch);}
