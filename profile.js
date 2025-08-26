@@ -7,13 +7,13 @@ let currentUser = null;
 
 // This function will run once the user's session is confirmed
 function initializePage(session) {
-    // If no session, redirect to the homepage
+    // If no session is found, redirect to the homepage
     if (!session) {
         window.location.href = 'index.html';
         return;
     }
 
-    // Make the page visible
+    // Make the page visible now that we've confirmed the user is logged in
     document.body.classList.remove('opacity-0');
 
     currentUser = session.user;
