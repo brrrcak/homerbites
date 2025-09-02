@@ -389,6 +389,151 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     
     <script>
+        console.log("modals.js v1.4 Loaded - Updated Design");
+
+        // A shared library for creating styled, site-wide pop-up modals that match the new Homer Bites design
+        function showCustomAlert(message, type = 'info') {
+            const existingAlert = document.getElementById('custom-alert-overlay');
+            if (existingAlert) existingAlert.remove();
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'custom-alert-overlay';
+            overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+            
+            const iconColor = type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : 'text-blue-500';
+            const iconName = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
+            const buttonColor = type === 'success' ? 'bg-green-500 hover:bg-green-600' : 
+                               type === 'error' ? 'bg-red-500 hover:bg-red-600' : 
+                               'bg-blue-500 hover:bg-blue-600';
+            
+            const modalHTML = `
+                <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center modal-slide-up">
+                    <div class="mb-4">
+                        <i data-lucide="${iconName}" class="w-12 h-12 ${iconColor} mx-auto"></i>
+                    </div>
+                    <p class="text-gray-800 mb-6 leading-relaxed">${message}</p>
+                    <button id="custom-alert-ok" class="px-8 py-3 ${buttonColor} text-white rounded-full shadow-lg transition-all duration-300 font-semibold btn-hover-scale">
+                        OK
+                    </button>
+                </div>
+            `;
+            
+            overlay.innerHTML = modalHTML;
+            document.body.appendChild(overlay);
+            
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+            
+            document.getElementById('custom-alert-ok').addEventListener('click', () => {
+                overlay.remove();
+            });
+            
+            addModalStyles();
+        }
+
+        function showCustomPrompt(message, placeholder = '', defaultValue = '') {
+            return new Promise(resolve => {
+                const existingPrompt = document.getElementById('custom-prompt-overlay');
+                if (existingPrompt) existingPrompt.remove();
+                
+                const overlay = document.createElement('div');
+                overlay.id = 'custom-prompt-overlay';
+                overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+                
+                const modalHTML = `
+                    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 modal-slide-up">
+                        <div class="mb-4">
+                            <i data-lucide="mail" class="w-8 h-8 text-blue-500 mx-auto"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">${message}</h3>
+                        <input type="email" id="custom-prompt-input" placeholder="${placeholder}" value="${defaultValue}" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-6">
+                        <div class="flex gap-4">
+                            <button id="custom-prompt-cancel" class="flex-1 px-6 py-3 bg-gray-500 text-white rounded-full shadow-lg hover:bg-gray-600 transition-all duration-300 font-semibold btn-hover-scale">
+                                Cancel
+                            </button>
+                            <button id="custom-prompt-ok" class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 font-semibold btn-hover-scale">
+                                Send Magic Link
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                overlay.innerHTML = modalHTML;
+                document.body.appendChild(overlay);
+                
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                }
+                
+                const input = document.getElementById('custom-prompt-input');
+                const okButton = document.getElementById('custom-prompt-ok');
+                const cancelButton = document.getElementById('custom-prompt-cancel');
+                
+                setTimeout(() => input.focus(), 100);
+                
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        okButton.click();
+                    } else if (e.key === 'Escape') {
+                        cancelButton.click();
+                    }
+                });
+                
+                okButton.addEventListener('click', () => {
+                    const value = input.value;
+                    overlay.remove();
+                    resolve(value);
+                });
+                
+                cancelButton.addEventListener('click', () => {
+                    overlay.remove();
+                    resolve(null);
+                });
+                
+                addModalStyles();
+            });
+        }
+
+        function addModalStyles() {
+            if (document.getElementById('homer-bites-modal-styles')) return;
+            
+            const style = document.createElement('style');
+            style.id = 'homer-bites-modal-styles';
+            style.textContent = `
+                .modal-slide-up {
+                    animation: modalSlideUp 0.3s ease-out forwards;
+                }
+                
+                .btn-hover-scale {
+                    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+                }
+                
+                .btn-hover-scale:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+                }
+                
+                @keyframes modalSlideUp {
+                    from { 
+                        transform: translateY(20px); 
+                        opacity: 0; 
+                    }
+                    to { 
+                        transform: translateY(0); 
+                        opacity: 1; 
+                    }
+                }
+            `;
+            
+            document.head.appendChild(style);
+        }
+
+        // Initialize styles immediately
+        addModalStyles();
+    
+    <script>
         // Initialize Lucide Icons
         lucide.createIcons();
         
@@ -428,31 +573,35 @@
         ];
 
         // Authentication functions
-        function handleSignIn() {
+        async function handleSignIn() {
             if (!supabase) {
-                alert('Authentication not available - Supabase connection failed');
+                showCustomAlert('Authentication not available - Supabase connection failed', 'error');
                 return;
             }
 
-            const email = prompt('Enter your email address:');
+            const email = await showCustomPrompt('Enter your email address:', 'your@email.com');
             if (!email) return;
 
-            supabase.auth.signInWithOtp({
-                email: email,
-                options: { emailRedirectTo: window.location.origin }
-            }).then(({ error }) => {
+            try {
+                const { error } = await supabase.auth.signInWithOtp({
+                    email: email,
+                    options: { emailRedirectTo: window.location.origin }
+                });
+
                 if (error) {
-                    alert('Failed to send sign-in email: ' + error.message);
+                    showCustomAlert('Failed to send sign-in email: ' + error.message, 'error');
                 } else {
-                    alert('Check your email for the sign-in link!');
+                    showCustomAlert('Check your email for the sign-in link!', 'success');
                 }
-            });
+            } catch (error) {
+                showCustomAlert('Failed to send sign-in email: ' + error.message, 'error');
+            }
         }
 
         function handleSignOut() {
             if (!supabase) return;
             supabase.auth.signOut().then(({ error }) => {
-                if (error) alert('Failed to sign out: ' + error.message);
+                if (error) showCustomAlert('Failed to sign out: ' + error.message, 'error');
             });
         }
 
@@ -577,7 +726,7 @@
         // Favorite functionality
         function toggleFavorite(restaurantId, buttonElement) {
             if (!currentUser) {
-                alert('Please sign in to save favorites');
+                showCustomAlert('Please sign in to save favorites', 'info');
                 return;
             }
 
@@ -670,7 +819,7 @@
                     filterRestaurants(null, searchTerm);
                     scrollToRestaurants();
                 } else {
-                    alert('Please enter a search term');
+                    showCustomAlert('Please enter a search term to discover restaurants', 'info');
                 }
             });
             
@@ -689,7 +838,7 @@
             
             document.getElementById('submissionForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                alert('Thank you for your submission! We will review it soon.');
+                showCustomAlert('Thank you for your submission! We will review it soon.', 'success');
                 closeSubmissionModal();
             });
         });
