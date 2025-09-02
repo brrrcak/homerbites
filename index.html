@@ -13,13 +13,13 @@
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap');
 
         :root {
-            --color-primary: #FF7043; /* Warm Orange */
-            --color-secondary: #4CAF50; /* Fresh Green */
-            --color-accent: #2196F3; /* Sky Blue */
+            --color-primary: #FF7043;
+            --color-secondary: #4CAF50;
+            --color-accent: #2196F3;
             --color-text-dark: #333333;
             --color-text-light: #555555;
-            --color-bg-light: #F9FAFB; /* Off-white */
-            --color-bg-paper: #FFFFFF; /* Pure White */
+            --color-bg-light: #F9FAFB;
+            --color-bg-paper: #FFFFFF;
             --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
             --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.08);
             --shadow-strong: 0 12px 36px rgba(0, 0, 0, 0.12);
@@ -37,7 +37,6 @@
             color: var(--color-text-dark);
         }
 
-        /* Custom Scrollbar for better aesthetics */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -47,14 +46,13 @@
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb {
-            background: #d1d5db; /* Light gray */
+            background: #d1d5db;
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #9ca3af; /* Darker gray */
+            background: #9ca3af;
         }
 
-        /* Hero Wave Effect */
         .hero-wave {
             position: absolute;
             bottom: 0;
@@ -69,14 +67,13 @@
             position: relative;
             display: block;
             width: calc(100% + 1.3px);
-            height: 150px; /* Adjust height as needed */
+            height: 150px;
         }
 
         .hero-wave .shape-fill {
             fill: var(--color-bg-light);
         }
 
-        /* Subtle Button Hover Effect */
         .btn-hover-scale {
             transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
         }
@@ -85,16 +82,6 @@
             box-shadow: var(--shadow-medium);
         }
 
-        /* Card Hover Effect - Enhanced for restaurant cards */
-        .card-hover-lift {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card-hover-lift:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Enhanced Restaurant Card Styling */
         .restaurant-card {
             position: relative;
             background: white;
@@ -143,13 +130,11 @@
             background: rgba(239, 68, 68, 1);
         }
 
-        /* Input Focus Styling */
         input:focus, textarea:focus {
             border-color: var(--color-accent) !important;
             box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
         }
 
-        /* Cuisine Option Styling - Updated to be just text */
         .cuisine-option {
             display: inline-block;
             padding: 8px 12px;
@@ -180,28 +165,6 @@
             font-weight: 600;
         }
 
-        /* Tag Button Styling */
-        .tag-button {
-            background-color: #f0f4f8; /* Light blue-gray */
-            color: var(--color-text-light);
-            border: 1px solid #e2e8f0; /* Lighter border */
-            transition: all 0.2s ease-out;
-        }
-        .tag-button:hover {
-            background-color: #e2e8f0;
-            border-color: var(--color-accent);
-            color: var(--color-accent);
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
-        }
-        .tag-button.active {
-            background-color: var(--color-accent);
-            color: white;
-            border-color: var(--color-accent);
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
-            transform: translateY(-2px);
-        }
-
         .modal-fade-in {
             animation: fadeIn 0.3s ease-out forwards;
         }
@@ -219,7 +182,6 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        /* Smooth scroll behavior */
         html {
             scroll-behavior: smooth;
         }
@@ -247,7 +209,9 @@
             </nav>
 
             <div id="authContainer" class="flex items-center space-x-3">
-                <!-- Auth buttons will be populated by JavaScript -->
+                <button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                    Sign In
+                </button>
             </div>
 
             <button class="md:hidden p-2 rounded-md hover:bg-gray-100 text-gray-700 transition-colors">
@@ -272,7 +236,7 @@
                 </button>
             </div>
 
-            <!-- Popular Cuisines to Explore - Moved under search box -->
+            <!-- Popular Cuisines to Explore -->
             <div class="mb-8">
                 <h3 class="text-lg font-semibold text-gray-700 mb-4">Popular Cuisines to Explore</h3>
                 <div id="popularCuisines" class="flex flex-wrap justify-center">
@@ -295,10 +259,9 @@
                 <button id="viewAllBtn" class="px-6 py-3 text-gray-600 hover:text-orange-500 transition-colors text-lg font-medium">
                     Or simply <span class="underline underline-offset-4 decoration-dashed decoration-gray-400">browse all restaurants</span>
                 </button>
-                <!-- REMOVED: Surprise Me button as requested -->
             </div>
         </div>
-        <!-- Hero Wave Background -->
+        
         <div class="hero-wave">
             <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                 <path d="M985.66,92.83C906.67,72,823.79,31,743.84,14.19c-82.26-17.34-168.35-16.64-250.46.15-82.7,17.7-172.14,87.31-257.83,11.3C155.18,74.58,66.44,53.13,0,34.52V0H1200V43.19C1128.15,68.8,1069.1,102.44,985.66,92.83Z" class="shape-fill"></path>
@@ -306,31 +269,18 @@
         </div>
     </section>
 
-    <!-- REMOVED: Static Tags Section (Browse by Category) -->
-
-    <!-- Restaurant Listings / Map Toggle -->
+    <!-- Restaurant Listings -->
     <main id="restaurantsSection" class="relative z-10 py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div id="viewToggleSection" class="hidden mb-10 flex justify-center gap-4 animate-fade-in">
-                <button id="gridViewBtn" class="flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 rounded-full shadow-md hover:bg-gray-100 transition-all btn-hover-scale active">
-                    <i data-lucide="grid" class="w-5 h-5"></i>
-                    <span class="font-medium">Grid View</span>
-                </button>
-                <button id="mapViewBtn" class="flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 rounded-full shadow-md hover:bg-gray-100 transition-all btn-hover-scale">
-                    <i data-lucide="map" class="w-5 h-5"></i>
-                    <span class="font-medium">Map View</span>
-                </button>
-            </div>
-
-            <div id="gridContent">
-                <div id="categoryContainer" class="space-y-16">
-                    <!-- Restaurant content will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <div id="mapContent" class="hidden">
-                <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
-                    <div id="map" class="w-full h-[60vh]"></div>
+            <div id="categoryContainer" class="space-y-16">
+                <div class="text-center py-16">
+                    <div class="mb-6">
+                        <i data-lucide="search" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-600 mb-4">Ready to Explore?</h3>
+                    <p class="text-gray-500 max-w-md mx-auto">
+                        Choose a cuisine above, search for something specific, or browse all restaurants to discover Homer's culinary scene.
+                    </p>
                 </div>
             </div>
         </div>
@@ -341,23 +291,6 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h3 class="text-4xl font-extrabold text-gray-800 mb-6">Our Mission: Connecting You with Homer's Best</h3>
             <p class="text-lg text-gray-700 leading-relaxed mb-8">Homer Bites was built on two things: a deep love for our local food scene and a sheer frustration with trying to find it. We believe finding your next great meal shouldn't require hunting through social media or piecing together search results. Our mission is to showcase the town's incredible culinary talent, helping both lifelong residents and curious visitors easily discover everything from comforting classics to innovative new tastes.</p>
-            <div class="flex flex-col sm:flex-row justify-center gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow-md flex-1 text-left card-hover-lift animate-slide-up">
-                    <div class="text-orange-500 mb-3"><i data-lucide="heart" class="w-8 h-8"></i></div>
-                    <h4 class="text-xl font-bold text-gray-800 mb-2">Love for Local</h4>
-                    <p class="text-gray-600 text-sm">Our guide is dedicated to the independent restaurants, cafes, and food trucks owned and operated right here in our community.</p>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-md flex-1 text-left card-hover-lift animate-slide-up">
-                    <div class="text-blue-500 mb-3"><i data-lucide="compass" class="w-8 h-8"></i></div>
-                    <h4 class="text-xl font-bold text-gray-800 mb-2">Effortless Discovery</h4>
-                    <p class="text-gray-600 text-sm">Our platform makes it easy to find exactly what you're craving, with intuitive search and curated categories.</p>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-md flex-1 text-left card-hover-lift animate-slide-up">
-                    <div class="text-green-500 mb-3"><i data-lucide="users" class="w-8 h-8"></i></div>
-                    <h4 class="text-xl font-bold text-gray-800 mb-2">Community Driven</h4>
-                    <p class="text-gray-600 text-sm">Submit your favorite spots and help us grow our comprehensive guide. Together, we celebrate Homer's culinary spirit.</p>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -420,10 +353,6 @@
                             <label for="restaurantAddress" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
                             <input type="text" id="restaurantAddress" name="restaurantAddress" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-200 focus:border-blue-500 outline-none transition-colors">
                         </div>
-                        <div>
-                            <label for="restaurantImage" class="block text-sm font-medium text-gray-700 mb-1">Image (Optional)</label>
-                            <input type="file" id="restaurantImage" name="restaurantImage" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors">
-                        </div>
                         <div class="mt-6">
                             <button type="submit" class="w-full flex items-center justify-center px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 btn-hover-scale text-base font-semibold">
                                 <i data-lucide="send" class="w-5 h-5 mr-3"></i>
@@ -436,8 +365,6 @@
         </div>
     </div>
 
-    <!-- Auth Modal (will be dynamically created) -->
-    
     <!-- Footer Section -->
     <footer id="contact" class="bg-gray-800 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -465,7 +392,7 @@
         // Initialize Lucide Icons
         lucide.createIcons();
         
-        // Initialize Supabase with error handling
+        // Initialize Supabase
         let supabase = null;
         try {
             const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
@@ -474,223 +401,34 @@
             if (window.supabase && window.supabase.createClient) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log('Supabase initialized successfully');
-            } else {
-                console.error('Supabase library not loaded');
             }
         } catch (error) {
             console.error('Failed to initialize Supabase:', error);
         }
 
-        // Global variables for favorites and selections
+        // Global variables
         let selectedCuisine = null;
         let userFavorites = new Set();
         let restaurants = [];
         let filteredRestaurants = [];
         let currentUser = null;
         let currentPage = 0;
-        let restaurantsPerPage = 6;
+        const restaurantsPerPage = 6;
 
-        // Demo restaurant data (fallback when Supabase fails)
+        // Demo restaurant data
         const demoRestaurants = [
-            {
-                id: 1,
-                name: "The Salty Dawg Saloon",
-                description: "Historic saloon with live music and hearty Alaskan fare",
-                cuisine: "American",
-                address: "4380 Homer Spit Rd, Homer, AK",
-                rating: 4.5,
-                image: null,
-                tags: ["bar", "live music", "historic"]
-            },
-            {
-                id: 2,
-                name: "Coal Point Seafood Company",
-                description: "Fresh local seafood with stunning views of Kachemak Bay",
-                cuisine: "Seafood",
-                address: "4306 Homer Spit Rd, Homer, AK", 
-                rating: 4.8,
-                image: null,
-                tags: ["seafood", "fresh", "bay views"]
-            },
-            {
-                id: 3,
-                name: "Two Sisters Bakery",
-                description: "Artisan breads and pastries made fresh daily",
-                cuisine: "Bakery", 
-                address: "233 E Bunnell Ave, Homer, AK",
-                rating: 4.6,
-                image: null,
-                tags: ["bakery", "coffee", "breakfast"]
-            },
-            {
-                id: 4,
-                name: "Homer Brewing Company",
-                description: "Local craft brewery with pub fare and Alaska-inspired beers",
-                cuisine: "American",
-                address: "1411 Lakeshore Dr, Homer, AK",
-                rating: 4.4,
-                image: null,
-                tags: ["brewery", "pizza", "local beer"]
-            },
-            {
-                id: 5,
-                name: "Cosmic Kitchen",
-                description: "Creative fusion cuisine with fresh, local ingredients",
-                cuisine: "Asian",
-                address: "510 E Pioneer Ave, Homer, AK",
-                rating: 4.7,
-                image: null,
-                tags: ["fusion", "creative", "local ingredients"]
-            },
-            {
-                id: 6,
-                name: "Fat Olives Restaurant",
-                description: "Italian-inspired dishes with Mediterranean flair",
-                cuisine: "Italian",
-                address: "276 Ohlson Ln, Homer, AK",
-                rating: 4.6,
-                image: null,
-                tags: ["italian", "mediterranean", "pasta"]
-            },
-            {
-                id: 7,
-                name: "Fresh Sourdough Express Bakery & Café",
-                description: "Breakfast and lunch spot famous for sourdough pancakes",
-                cuisine: "Breakfast",
-                address: "1316 Ocean Dr, Homer, AK",
-                rating: 4.3,
-                image: null,
-                tags: ["breakfast", "pancakes", "sourdough"]
-            },
-            {
-                id: 8,
-                name: "La Cantina",
-                description: "Authentic Mexican cuisine with fresh ingredients",
-                cuisine: "Mexican",
-                address: "120 W Bunnell Ave, Homer, AK",
-                rating: 4.5,
-                image: null,
-                tags: ["mexican", "authentic", "fresh"]
-            },
-            {
-                id: 9,
-                name: "Alaska Pizza & Burgers",
-                description: "Local pizza joint with handcrafted burgers",
-                cuisine: "Pizza",
-                address: "4005 Lake St, Homer, AK",
-                rating: 4.2,
-                image: null,
-                tags: ["pizza", "burgers", "local"]
-            },
-            {
-                id: 10,
-                name: "Niko's Gyros",
-                description: "Greek specialties and Mediterranean sandwiches",
-                cuisine: "Sandwiches",
-                address: "451 E Pioneer Ave, Homer, AK",
-                rating: 4.4,
-                image: null,
-                tags: ["greek", "gyros", "sandwiches"]
-            }
+            { id: 1, name: "The Salty Dawg Saloon", description: "Historic saloon with live music and hearty Alaskan fare", cuisine: "American", address: "4380 Homer Spit Rd, Homer, AK", rating: 4.5, tags: ["bar", "live music", "historic"] },
+            { id: 2, name: "Coal Point Seafood Company", description: "Fresh local seafood with stunning views of Kachemak Bay", cuisine: "Seafood", address: "4306 Homer Spit Rd, Homer, AK", rating: 4.8, tags: ["seafood", "fresh", "bay views"] },
+            { id: 3, name: "Two Sisters Bakery", description: "Artisan breads and pastries made fresh daily", cuisine: "Bakery", address: "233 E Bunnell Ave, Homer, AK", rating: 4.6, tags: ["bakery", "coffee", "breakfast"] },
+            { id: 4, name: "Homer Brewing Company", description: "Local craft brewery with pub fare and Alaska-inspired beers", cuisine: "American", address: "1411 Lakeshore Dr, Homer, AK", rating: 4.4, tags: ["brewery", "pizza", "local beer"] },
+            { id: 5, name: "Cosmic Kitchen", description: "Creative fusion cuisine with fresh, local ingredients", cuisine: "Asian", address: "510 E Pioneer Ave, Homer, AK", rating: 4.7, tags: ["fusion", "creative", "local ingredients"] },
+            { id: 6, name: "Fat Olives Restaurant", description: "Italian-inspired dishes with Mediterranean flair", cuisine: "Italian", address: "276 Ohlson Ln, Homer, AK", rating: 4.6, tags: ["italian", "mediterranean", "pasta"] },
+            { id: 7, name: "Fresh Sourdough Express Bakery & Café", description: "Breakfast and lunch spot famous for sourdough pancakes", cuisine: "Breakfast", address: "1316 Ocean Dr, Homer, AK", rating: 4.3, tags: ["breakfast", "pancakes", "sourdough"] },
+            { id: 8, name: "La Cantina", description: "Authentic Mexican cuisine with fresh ingredients", cuisine: "Mexican", address: "120 W Bunnell Ave, Homer, AK", rating: 4.5, tags: ["mexican", "authentic", "fresh"] }
         ];
 
-        // Load restaurants with fallback
-        async function loadRestaurants() {
-            try {
-                if (supabase) {
-                    console.log('Attempting to load restaurants from Supabase...');
-                    const { data, error } = await supabase
-                        .from('restaurants')
-                        .select('*')
-                        .eq('approved', true);
-                    
-                    if (error) {
-                        console.warn('Supabase error:', error);
-                        throw error;
-                    }
-                    
-                    if (data && data.length > 0) {
-                        restaurants = data;
-                        console.log('Loaded restaurants from Supabase:', restaurants.length);
-                    } else {
-                        throw new Error('No restaurants found in database');
-                    }
-                } else {
-                    throw new Error('Supabase not initialized');
-                }
-            } catch (error) {
-                console.warn('Failed to load from Supabase, using demo data:', error);
-                restaurants = demoRestaurants;
-            }
-            
-            displayRestaurants();
-        }
-
-        // Initialize auth and check current user
-        async function initializeAuth() {
-            const authContainer = document.getElementById('authContainer');
-            if (!authContainer) return;
-
-            try {
-                if (supabase) {
-                    // Check if user is already logged in
-                    const { data: { user }, error } = await supabase.auth.getUser();
-                    
-                    if (error && error.message !== 'Invalid JWT: Unable to process JWT') {
-                        console.warn('Auth error:', error);
-                    }
-
-                    currentUser = user;
-                    updateAuthUI();
-
-                    // Listen for auth changes
-                    supabase.auth.onAuthStateChange((event, session) => {
-                        console.log('Auth state changed:', event, session?.user?.email);
-                        currentUser = session?.user || null;
-                        updateAuthUI();
-                        if (currentUser) {
-                            loadUserFavorites();
-                        } else {
-                            userFavorites.clear();
-                        }
-                    });
-                } else {
-                    // Fallback when Supabase isn't available
-                    currentUser = null;
-                    updateAuthUI();
-                }
-            } catch (error) {
-                console.warn('Auth initialization failed:', error);
-                currentUser = null;
-                updateAuthUI();
-            }
-        }
-
-        // Update auth UI based on current user
-        function updateAuthUI() {
-            const authContainer = document.getElementById('authContainer');
-            if (!authContainer) return;
-
-            if (currentUser) {
-                authContainer.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <span class="text-sm text-gray-600">Welcome, ${currentUser.email?.split('@')[0] || 'User'}</span>
-                        <button onclick="handleSignOut()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-                            Sign Out
-                        </button>
-                    </div>
-                `;
-            } else {
-                authContainer.innerHTML = `
-                    <button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
-                        Sign In
-                    </button>
-                `;
-            }
-        }
-
-        // Handle sign in
-        async function handleSignIn() {
+        // Authentication functions
+        function handleSignIn() {
             if (!supabase) {
                 alert('Authentication not available - Supabase connection failed');
                 return;
@@ -699,162 +437,186 @@
             const email = prompt('Enter your email address:');
             if (!email) return;
 
-            try {
-                const { error } = await supabase.auth.signInWithOtp({
-                    email: email,
-                    options: {
-                        emailRedirectTo: window.location.origin
-                    }
-                });
-
-                if (error) throw error;
-                
-                alert('Check your email for the sign-in link!');
-            } catch (error) {
-                console.error('Sign in error:', error);
-                alert('Failed to send sign-in email: ' + error.message);
-            }
+            supabase.auth.signInWithOtp({
+                email: email,
+                options: { emailRedirectTo: window.location.origin }
+            }).then(({ error }) => {
+                if (error) {
+                    alert('Failed to send sign-in email: ' + error.message);
+                } else {
+                    alert('Check your email for the sign-in link!');
+                }
+            });
         }
 
-        // Handle sign out
-        async function handleSignOut() {
+        function handleSignOut() {
             if (!supabase) return;
+            supabase.auth.signOut().then(({ error }) => {
+                if (error) alert('Failed to sign out: ' + error.message);
+            });
+        }
 
-            try {
-                const { error } = await supabase.auth.signOut();
-                if (error) throw error;
-            } catch (error) {
-                console.error('Sign out error:', error);
-                alert('Failed to sign out: ' + error.message);
+        function updateAuthUI() {
+            const authContainer = document.getElementById('authContainer');
+            if (currentUser) {
+                authContainer.innerHTML = '<div class="flex items-center space-x-3"><span class="text-sm text-gray-600">Welcome, ' + (currentUser.email ? currentUser.email.split('@')[0] : 'User') + '</span><button onclick="handleSignOut()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">Sign Out</button></div>';
+            } else {
+                authContainer.innerHTML = '<button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Sign In</button>';
             }
         }
 
-        // Load user favorites
-        async function loadUserFavorites() {
-            if (!currentUser || !supabase) return;
-
+        // Load restaurants
+        async function loadRestaurants() {
             try {
-                const { data, error } = await supabase
-                    .from('favorites')
-                    .select('restaurant_id')
-                    .eq('user_id', currentUser.id);
-
-                if (error) throw error;
-
-                userFavorites = new Set(data.map(f => f.restaurant_id));
-                console.log('Loaded user favorites:', userFavorites.size);
-                
-                // Only refresh display if restaurants are currently shown
-                if (filteredRestaurants.length > 0) {
-                    displayRestaurants();
+                if (supabase) {
+                    const { data, error } = await supabase.from('restaurants').select('*').eq('status', 'approved');
+                    if (!error && data && data.length > 0) {
+                        restaurants = data;
+                        console.log('Loaded restaurants from Supabase:', restaurants.length);
+                        return;
+                    }
                 }
             } catch (error) {
-                console.warn('Failed to load favorites:', error);
+                console.warn('Supabase error:', error);
             }
+            
+            restaurants = demoRestaurants;
+            console.log('Using demo restaurants:', restaurants.length);
         }
 
-        // Display restaurants in grid
+        // Filter and display restaurants
+        function filterRestaurants(cuisineFilter, searchTerm) {
+            if (cuisineFilter) {
+                filteredRestaurants = restaurants.filter(r => 
+                    r.cuisine && r.cuisine.toLowerCase() === cuisineFilter.toLowerCase()
+                );
+            } else if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filteredRestaurants = restaurants.filter(r =>
+                    r.name.toLowerCase().includes(term) ||
+                    r.description.toLowerCase().includes(term) ||
+                    (r.cuisine && r.cuisine.toLowerCase().includes(term))
+                );
+            } else {
+                filteredRestaurants = [...restaurants];
+            }
+            
+            currentPage = 0;
+            displayRestaurants();
+        }
+
         function displayRestaurants() {
             const container = document.getElementById('categoryContainer');
-            if (!container) return;
             
-            container.innerHTML = '';
-            
-            // Group restaurants by cuisine
-            const groupedRestaurants = {};
-            restaurants.forEach(restaurant => {
-                const cuisine = restaurant.cuisine || 'Other';
-                if (!groupedRestaurants[cuisine]) {
-                    groupedRestaurants[cuisine] = [];
-                }
-                groupedRestaurants[cuisine].push(restaurant);
-            });
-            
-            // Create sections for each cuisine
-            Object.entries(groupedRestaurants).forEach(([cuisine, restaurantList]) => {
-                const section = document.createElement('div');
-                section.className = 'mb-12';
-                section.innerHTML = `
-                    <h3 class="text-3xl font-bold text-gray-800 mb-8 text-center">${cuisine}</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        ${restaurantList.map(restaurant => createEnhancedRestaurantCard(restaurant)).join('')}
-                    </div>
-                `;
-                container.appendChild(section);
-            });
-            
-            // Show the view toggle section
-            const viewToggleSection = document.getElementById('viewToggleSection');
-            if (viewToggleSection) {
-                viewToggleSection.classList.remove('hidden');
+            if (filteredRestaurants.length === 0) {
+                container.innerHTML = '<div class="text-center py-16"><h3 class="text-2xl font-bold text-gray-600 mb-4">No Results Found</h3><p class="text-gray-500">Try a different cuisine or search term.</p></div>';
+                return;
             }
             
-            // Re-initialize Lucide icons
+            const totalPages = Math.ceil(filteredRestaurants.length / restaurantsPerPage);
+            const startIndex = currentPage * restaurantsPerPage;
+            const currentRestaurants = filteredRestaurants.slice(startIndex, startIndex + restaurantsPerPage);
+            
+            let html = '<div class="mb-8"><div class="flex items-center justify-between mb-6">';
+            html += '<h3 class="text-3xl font-bold text-gray-800">';
+            html += selectedCuisine ? selectedCuisine.charAt(0).toUpperCase() + selectedCuisine.slice(1) : 'All Restaurants';
+            html += ' <span class="text-lg font-normal text-gray-500 ml-2">(' + filteredRestaurants.length + ' found)</span></h3>';
+            
+            if (totalPages > 1) {
+                html += '<div class="flex items-center space-x-4">';
+                html += '<span class="text-sm text-gray-600">Page ' + (currentPage + 1) + ' of ' + totalPages + '</span>';
+                html += '<div class="flex items-center space-x-2">';
+                html += '<button onclick="previousPage()" ' + (currentPage === 0 ? 'disabled' : '') + ' class="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-5 h-5 text-gray-600"></i></button>';
+                html += '<button onclick="nextPage()" ' + (currentPage >= totalPages - 1 ? 'disabled' : '') + ' class="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-right" class="w-5 h-5 text-gray-600"></i></button>';
+                html += '</div></div>';
+            }
+            
+            html += '</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
+            
+            currentRestaurants.forEach(restaurant => {
+                const isFavorited = userFavorites.has(restaurant.id);
+                html += '<div class="restaurant-card">';
+                html += '<div class="relative">';
+                html += '<div class="w-full h-48 bg-gradient-to-br from-orange-200 to-rose-200 flex items-center justify-center"><i data-lucide="utensils" class="w-12 h-12 text-gray-400"></i></div>';
+                html += '<button class="favorite-btn ' + (isFavorited ? 'favorited' : '') + '" onclick="toggleFavorite(' + restaurant.id + ', this)">';
+                html += '<i data-lucide="heart" class="w-5 h-5 ' + (isFavorited ? 'fill-current' : '') + '"></i></button>';
+                html += '</div><div class="p-6">';
+                html += '<h3 class="text-xl font-bold text-gray-800 mb-2">' + restaurant.name + '</h3>';
+                html += '<p class="text-gray-600 mb-3">' + restaurant.description + '</p>';
+                html += '<div class="flex items-center justify-between mb-4">';
+                html += '<span class="text-sm font-medium text-orange-600 bg-orange-50 px-3 py-1 rounded-full">' + restaurant.cuisine + '</span>';
+                if (restaurant.rating) {
+                    html += '<div class="flex items-center"><i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current mr-1"></i><span class="text-sm font-medium text-gray-700">' + restaurant.rating + '</span></div>';
+                }
+                html += '</div>';
+                html += '<button onclick="openRestaurantModal(' + restaurant.id + ')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors">View Details</button>';
+                html += '</div></div>';
+            });
+            
+            html += '</div></div>';
+            container.innerHTML = html;
             lucide.createIcons();
         }
 
-        // Filter by tag
-        function filterByTag(tag) {
-            console.log('Filtering by tag:', tag);
-            scrollToRestaurants();
+        // Pagination functions
+        function nextPage() {
+            const totalPages = Math.ceil(filteredRestaurants.length / restaurantsPerPage);
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                displayRestaurants();
+            }
         }
 
-        // Simple modal functions
+        function previousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                displayRestaurants();
+            }
+        }
+
+        // Favorite functionality
+        function toggleFavorite(restaurantId, buttonElement) {
+            if (!currentUser) {
+                alert('Please sign in to save favorites');
+                return;
+            }
+
+            if (userFavorites.has(restaurantId)) {
+                userFavorites.delete(restaurantId);
+                buttonElement.classList.remove('favorited');
+                buttonElement.querySelector('i').classList.remove('fill-current');
+            } else {
+                userFavorites.add(restaurantId);
+                buttonElement.classList.add('favorited');
+                buttonElement.querySelector('i').classList.add('fill-current');
+            }
+        }
+
+        // Restaurant modal
         function openRestaurantModal(restaurantId) {
-            const restaurant = restaurants.find(r => r.id === restaurantId);
+            const restaurant = restaurants.find(r => r.id === restaurantId) || filteredRestaurants.find(r => r.id === restaurantId);
             if (!restaurant) return;
             
             const modal = document.getElementById('restaurantModal');
             const modalContent = document.getElementById('modalContent');
             
-            modalContent.innerHTML = `
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">${restaurant.name}</h2>
-                <div class="mb-4">
-                    <span class="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
-                        ${restaurant.cuisine}
-                    </span>
-                    ${restaurant.rating ? `
-                        <span class="inline-block ml-2">
-                            <i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current inline"></i>
-                            <span class="text-sm font-medium text-gray-700">${restaurant.rating}</span>
-                        </span>
-                    ` : ''}
-                </div>
-                <p class="text-gray-600 mb-6">${restaurant.description}</p>
-                <div class="space-y-3">
-                    <div class="flex items-center text-gray-600">
-                        <i data-lucide="map-pin" class="w-5 h-5 mr-3"></i>
-                        <span>${restaurant.address}</span>
-                    </div>
-                    ${restaurant.phone ? `
-                        <div class="flex items-center text-gray-600">
-                            <i data-lucide="phone" class="w-5 h-5 mr-3"></i>
-                            <span>${restaurant.phone}</span>
-                        </div>
-                    ` : ''}
-                    ${restaurant.website ? `
-                        <div class="flex items-center text-gray-600">
-                            <i data-lucide="external-link" class="w-5 h-5 mr-3"></i>
-                            <a href="${restaurant.website}" target="_blank" class="text-orange-500 hover:underline">Visit Website</a>
-                        </div>
-                    ` : ''}
-                </div>
-                ${restaurant.tags && restaurant.tags.length > 0 ? `
-                    <div class="mt-6">
-                        <h4 class="font-semibold text-gray-800 mb-2">Tags</h4>
-                        <div class="flex flex-wrap gap-2">
-                            ${restaurant.tags.map(tag => 
-                                `<span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">${tag}</span>`
-                            ).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-            `;
+            let html = '<h2 class="text-3xl font-bold text-gray-800 mb-4">' + restaurant.name + '</h2>';
+            html += '<div class="mb-4"><span class="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">' + restaurant.cuisine + '</span>';
+            if (restaurant.rating) {
+                html += '<span class="inline-block ml-2"><i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current inline mr-1"></i>' + restaurant.rating + '</span>';
+            }
+            html += '</div>';
+            html += '<p class="text-gray-600 mb-6">' + restaurant.description + '</p>';
+            html += '<div class="space-y-3">';
+            html += '<div class="flex items-center text-gray-600"><i data-lucide="map-pin" class="w-5 h-5 mr-3"></i><span>' + restaurant.address + '</span></div>';
+            html += '</div>';
             
+            modalContent.innerHTML = html;
             modal.classList.remove('hidden');
             lucide.createIcons();
         }
 
+        // Modal functions
         function closeRestaurantModal() {
             document.getElementById('restaurantModal').classList.add('hidden');
         }
@@ -863,227 +625,74 @@
             document.getElementById('submissionModal').classList.add('hidden');
         }
 
-        // Auth placeholder functions
-        function initializeAuth() {
-            const authContainer = document.getElementById('authContainer');
-            if (authContainer) {
-                authContainer.innerHTML = `
-                    <button class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
-                        Sign In
-                    </button>
-                `;
-            }
-        }
-
-        // Auto-scroll functionality
+        // Scroll to restaurants
         function scrollToRestaurants() {
-            document.getElementById('restaurantsSection').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+            document.getElementById('restaurantsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Initialize popular cuisine selection
-        function initializeCuisineSelection() {
-            const cuisineOptions = document.querySelectorAll('.cuisine-option');
-            
-            cuisineOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove selected class from all options (single selection)
-                    cuisineOptions.forEach(opt => opt.classList.remove('selected'));
-                    
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                    
-                    // Store selected cuisine
-                    selectedCuisine = this.dataset.cuisine;
-                    
-                    // Filter restaurants by cuisine
-                    filterRestaurants(selectedCuisine);
-                    
-                    // Auto-scroll to restaurants section
-                    scrollToRestaurants();
-                });
-            });
-        }
-
-        // Auto-scroll for main buttons
+        // Initialize everything
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize cuisine selection
-            initializeCuisineSelection();
-            
-            // Add auto-scroll to "Discover Eats" button
-            const findBtn = document.getElementById('findBtn');
-            if (findBtn) {
-                findBtn.addEventListener('click', scrollToRestaurants);
-            }
-            
-            // Add auto-scroll to "browse all restaurants" button
-            const viewAllBtn = document.getElementById('viewAllBtn');
-            if (viewAllBtn) {
-                viewAllBtn.addEventListener('click', scrollToRestaurants);
-            }
-        });
-
-        // Enhanced restaurant card creation with favorites
-        function createEnhancedRestaurantCard(restaurant) {
-            const isFavorited = userFavorites.has(restaurant.id);
-            
-            return `
-                <div class="restaurant-card">
-                    <div class="relative">
-                        ${restaurant.image ? 
-                            `<img src="${restaurant.image}" alt="${restaurant.name}" class="w-full h-48 object-cover">` :
-                            `<div class="w-full h-48 bg-gradient-to-br from-orange-200 to-rose-200 flex items-center justify-center">
-                                <i data-lucide="utensils" class="w-12 h-12 text-gray-400"></i>
-                            </div>`
-                        }
-                        
-                        <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" onclick="toggleFavorite(${restaurant.id}, this)">
-                            <i data-lucide="heart" class="w-5 h-5 ${isFavorited ? 'fill-current' : ''}"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${restaurant.name}</h3>
-                        <p class="text-gray-600 mb-3 line-clamp-2">${restaurant.description || 'A great local dining spot.'}</p>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-medium text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
-                                ${restaurant.cuisine || 'Restaurant'}
-                            </span>
-                            ${restaurant.rating ? 
-                                `<div class="flex items-center">
-                                    <i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current mr-1"></i>
-                                    <span class="text-sm font-medium text-gray-700">${restaurant.rating}</span>
-                                </div>` : ''
-                            }
-                        </div>
-                        
-                        <button onclick="openRestaurantModal(${restaurant.id})" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors">
-                            View Details
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Toggle favorite functionality
-        async function toggleFavorite(restaurantId, buttonElement) {
-            if (!currentUser) {
-                alert('Please sign in to save favorites');
-                return;
-            }
-
-            try {
-                if (userFavorites.has(restaurantId)) {
-                    // Remove favorite
-                    if (supabase) {
-                        const { error } = await supabase
-                            .from('favorites')
-                            .delete()
-                            .eq('user_id', currentUser.id)
-                            .eq('restaurant_id', restaurantId);
-                        
-                        if (error) throw error;
-                    }
-                    
-                    userFavorites.delete(restaurantId);
-                    buttonElement.classList.remove('favorited');
-                    buttonElement.querySelector('i').classList.remove('fill-current');
-                } else {
-                    // Add favorite
-                    if (supabase) {
-                        const { error } = await supabase
-                            .from('favorites')
-                            .insert([{ 
-                                user_id: currentUser.id, 
-                                restaurant_id: restaurantId 
-                            }]);
-                        
-                        if (error) throw error;
-                    }
-                    
-                    userFavorites.add(restaurantId);
-                    buttonElement.classList.add('favorited');
-                    buttonElement.querySelector('i').classList.add('fill-current');
-                }
-                
-                // Re-initialize Lucide icons
-                lucide.createIcons();
-            } catch (error) {
-                console.error('Error toggling favorite:', error);
-                alert('Failed to update favorite');
-            }
-        }
-
-        // Initialize everything when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing...');
-            
-            // Initialize cuisine selection
-            initializeCuisineSelection();
-            
-            // Initialize auth
-            initializeAuth();
+            console.log('Initializing Homer Bites...');
             
             // Load restaurants
             loadRestaurants();
             
-            // Add auto-scroll to main buttons
-            const findBtn = document.getElementById('findBtn');
-            if (findBtn) {
-                findBtn.addEventListener('click', function() {
-                    const searchTerm = document.getElementById('tagSearchInput').value.trim();
-                    if (searchTerm) {
-                        // Clear cuisine selection when searching
-                        document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
-                        selectedCuisine = null;
-                        filterRestaurants(null, searchTerm);
-                        console.log('Searching for:', searchTerm);
-                    } else {
-                        alert('Please enter a search term');
-                        return;
-                    }
-                    scrollToRestaurants();
+            // Initialize auth
+            if (supabase) {
+                supabase.auth.getUser().then(({ data: { user } }) => {
+                    currentUser = user;
+                    updateAuthUI();
+                });
+                
+                supabase.auth.onAuthStateChange((event, session) => {
+                    currentUser = session?.user || null;
+                    updateAuthUI();
                 });
             }
             
-            const viewAllBtn = document.getElementById('viewAllBtn');
-            if (viewAllBtn) {
-                viewAllBtn.addEventListener('click', function() {
-                    // Clear selections
+            // Initialize cuisine selection
+            document.querySelectorAll('.cuisine-option').forEach(option => {
+                option.addEventListener('click', function() {
                     document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
-                    selectedCuisine = null;
-                    filterRestaurants(); // Show all
+                    this.classList.add('selected');
+                    selectedCuisine = this.dataset.cuisine;
+                    filterRestaurants(selectedCuisine);
                     scrollToRestaurants();
                 });
-            }
-
-            // Submit restaurant button
-            const submitBtn = document.getElementById('submitRestaurantBtn_bottom');
-            if (submitBtn) {
-                submitBtn.addEventListener('click', function() {
-                    document.getElementById('submissionModal').classList.remove('hidden');
-                });
-            }
-
-            // Form submission
-            const submissionForm = document.getElementById('submissionForm');
-            if (submissionForm) {
-                submissionForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    alert('Thank you for your submission! We will review it soon.');
-                    closeSubmissionModal();
-                });
-            }
+            });
+            
+            // Search functionality
+            document.getElementById('findBtn').addEventListener('click', function() {
+                const searchTerm = document.getElementById('tagSearchInput').value.trim();
+                if (searchTerm) {
+                    document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
+                    selectedCuisine = null;
+                    filterRestaurants(null, searchTerm);
+                    scrollToRestaurants();
+                } else {
+                    alert('Please enter a search term');
+                }
+            });
+            
+            // Browse all functionality
+            document.getElementById('viewAllBtn').addEventListener('click', function() {
+                document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
+                selectedCuisine = null;
+                filterRestaurants();
+                scrollToRestaurants();
+            });
+            
+            // Submit restaurant functionality
+            document.getElementById('submitRestaurantBtn_bottom').addEventListener('click', function() {
+                document.getElementById('submissionModal').classList.remove('hidden');
+            });
+            
+            document.getElementById('submissionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Thank you for your submission! We will review it soon.');
+                closeSubmissionModal();
+            });
         });
-
-        // Placeholder restaurant modal function (you'll need to implement in your script.js)
-        function openRestaurantModal(restaurantId) {
-            // Your existing modal logic
-            console.log('Opening modal for restaurant:', restaurantId);
-        }
     </script>
 </body>
 </html>
