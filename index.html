@@ -1,223 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homer Bites - Discover Local Food in Homer, Alaska</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Homer Bites - A Culinary Journey in Homer, Alaska</title>
+    <meta name="description" content="Discover the best local eateries, hidden gems, and delightful dining experiences in Homer, Alaska with Homer Bites.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'sans': ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                    colors: {
-                        'brand': {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            400: '#38bdf8',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            900: '#1e3a8a',
-                        },
-                        'accent': {
-                            400: '#fb7185',
-                            500: '#f43f5e',
-                            600: '#e11d48',
-                        }
-                    },
-                    animation: {
-                        'slide-up': 'slideUp 0.5s ease-out',
-                        'fade-in': 'fadeIn 0.3s ease-out',
-                        'scale-in': 'scaleIn 0.2s ease-out',
-                        'shimmer': 'shimmer 2s infinite',
-                        'glow-shine': 'glowShine 0.5s 0s linear',
-                        'rotate-border': 'rotateBorder 3s linear infinite',
-                    },
-                    keyframes: {
-                        slideUp: {
-                            '0%': { transform: 'translateY(100px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        scaleIn: {
-                            '0%': { transform: 'scale(0.9)', opacity: '0' },
-                            '100%': { transform: 'scale(1)', opacity: '1' },
-                        },
-                        shimmer: {
-                            '0%': { transform: 'translateX(-100%)' },
-                            '100%': { transform: 'translateX(100%)' },
-                        },
-                        glowShine: {
-                            'from': { opacity: '0', left: '0%' },
-                            '50%': { opacity: '1' },
-                            'to': { opacity: '0', left: '100%' }
-                        },
-                        rotateBorder: {
-                            '0%': { transform: 'rotate(0deg)' },
-                            '100%': { transform: 'rotate(360deg)' }
-                        }
-                    }
-                }
-            }
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap');
+
+        :root {
+            --color-primary: #FF7043; /* Warm Orange */
+            --color-secondary: #4CAF50; /* Fresh Green */
+            --color-accent: #2196F3; /* Sky Blue */
+            --color-text-dark: #333333;
+            --color-text-light: #555555;
+            --color-bg-light: #F9FAFB; /* Off-white */
+            --color-bg-paper: #FFFFFF; /* Pure White */
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow-strong: 0 12px 36px rgba(0, 0, 0, 0.12);
         }
-        
-        // Initialize Supabase
-        const supabase = window.supabase.createClient(
-            'https://qtjwacufuwkehfkkijsl.supabase.co', 
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc'
-        );
-    </script>
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--color-bg-light);
+            color: var(--color-text-light);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            color: var(--color-text-dark);
+        }
+
+        /* Custom Scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg-light);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db; /* Light gray */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af; /* Darker gray */
+        }
+
+        /* Hero Wave Effect */
+        .hero-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            transform: rotate(180deg);
+        }
+
+        .hero-wave svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 150px; /* Adjust height as needed */
+        }
+
+        .hero-wave .shape-fill {
+            fill: var(--color-bg-light);
+        }
+
+        /* Subtle Button Hover Effect */
+        .btn-hover-scale {
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .btn-hover-scale:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Card Hover Effect */
+        .card-hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Input Focus Styling */
+        input:focus, textarea:focus {
+            border-color: var(--color-accent) !important;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
+        }
+
+        /* Tag Button Styling */
+        .tag-button {
+            background-color: #f0f4f8; /* Light blue-gray */
+            color: var(--color-text-light);
+            border: 1px solid #e2e8f0; /* Lighter border */
+            transition: all 0.2s ease-out;
+        }
+        .tag-button:hover {
+            background-color: #e2e8f0;
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+        }
+        .tag-button.active {
+            background-color: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .modal-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .modal-slide-up {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen font-sans antialiased">
+<body class="bg-gradient-to-br from-blue-50 to-rose-50 min-h-screen font-sans antialiased">
 
-    <nav class="relative z-50 backdrop-blur-xl bg-white/10 border-b border-white/10 sticky top-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-accent-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/25">
-                            HB
-                        </div>
-                        <div class="ml-3">
-                            <h1 class="text-xl font-bold text-white">Homer Bites</h1>
-                            <p class="text-xs text-gray-300">Discover local food in Homer, Alaska</p>
-                        </div>
-                    </div>
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-3 group animate-fade-in">
+                <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl shadow-md group-hover:shadow-lg transition-all duration-300">
+                    HB
                 </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800 tracking-tight">Homer Bites</h1>
+                    <p class="text-xs text-gray-500">Discover local food</p>
+                </div>
+            </a>
 
-                <div id="authContainer" class="flex items-center space-x-3">
-                    </div>
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                <a href="#hero" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Discover</a>
+                <a href="#about" class="text-gray-600 hover:text-orange-500 transition-colors py-2">About</a>
+                <a href="#contact" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Contact</a>
+            </nav>
+
+            <div id="authContainer" class="flex items-center space-x-3">
+                <!-- Auth buttons will be populated by JavaScript -->
+            </div>
+
+            <button class="md:hidden p-2 rounded-md hover:bg-gray-100 text-gray-700 transition-colors">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative bg-gradient-to-br from-blue-100 to-rose-100 py-24 sm:py-32 overflow-hidden text-center">
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-5xl md:text-6xl font-extrabold text-gray-800 leading-tight mb-6 animate-slide-up">
+                Savor the Flavor of <span class="text-rose-600">Homer</span>, Alaska
+            </h2>
+            <p class="text-xl text-gray-600 mb-10 animate-fade-in">Your ultimate guide to Homer's vibrant culinary scene. Find local favorites, hidden gems, and unforgettable meals.</p>
+
+            <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 animate-fade-in">
+                <input type="text" id="tagSearchInput" placeholder="Craving something specific? E.g., 'seafood', 'pizza'..." class="w-full sm:w-2/3 lg:w-1/2 px-6 py-4 rounded-full border border-gray-300 shadow-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all outline-none text-gray-700 text-lg">
+                <button id="findBtn" class="flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 btn-hover-scale text-lg font-semibold">
+                    <i data-lucide="search" class="w-6 h-6 mr-3"></i>
+                    Discover Eats
+                </button>
+            </div>
+            
+            <div class="flex justify-center gap-4 mb-6">
+                <button id="viewAllBtn" class="px-6 py-3 text-gray-600 hover:text-orange-500 transition-colors text-lg font-medium">
+                    Or simply <span class="underline underline-offset-4 decoration-dashed decoration-gray-400">browse all restaurants</span>
+                </button>
+                <button id="randomRestaurantBtn" class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all btn-hover-scale font-medium">
+                    <i data-lucide="shuffle" class="w-5 h-5 mr-2"></i>
+                    Surprise Me!
+                </button>
             </div>
         </div>
-    </nav>
+        <!-- Hero Wave Background -->
+        <div class="hero-wave">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M985.66,92.83C906.67,72,823.79,31,743.84,14.19c-82.26-17.34-168.35-16.64-250.46.15-82.7,17.7-172.14,87.31-257.83,11.3C155.18,74.58,66.44,53.13,0,34.52V0H1200V43.19C1128.15,68.8,1069.1,102.44,985.66,92.83Z" class="shape-fill"></path>
+            </svg>
+        </div>
+    </section>
 
-    <section class="relative z-10 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-6 border border-white/20 shadow-2xl">
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-white mb-4">Find Your Next Meal</h2>
-                    <div class="text-gray-300 text-sm mb-6 space-y-1">
-                        <p>Feeling picky? <strong class="text-white">Use the search!</strong></p>
-                        <p>Feeling indecisive? <strong class="text-white">Use the tags!</strong></p>
-                        <p>Feeling lazy? <strong class="text-white">Hit "View All"!</strong></p>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
-                        <input type="text" id="tagSearchInput" placeholder="e.g.: burgers, pizza, seafood, etc.." class="w-full sm:w-1/2 px-4 py-3 bg-white/5 border border-white/20 rounded-xl shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all">
-                        <button id="findBtn" class="glow-button glow-button-red w-full sm:w-auto">Find</button>
-                        <button id="viewAllBtn" class="glow-button glow-button-gray w-full sm:w-auto">View All</button>
-                    </div>
-                </div>
-                
-                <div id="staticTagsContainer" class="flex flex-wrap justify-center gap-2">
-                    </div>
+    <!-- Popular Cuisines Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-3xl font-bold text-gray-800 mb-8">Popular Cuisines to Explore</h3>
+            <div id="staticTagsContainer" class="flex flex-wrap justify-center gap-3 animate-fade-in">
+                <!-- Tags will be populated by JavaScript -->
             </div>
         </div>
     </section>
 
-    <main class="relative z-10 pb-16">
-        <div id="viewToggleSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <div class="flex justify-center gap-3">
-                <button id="gridViewBtn" class="glow-button glow-button-blue">
-                    Grid View
+    <!-- Restaurant Listings / Map Toggle -->
+    <main class="relative z-10 py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="viewToggleSection" class="hidden mb-10 flex justify-center gap-4 animate-fade-in">
+                <button id="gridViewBtn" class="flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 rounded-full shadow-md hover:bg-gray-100 transition-all btn-hover-scale active">
+                    <i data-lucide="grid" class="w-5 h-5"></i>
+                    <span class="font-medium">Grid View</span>
                 </button>
-                <button id="mapViewBtn" class="glow-button glow-button-gray">
-                    Map View
+                <button id="mapViewBtn" class="flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 rounded-full shadow-md hover:bg-gray-100 transition-all btn-hover-scale">
+                    <i data-lucide="map" class="w-5 h-5"></i>
+                    <span class="font-medium">Map View</span>
                 </button>
             </div>
-        </div>
 
-        <div id="gridContent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div id="categoryContainer" class="space-y-16">
+            <div id="gridContent">
+                <div id="categoryContainer" class="space-y-16">
+                    <!-- Restaurant content will be populated by JavaScript -->
                 </div>
-        </div>
+            </div>
 
-        <div id="mapContent" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
-                <div id="map" class="w-full h-[70vh]"></div>
+            <div id="mapContent" class="hidden">
+                <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+                    <div id="map" class="w-full h-[60vh]"></div>
+                </div>
             </div>
         </div>
     </main>
 
-    <div id="restaurantModal" class="fixed inset-0 z-50 hidden">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeRestaurantModal()"></div>
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gradient-to-br from-blue-50 to-rose-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-4xl font-extrabold text-gray-800 mb-6">Our Mission: Connecting You with Homer's Best</h3>
+            <p class="text-lg text-gray-700 leading-relaxed mb-8">Homer Bites was built on two things: a deep love for our local food scene and a sheer frustration with trying to find it. We believe finding your next great meal shouldn't require hunting through social media or piecing together search results. Our mission is to showcase the town's incredible culinary talent, helping both lifelong residents and curious visitors easily discover everything from comforting classics to innovative new tastes.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-md flex-1 text-left card-hover-lift animate-slide-up">
+                    <div class="text-orange-500 mb-3"><i data-lucide="heart" class="w-8 h-8"></i></div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">Love for Local</h4>
+                    <p class="text-gray-600 text-sm">Our guide is dedicated to the independent restaurants, cafes, and food trucks owned and operated right here in our community.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-md flex-1 text-left card-hover-lift animate-slide-up">
+                    <div class="text-blue-500 mb-3"><i data-lucide="compass" class="w-8 h-8"></i></div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">Effortless Discovery</h4>
+                    <p class="text-gray-600 text-sm">Our platform makes it easy to find exactly what you're craving, with intuitive search and curated categories.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-md flex-1 text-left card-hover-lift animate-slide-up">
+                    <div class="text-green-500 mb-3"><i data-lucide="users" class="w-8 h-8"></i></div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">Community Driven</h4>
+                    <p class="text-gray-600 text-sm">Submit your favorite spots and help us grow our comprehensive guide. Together, we celebrate Homer's culinary spirit.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="py-16 bg-white text-center">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h3 class="text-3xl font-bold text-gray-800 mb-4">Don't See Your Favorite Spot?</h3>
+            <p class="text-lg text-gray-600 mb-8">
+                Help us make Homer Bites even better! If there's a restaurant you love that's not listed, please let us know.
+            </p>
+            <button id="submitRestaurantBtn_bottom" class="flex items-center justify-center mx-auto px-8 py-4 bg-rose-500 text-white rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 btn-hover-scale text-lg font-semibold">
+                <i data-lucide="plus" class="w-6 h-6 mr-3"></i>
+                Submit a Restaurant
+            </button>
+        </div>
+    </section>
+
+    <!-- Restaurant Detail Modal -->
+    <div id="restaurantModal" class="fixed inset-0 z-50 hidden modal-fade-in">
+        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRestaurantModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="popup-border-wrap rounded-3xl animate-scale-in">
-                <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-                    <div class="relative">
-                        <button onclick="closeRestaurantModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-black/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/40 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                        <div id="modalContent">
-                            </div>
+            <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl modal-slide-up">
+                <div class="relative">
+                    <button onclick="closeRestaurantModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-sm">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                    <div id="modalContent" class="p-8">
+                        <!-- Dynamic content will be loaded here -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="submissionModal" class="fixed inset-0 z-50 hidden">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeSubmissionModal()"></div>
+    <!-- Submission Modal -->
+    <div id="submissionModal" class="fixed inset-0 z-50 hidden modal-fade-in">
+        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSubmissionModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="popup-border-wrap rounded-3xl animate-scale-in">
-                <div class="backdrop-blur-2xl bg-slate-800/50 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl text-white">
-                    <div class="relative p-8">
-                        <button onclick="closeSubmissionModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                        <h2 class="text-2xl font-bold mb-2 text-white">Submit a Restaurant</h2>
-                        <p class="text-gray-300 mb-6">Know a great spot we're missing? Fill out the form below!</p>
-                        <form id="submissionForm">
-                            <div class="space-y-4">
-                                <div>
-                                    <label for="restaurantName" class="block text-sm font-medium text-gray-300">Restaurant Name</label>
-                                    <input type="text" id="restaurantName" name="restaurantName" required class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="restaurantWebsite" class="block text-sm font-medium text-gray-300">Restaurant Website</label>
-                                    <input type="url" id="restaurantWebsite" name="restaurantWebsite" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="restaurantAddress" class="block text-sm font-medium text-gray-300">Address</label>
-                                    <input type="text" id="restaurantAddress" name="restaurantAddress" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="restaurantImage" class="block text-sm font-medium text-gray-300">Image of Restaurant</label>
-                                    <input type="file" id="restaurantImage" name="restaurantImage" accept="image/*" class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent-500/10 file:text-accent-400 hover:file:bg-accent-500/20">
-                                </div>
-                            </div>
-                            <div class="mt-8">
-                                <button type="submit" class="glow-button glow-button-blue w-full">
-                                    Submit Suggestion
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+            <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl modal-slide-up">
+                <div class="relative p-8">
+                    <button onclick="closeSubmissionModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-sm">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Share a Culinary Gem</h2>
+                    <p class="text-gray-600 mb-6">Help us grow our directory by suggesting a new restaurant.</p>
+                    <form id="submissionForm" class="space-y-5">
+                        <div>
+                            <label for="restaurantName" class="block text-sm font-medium text-gray-700 mb-1">Restaurant Name</label>
+                            <input type="text" id="restaurantName" name="restaurantName" required class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-200 focus:border-blue-500 outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label for="restaurantDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea id="restaurantDescription" name="restaurantDescription" rows="3" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-200 focus:border-blue-500 outline-none transition-colors" placeholder="Briefly describe the restaurant..."></textarea>
+                        </div>
+                        <div>
+                            <label for="restaurantWebsite" class="block text-sm font-medium text-gray-700 mb-1">Website (Optional)</label>
+                            <input type="url" id="restaurantWebsite" name="restaurantWebsite" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-200 focus:border-blue-500 outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label for="restaurantAddress" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                            <input type="text" id="restaurantAddress" name="restaurantAddress" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-200 focus:border-blue-500 outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label for="restaurantImage" class="block text-sm font-medium text-gray-700 mb-1">Image (Optional)</label>
+                            <input type="file" id="restaurantImage" name="restaurantImage" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors">
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" class="w-full flex items-center justify-center px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 btn-hover-scale text-base font-semibold">
+                                <i data-lucide="send" class="w-5 h-5 mr-3"></i>
+                                Submit Suggestion
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="relative z-10 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="backdrop-blur-xl bg-white/5 rounded-3xl p-8 border border-white/10 text-center">
-                <p class="text-gray-400">© 2025 Homer Bites. Made with love for Homer and food.</p>
+    <!-- Auth Modal (will be dynamically created) -->
+    
+    <!-- Footer Section -->
+    <footer id="contact" class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 mb-8">
+                <a href="#" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl">
+                        HB
+                    </div>
+                    <span class="text-2xl font-bold text-white tracking-tight">Homer Bites</span>
+                </a>
+                <nav class="flex space-x-6 text-sm font-medium">
+                    <a href="#hero" class="text-gray-300 hover:text-white transition-colors">Discover</a>
+                    <a href="#about" class="text-gray-300 hover:text-white transition-colors">About Us</a>
+                    <a href="#contact" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                </nav>
             </div>
+            <p class="text-gray-400 text-sm">© 2025 Homer Bites. Crafted with passion for the rich flavors of Homer, Alaska.</p>
         </div>
     </footer>
 
@@ -225,340 +369,14 @@
     <script src="modals.js?v=1.2"></script>
     <script src="script.js?v=1.2"></script>
 
-    <style>
-        /* Fallback styles and custom components */
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
-            min-height: 100vh;
-            color: white;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Animated Gradient Border for Popups */
-        @property --angle {
-          syntax: '<angle>';
-          inherits: false;
-          initial-value: 0deg;
-        }
-
-        .popup-border-wrap {
-          padding: 3px; /* This creates the border thickness */
-          background: conic-gradient(
-            from var(--angle),
-            #3b82f6, /* Tailwind 'brand-500' */
-            #f43f5e, /* Tailwind 'accent-500' */
-            #a855f7, /* A nice purple to bridge them */
-            #3b82f6
-          );
-          animation: rotate-border-animation 4s linear infinite;
-        }
-
-        @keyframes rotate-border-animation {
-          from { --angle: 0deg; }
-          to   { --angle: 360deg; }
-        }
-
-        /* Styles for Custom Alert */
-        #custom-alert-overlay {
-            z-index: 100;
-        }
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
         
-        /* Glow Button Styles */
-        .glow-button {
-            position: relative;
-            padding: 10px 20px;
-            border-radius: 7px;
-            font-size: 14px;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 2px;
-            background: transparent;
-            color: #fff;
-            overflow: hidden;
-            box-shadow: 0 0 0 0 transparent;
-            transition: all 0.2s ease-in;
-            border: 1px solid;
-            cursor: pointer;
-        }
-
-        /* Blue buttons */
-        .glow-button-blue {
-            border-color: rgb(59, 130, 246);
-        }
-        .glow-button-blue:hover {
-            background: rgb(59, 130, 246);
-            box-shadow: 0 0 30px 5px rgba(59, 130, 246, 0.815);
-            transition: all 0.2s ease-out;
-        }
-
-        /* Red buttons */
-        .glow-button-red {
-            border-color: rgb(244, 63, 94);
-        }
-        .glow-button-red:hover {
-            background: rgb(244, 63, 94);
-            box-shadow: 0 0 30px 5px rgba(244, 63, 94, 0.815);
-            transition: all 0.2s ease-out;
-        }
-
-        /* Green buttons */
-        .glow-button-green {
-            border-color: rgb(34, 197, 94);
-        }
-        .glow-button-green:hover {
-            background: rgb(34, 197, 94);
-            box-shadow: 0 0 30px 5px rgba(34, 197, 94, 0.815);
-            transition: all 0.2s ease-out;
-        }
-
-        /* Gray buttons */
-        .glow-button-gray {
-            border-color: rgb(156, 163, 175);
-        }
-        .glow-button-gray:hover {
-            background: rgb(156, 163, 175);
-            box-shadow: 0 0 30px 5px rgba(156, 163, 175, 0.815);
-            transition: all 0.2s ease-out;
-        }
-
-        /* Purple buttons */
-        .glow-button-purple {
-            border-color: rgb(147, 51, 234);
-        }
-        .glow-button-purple:hover {
-            background: rgb(147, 51, 234);
-            box-shadow: 0 0 30px 5px rgba(147, 51, 234, 0.815);
-            transition: all 0.2s ease-out;
-        }
-
-        .glow-button:hover::before {
-            animation: glowShine 0.5s 0s linear;
-        }
-
-        .glow-button::before {
-            content: '';
-            display: block;
-            width: 0px;
-            height: 86%;
-            position: absolute;
-            top: 7%;
-            left: 0%;
-            opacity: 0;
-            background: #fff;
-            box-shadow: 0 0 50px 30px #fff;
-            transform: skewX(-20deg);
-        }
-
-        @keyframes glowShine {
-            from {
-                opacity: 0;
-                left: 0%;
-            }
-            50% {
-                opacity: 1;
-            }
-            to {
-                opacity: 0;
-                left: 100%;
-            }
-        }
-
-        .glow-button:active {
-            box-shadow: 0 0 0 0 transparent;
-            transition: box-shadow 0.2s ease-in;
-        }
-
-        /* Smaller button styles for nav */
-        .glow-button.text-xs {
-            padding: 6px 12px;
-            font-size: 11px;
-            letter-spacing: 1px;
-        }
-        
-        .cuisine-filter {
-            position: relative;
-            padding: 12px 24px;
-            border-radius: 16px;
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.2s;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            cursor: pointer;
-            overflow: hidden;
-        }
-
-        .cuisine-filter:hover {
-            transform: scale(1.05);
-        }
-
-        .cuisine-filter.active {
-            background: linear-gradient(to right, #3b82f6, #2563eb);
-            border-color: #3b82f6;
-            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.25);
-        }
-
-        /* Static tag buttons - smaller size with glow animations */
-        .static-tag-button {
-            position: relative;
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-weight: 500;
-            font-size: 12px;
-            transition: all 0.2s ease-in;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            cursor: pointer;
-            overflow: hidden;
-            text-transform: capitalize;
-        }
-
-        .static-tag-button:hover {
-            transform: scale(1.05);
-            background: linear-gradient(to right, #3b82f6, #2563eb);
-            border-color: rgb(59, 130, 246);
-            box-shadow: 0 0 20px 3px rgba(59, 130, 246, 0.6);
-            transition: all 0.2s ease-out;
-        }
-
-        .static-tag-button:hover::before {
-            animation: glowShine 0.5s 0s linear;
-        }
-
-        .static-tag-button::before {
-            content: '';
-            display: block;
-            width: 0px;
-            height: 86%;
-            position: absolute;
-            top: 7%;
-            left: 0%;
-            opacity: 0;
-            background: #fff;
-            box-shadow: 0 0 30px 20px #fff;
-            transform: skewX(-20deg);
-        }
-
-        .static-tag-button:active {
-            box-shadow: 0 0 0 0 transparent;
-            transition: box-shadow 0.2s ease-in;
-        }
-
-        .static-tag-button.selected {
-            background: linear-gradient(to right, #3b82f6, #2563eb);
-            border-color: rgb(59, 130, 246);
-            box-shadow: 0 0 20px 3px rgba(59, 130, 246, 0.6);
-            transform: scale(1.05);
-        }
-
-        .restaurant-card {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .restaurant-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-        }
-
-        .restaurant-image {
-            position: relative;
-            overflow: hidden;
-            height: 200px;
-        }
-
-        .restaurant-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .restaurant-card:hover .restaurant-image img {
-            transform: scale(1.05);
-        }
-
-        .restaurant-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.1), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .restaurant-card:hover .restaurant-overlay {
-            opacity: 1;
-        }
-
-        .fav-btn svg {
-            transition: all 0.2s ease-in-out;
-        }
-        .fav-btn:hover svg {
-            transform: scale(1.2);
-        }
-
-        /* From Uiverse.io by catraco */
-        .random-btn {
-         --primary: 255, 90, 120;
-         --secondary: 150, 50, 60;
-         width: 60px;
-         height: 50px;
-         border: none;
-         outline: none;
-         cursor: pointer;
-         user-select: none;
-         touch-action: manipulation;
-         outline: 10px solid rgb(var(--primary), .5);
-         border-radius: 100%;
-         position: relative;
-         transition: .3s;
-        }
-
-        .random-btn .back {
-         background: rgb(var(--secondary));
-         border-radius: 100%;
-         position: absolute;
-         left: 0;
-         top: 0;
-         width: 100%;
-         height: 100%;
-        }
-
-        .random-btn .front {
-         background: linear-gradient(0deg, rgba(var(--primary), .6) 20%, rgba(var(--primary)) 50%);
-         box-shadow: 0 .5em 1em -0.2em rgba(var(--secondary), .5);
-         border-radius: 100%;
-         position: absolute;
-         border: 1px solid rgb(var(--secondary));
-         left: 0;
-         top: 0;
-         width: 100%;
-         height: 100%;
-         display: flex;
-         justify-content: center;
-         align-items: center;
-         font-size: 1.2rem;
-         font-weight: 600;
-         font-family: inherit;
-         transform: translateY(-15%);
-         transition: .15s;
-         color: rgb(var(--secondary));
-        }
-
-        .random-btn:active .front {
-         transform: translateY(0%);
-         box-shadow: 0 0;
-        }
-    </style>
+        // Initialize Supabase
+        const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
 </body>
 </html>
