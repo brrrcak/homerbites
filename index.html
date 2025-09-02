@@ -260,7 +260,7 @@
     <section id="hero" class="relative bg-gradient-to-br from-blue-100 to-rose-100 py-24 sm:py-32 overflow-hidden text-center">
         <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-5xl md:text-6xl font-extrabold text-gray-800 leading-tight mb-6 animate-slide-up">
-                Savor the Flavor of <span class="text-rose-600">Homer</span>.
+                Savor the Flavor of <span class="text-rose-600">Homer</span>, Alaska
             </h2>
             <p class="text-xl text-gray-600 mb-10 animate-fade-in">Your ultimate guide to Homer's vibrant culinary scene. Find local favorites, hidden gems, and unforgettable meals.</p>
 
@@ -279,7 +279,7 @@
                     <span class="cuisine-option" data-cuisine="seafood">Seafood</span>
                     <span class="cuisine-option" data-cuisine="american">American</span>
                     <span class="cuisine-option" data-cuisine="pizza">Pizza</span>
-                    <span class="cuisine-option" data-cuisine="coffee">Coffee</span>
+                    <span class="cuisine-option" data-cuisine="coffee">Coffee & Cafes</span>
                     <span class="cuisine-option" data-cuisine="bakery">Bakery</span>
                     <span class="cuisine-option" data-cuisine="mexican">Mexican</span>
                     <span class="cuisine-option" data-cuisine="asian">Asian</span>
@@ -485,7 +485,10 @@
         let selectedCuisine = null;
         let userFavorites = new Set();
         let restaurants = [];
+        let filteredRestaurants = [];
         let currentUser = null;
+        let currentPage = 0;
+        let restaurantsPerPage = 6;
 
         // Demo restaurant data (fallback when Supabase fails)
         const demoRestaurants = [
@@ -533,11 +536,61 @@
                 id: 5,
                 name: "Cosmic Kitchen",
                 description: "Creative fusion cuisine with fresh, local ingredients",
-                cuisine: "Fusion",
+                cuisine: "Asian",
                 address: "510 E Pioneer Ave, Homer, AK",
                 rating: 4.7,
                 image: null,
                 tags: ["fusion", "creative", "local ingredients"]
+            },
+            {
+                id: 6,
+                name: "Fat Olives Restaurant",
+                description: "Italian-inspired dishes with Mediterranean flair",
+                cuisine: "Italian",
+                address: "276 Ohlson Ln, Homer, AK",
+                rating: 4.6,
+                image: null,
+                tags: ["italian", "mediterranean", "pasta"]
+            },
+            {
+                id: 7,
+                name: "Fresh Sourdough Express Bakery & Café",
+                description: "Breakfast and lunch spot famous for sourdough pancakes",
+                cuisine: "Breakfast",
+                address: "1316 Ocean Dr, Homer, AK",
+                rating: 4.3,
+                image: null,
+                tags: ["breakfast", "pancakes", "sourdough"]
+            },
+            {
+                id: 8,
+                name: "La Cantina",
+                description: "Authentic Mexican cuisine with fresh ingredients",
+                cuisine: "Mexican",
+                address: "120 W Bunnell Ave, Homer, AK",
+                rating: 4.5,
+                image: null,
+                tags: ["mexican", "authentic", "fresh"]
+            },
+            {
+                id: 9,
+                name: "Alaska Pizza & Burgers",
+                description: "Local pizza joint with handcrafted burgers",
+                cuisine: "Pizza",
+                address: "4005 Lake St, Homer, AK",
+                rating: 4.2,
+                image: null,
+                tags: ["pizza", "burgers", "local"]
+            },
+            {
+                id: 10,
+                name: "Niko's Gyros",
+                description: "Greek specialties and Mediterranean sandwiches",
+                cuisine: "Sandwiches",
+                address: "451 E Pioneer Ave, Homer, AK",
+                rating: 4.4,
+                image: null,
+                tags: ["greek", "gyros", "sandwiches"]
             }
         ];
 
@@ -583,9 +636,8 @@
                     // Check if user is already logged in
                     const { data: { user }, error } = await supabase.auth.getUser();
                     
-                    if (error) {
+                    if (error && error.message !== 'Invalid JWT: Unable to process JWT') {
                         console.warn('Auth error:', error);
-                        throw error;
                     }
 
                     currentUser = user;
@@ -640,7 +692,7 @@
         // Handle sign in
         async function handleSignIn() {
             if (!supabase) {
-                alert('Authentication not available');
+                alert('Authentication not available - Supabase connection failed');
                 return;
             }
 
@@ -691,7 +743,11 @@
 
                 userFavorites = new Set(data.map(f => f.restaurant_id));
                 console.log('Loaded user favorites:', userFavorites.size);
-                displayRestaurants(); // Refresh display to show favorites
+                
+                // Only refresh display if restaurants are currently shown
+                if (filteredRestaurants.length > 0) {
+                    displayRestaurants();
+                }
             } catch (error) {
                 console.warn('Failed to load favorites:', error);
             }
@@ -842,8 +898,8 @@
                     // Store selected cuisine
                     selectedCuisine = this.dataset.cuisine;
                     
-                    // Filter restaurants by cuisine (you'll need to implement this in your script.js)
-                    // filterRestaurantsByCuisine(selectedCuisine);
+                    // Filter restaurants by cuisine
+                    filterRestaurants(selectedCuisine);
                     
                     // Auto-scroll to restaurants section
                     scrollToRestaurants();
@@ -978,9 +1034,16 @@
             const findBtn = document.getElementById('findBtn');
             if (findBtn) {
                 findBtn.addEventListener('click', function() {
-                    const searchTerm = document.getElementById('tagSearchInput').value;
+                    const searchTerm = document.getElementById('tagSearchInput').value.trim();
                     if (searchTerm) {
+                        // Clear cuisine selection when searching
+                        document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
+                        selectedCuisine = null;
+                        filterRestaurants(null, searchTerm);
                         console.log('Searching for:', searchTerm);
+                    } else {
+                        alert('Please enter a search term');
+                        return;
                     }
                     scrollToRestaurants();
                 });
@@ -988,7 +1051,13 @@
             
             const viewAllBtn = document.getElementById('viewAllBtn');
             if (viewAllBtn) {
-                viewAllBtn.addEventListener('click', scrollToRestaurants);
+                viewAllBtn.addEventListener('click', function() {
+                    // Clear selections
+                    document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
+                    selectedCuisine = null;
+                    filterRestaurants(); // Show all
+                    scrollToRestaurants();
+                });
             }
 
             // Submit restaurant button
