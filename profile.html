@@ -1,99 +1,416 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Your Profile - Homer Bites</title>
+    <meta name="description" content="Manage your Homer Bites profile and view your favorite restaurants.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { 'sans': ['Inter', 'system-ui', 'sans-serif'] },
-                    colors: {
-                        'brand': { 500: '#3b82f6', 600: '#2563eb' },
-                        'accent': { 500: '#f43f5e', 600: '#e11d48' }
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen font-sans antialiased text-white opacity-0 transition-opacity duration-500">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap');
 
-    <nav class="relative z-50 backdrop-blur-xl bg-white/10 border-b border-white/10 sticky top-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <a href="index.html" class="flex items-center space-x-4">
-                    <div class="w-10 h-10 bg-gradient-to-r from-brand-500 to-accent-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">HB</div>
-                    <div class="ml-3">
-                        <h1 class="text-xl font-bold text-white">Homer Bites</h1>
-                        <p class="text-xs text-gray-300">Discover local food in Homer, Alaska</p>
-                    </div>
-                </a>
-                <div class="flex items-center space-x-3">
-                    <a href="index.html" class="glow-button glow-button-gray text-xs">Back to Restaurants</a>
+        :root {
+            --color-primary: #FF7043; /* Warm Orange */
+            --color-secondary: #4CAF50; /* Fresh Green */
+            --color-accent: #2196F3; /* Sky Blue */
+            --color-text-dark: #333333;
+            --color-text-light: #555555;
+            --color-bg-light: #F9FAFB; /* Off-white */
+            --color-bg-paper: #FFFFFF; /* Pure White */
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow-strong: 0 12px 36px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--color-bg-light);
+            color: var(--color-text-light);
+            line-height: 1.6;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            color: var(--color-text-dark);
+        }
+
+        /* Custom Scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg-light);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db; /* Light gray */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af; /* Darker gray */
+        }
+
+        /* Button Hover Effect */
+        .btn-hover-scale {
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .btn-hover-scale:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Card Hover Effect */
+        .card-hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Input Focus Styling */
+        input:focus, textarea:focus {
+            border-color: var(--color-accent) !important;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .favorite-item {
+            transition: all 0.3s ease;
+        }
+        .favorite-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-rose-50 min-h-screen font-sans antialiased">
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <a href="index.html" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl shadow-md group-hover:shadow-lg transition-all duration-300">
+                    HB
                 </div>
-            </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800 tracking-tight">Homer Bites</h1>
+                    <p class="text-xs text-gray-500">Your Profile</p>
+                </div>
+            </a>
+
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                <a href="index.html" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Back to Restaurants</a>
+            </nav>
+
+            <button class="md:hidden p-2 rounded-md hover:bg-gray-100 text-gray-700 transition-colors">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
         </div>
-    </nav>
+    </header>
 
     <main class="py-12">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-8 border border-white/20 shadow-2xl space-y-12">
+            <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
                 
-                <div>
-                    <h2 class="text-3xl font-bold text-white mb-6">Profile Settings</h2>
-                    <form id="profileForm" class="space-y-4">
-                        <div>
-                            <label for="fullName" class="block text-sm font-medium text-gray-300">Full Name</label>
-                            <input type="text" id="fullName" name="fullName" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md shadow-sm text-white">
+                <!-- Profile Header -->
+                <div class="bg-gradient-to-br from-blue-100 to-rose-100 p-8 text-center">
+                    <div class="w-20 h-20 bg-gradient-to-br from-rose-500 to-orange-500 rounded-full flex items-center justify-center text-white font-extrabold text-2xl mx-auto mb-4 shadow-lg">
+                        <span id="profileInitials">U</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2" id="profileDisplayName">Your Profile</h2>
+                    <p class="text-gray-600" id="profileEmail">Loading...</p>
+                </div>
+
+                <!-- Profile Settings -->
+                <div class="p-8 border-b border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Profile Settings</h3>
+                    <form id="profileForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                <input type="text" id="fullName" name="fullName" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all">
+                            </div>
+                            <div>
+                                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                                <input type="text" id="username" name="username" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all">
+                            </div>
                         </div>
                         <div>
-                            <label for="username" class="block text-sm font-medium text-gray-300">Username</label>
-                            <input type="text" id="username" name="username" class="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md shadow-sm text-white">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" id="email" name="email" disabled class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm text-gray-500 cursor-not-allowed">
+                            <p class="text-sm text-gray-500 mt-1">Email cannot be changed from this page</p>
                         </div>
-                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
-                            <input type="email" id="email" name="email" disabled class="mt-1 block w-full px-3 py-2 bg-black/20 border border-white/10 rounded-md shadow-sm text-gray-400 cursor-not-allowed">
-                        </div>
-                        <div class="pt-4">
-                            <button type="submit" class="glow-button glow-button-blue">Save Changes</button>
+                        <div class="pt-2">
+                            <button type="submit" class="flex items-center px-8 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 btn-hover-scale font-semibold">
+                                <i data-lucide="save" class="w-5 h-5 mr-2"></i>
+                                Save Changes
+                            </button>
                         </div>
                     </form>
                 </div>
 
-                <div class="w-full h-px bg-white/10"></div>
-
-                <div>
-                    <h2 class="text-3xl font-bold text-white mb-6">Your Favorites</h2>
-                    <div id="favoritesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Favorites Section -->
+                <div class="p-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>
+                    <div id="favoritesContainer" class="space-y-4">
+                        <div class="text-center py-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                            <p class="text-gray-500">Loading your favorites...</p>
                         </div>
+                    </div>
                 </div>
 
             </div>
         </div>
     </main>
-    
-    <script src="modals.js?v=1.2"></script>
-    <script src="profile.js?v=1.2"></script>
 
-    <style>
-         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        .glow-button {
-            position: relative; padding: 10px 20px; border-radius: 7px;
-            font-size: 14px; text-transform: uppercase; font-weight: 600;
-            letter-spacing: 2px; background: transparent; color: #fff;
-            overflow: hidden; box-shadow: 0 0 0 0 transparent;
-            transition: all 0.2s ease-in; border: 1px solid; cursor: pointer;
+    <!-- Footer Section -->
+    <footer class="bg-gray-800 text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 mb-8">
+                <a href="index.html" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl">
+                        HB
+                    </div>
+                    <span class="text-2xl font-bold text-white tracking-tight">Homer Bites</span>
+                </a>
+                <nav class="flex space-x-6 text-sm font-medium">
+                    <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Back to Restaurants</a>
+                </nav>
+            </div>
+            <p class="text-gray-400 text-sm">© 2025 Homer Bites. Crafted with passion for the rich flavors of Homer, Alaska.</p>
+        </div>
+    </footer>
+
+    <script src="modals.js?v=1.2"></script>
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+        
+        // Initialize Supabase
+        const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+
+        // This function will run once the user's session is confirmed
+        function initializePage(session) {
+            // If no session is found, redirect to the homepage
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Make the page visible now that we've confirmed the user is logged in
+            document.body.classList.add('loaded');
+
+            currentUser = session.user;
+            loadUserProfile();
+            loadUserFavorites();
+
+            const profileForm = document.getElementById('profileForm');
+            profileForm.addEventListener('submit', handleProfileUpdate);
         }
-        .glow-button-blue { border-color: rgb(59, 130, 246); }
-        .glow-button-blue:hover { background: rgb(59, 130, 246); box-shadow: 0 0 30px 5px rgba(59, 130, 246, 0.815); }
-        .glow-button-gray { border-color: rgb(156, 163, 175); }
-        .glow-button-gray:hover { background: rgb(156, 163, 175); box-shadow: 0 0 30px 5px rgba(156, 163, 175, 0.815); }
-        .glow-button.text-xs { padding: 6px 12px; font-size: 11px; letter-spacing: 1px; }
-    </style>
+
+        // Listen for authentication state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            // The 'INITIAL_SESSION' event fires once when the client first loads.
+            // This is the ideal time to check for a user and initialize the page.
+            if (event === 'INITIAL_SESSION') {
+                initializePage(session);
+            }
+        });
+
+        async function loadUserProfile() {
+            const emailField = document.getElementById('email');
+            const profileEmail = document.getElementById('profileEmail');
+            const profileDisplayName = document.getElementById('profileDisplayName');
+            const profileInitials = document.getElementById('profileInitials');
+            
+            emailField.value = currentUser.email;
+            profileEmail.textContent = currentUser.email;
+
+            const { data, error } = await supabase
+                .from('user_profiles')
+                .select('full_name, username')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found, which is fine for new users
+                console.error('Error fetching profile:', error);
+                return;
+            }
+            
+            if (data) {
+                document.getElementById('fullName').value = data.full_name || '';
+                document.getElementById('username').value = data.username || '';
+                
+                // Update profile display
+                if (data.full_name) {
+                    profileDisplayName.textContent = data.full_name;
+                    profileInitials.textContent = data.full_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                } else {
+                    profileDisplayName.textContent = 'Your Profile';
+                    profileInitials.textContent = currentUser.email[0].toUpperCase();
+                }
+            } else {
+                profileInitials.textContent = currentUser.email[0].toUpperCase();
+            }
+        }
+
+        async function handleProfileUpdate(event) {
+            event.preventDefault();
+            const form = event.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            
+            submitButton.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>Saving...';
+            submitButton.disabled = true;
+
+            const updates = {
+                id: currentUser.id,
+                full_name: document.getElementById('fullName').value,
+                username: document.getElementById('username').value,
+                updated_at: new Date(),
+            };
+
+            const { error } = await supabase.from('user_profiles').upsert(updates);
+
+            if (error) {
+                showCustomAlert('Error updating profile: ' + error.message, 'error');
+            } else {
+                showCustomAlert('Profile saved successfully!', 'success');
+                loadUserProfile(); // Refresh the profile display
+            }
+            
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+        }
+
+        async function loadUserFavorites() {
+            const container = document.getElementById('favoritesContainer');
+
+            const { data, error } = await supabase
+                .from('user_favorites')
+                .select('restaurants(*)')
+                .eq('user_id', currentUser.id);
+
+            if (error) {
+                console.error('Error fetching favorites:', error);
+                container.innerHTML = '<div class="text-center py-8"><p class="text-red-500">Could not load favorites.</p></div>';
+                return;
+            }
+
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="heart" class="w-8 h-8 text-gray-400"></i>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">No Favorites Yet</h4>
+                        <p class="text-gray-600 mb-6">You haven't favorited any restaurants yet. Go discover some delicious spots!</p>
+                        <a href="index.html" class="inline-flex items-center px-6 py-3 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all btn-hover-scale font-semibold">
+                            <i data-lucide="search" class="w-5 h-5 mr-2"></i>
+                            Explore Restaurants
+                        </a>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = data.map(fav => {
+                const restaurant = fav.restaurants;
+                if (!restaurant) return ''; // Skip if restaurant data is missing for some reason
+                const imageUrl = restaurant.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&h=200&q=80';
+                return `
+                    <a href="index.html" class="favorite-item bg-white p-6 rounded-2xl border border-gray-200 flex items-center space-x-6 hover:border-orange-200 group">
+                        <img src="${imageUrl}" alt="${restaurant.name}" class="w-24 h-24 rounded-xl object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=96&h=96&q=80'">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors">${restaurant.name}</h4>
+                                <div class="flex items-center space-x-1 text-sm text-gray-500">
+                                    <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-current"></i>
+                                    <span>${restaurant.rating || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-2">${restaurant.description || 'No description available.'}</p>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                                <span>${restaurant.address || 'Address not available'}</span>
+                            </div>
+                        </div>
+                        <div class="text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+            
+            lucide.createIcons();
+        }
+
+        // Custom Alert Function (matches your existing modal styling)
+        function showCustomAlert(message, type = 'info') {
+            const existingAlert = document.getElementById('custom-alert-overlay');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'custom-alert-overlay';
+            overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+            
+            const iconColor = type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : 'text-blue-500';
+            const iconName = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
+            
+            overlay.innerHTML = `
+                <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center animate-slide-up">
+                    <div class="mb-4">
+                        <i data-lucide="${iconName}" class="w-12 h-12 ${iconColor} mx-auto"></i>
+                    </div>
+                    <p class="text-gray-800 mb-6">${message}</p>
+                    <button id="custom-alert-ok" class="px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all btn-hover-scale font-semibold">
+                        OK
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            lucide.createIcons();
+            
+            document.getElementById('custom-alert-ok').addEventListener('click', () => {
+                overlay.remove();
+            });
+        }
+    </script>
 </body>
 </html>
