@@ -149,38 +149,35 @@
             box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
         }
 
-        /* Cuisine Tag Button Styling - Enhanced */
+        /* Cuisine Option Styling - Updated to be just text */
         .cuisine-option {
             display: inline-block;
-            padding: 10px 20px;
-            margin: 0 8px 8px 0;
-            background-color: #f8fafc;
+            padding: 8px 12px;
+            margin: 0 16px 8px 0;
             color: var(--color-text-light);
-            border: 2px solid #e2e8f0;
-            border-radius: 25px;
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
+            text-decoration: none;
+            border: none;
+            background: none;
         }
 
         .cuisine-option:hover {
-            background-color: #e2e8f0;
-            border-color: var(--color-primary);
             color: var(--color-primary);
-            transform: translateY(-2px) scale(1.05);
+            transform: scale(1.05);
             text-decoration: underline;
-            box-shadow: 0 4px 12px rgba(255, 112, 67, 0.2);
+            text-underline-offset: 4px;
         }
 
         .cuisine-option.selected {
-            background-color: var(--color-primary);
-            color: white;
-            border-color: var(--color-primary);
-            transform: translateY(-2px) scale(1.05);
+            color: var(--color-primary);
+            transform: scale(1.05);
             text-decoration: underline;
-            box-shadow: 0 6px 20px rgba(255, 112, 67, 0.3);
+            text-underline-offset: 4px;
+            font-weight: 600;
         }
 
         /* Tag Button Styling */
@@ -263,7 +260,7 @@
     <section id="hero" class="relative bg-gradient-to-br from-blue-100 to-rose-100 py-24 sm:py-32 overflow-hidden text-center">
         <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-5xl md:text-6xl font-extrabold text-gray-800 leading-tight mb-6 animate-slide-up">
-                Savor the Flavor of <span class="text-rose-600">Homer</span>, Alaska
+                Savor the Flavor of <span class="text-rose-600">Homer</span>.
             </h2>
             <p class="text-xl text-gray-600 mb-10 animate-fade-in">Your ultimate guide to Homer's vibrant culinary scene. Find local favorites, hidden gems, and unforgettable meals.</p>
 
@@ -282,8 +279,15 @@
                     <span class="cuisine-option" data-cuisine="seafood">Seafood</span>
                     <span class="cuisine-option" data-cuisine="american">American</span>
                     <span class="cuisine-option" data-cuisine="pizza">Pizza</span>
-                    <span class="cuisine-option" data-cuisine="coffee">Coffee & Cafes</span>
+                    <span class="cuisine-option" data-cuisine="coffee">Coffee</span>
                     <span class="cuisine-option" data-cuisine="bakery">Bakery</span>
+                    <span class="cuisine-option" data-cuisine="mexican">Mexican</span>
+                    <span class="cuisine-option" data-cuisine="asian">Asian</span>
+                    <span class="cuisine-option" data-cuisine="italian">Italian</span>
+                    <span class="cuisine-option" data-cuisine="burgers">Burgers</span>
+                    <span class="cuisine-option" data-cuisine="sandwiches">Sandwiches</span>
+                    <span class="cuisine-option" data-cuisine="breakfast">Breakfast</span>
+                    <span class="cuisine-option" data-cuisine="fine-dining">Fine Dining</span>
                 </div>
             </div>
             
@@ -302,15 +306,7 @@
         </div>
     </section>
 
-    <!-- Static Tags Section (kept original styling for now) -->
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h3 class="text-3xl font-bold text-gray-800 mb-8">Browse by Category</h3>
-            <div id="staticTagsContainer" class="flex flex-wrap justify-center gap-3 animate-fade-in">
-                <!-- Tags will be populated by JavaScript -->
-            </div>
-        </div>
-    </section>
+    <!-- REMOVED: Static Tags Section (Browse by Category) -->
 
     <!-- Restaurant Listings / Map Toggle -->
     <main id="restaurantsSection" class="relative z-10 py-16 bg-gray-50">
@@ -575,7 +571,130 @@
             }
             
             displayRestaurants();
-            generateTags();
+        }
+
+        // Initialize auth and check current user
+        async function initializeAuth() {
+            const authContainer = document.getElementById('authContainer');
+            if (!authContainer) return;
+
+            try {
+                if (supabase) {
+                    // Check if user is already logged in
+                    const { data: { user }, error } = await supabase.auth.getUser();
+                    
+                    if (error) {
+                        console.warn('Auth error:', error);
+                        throw error;
+                    }
+
+                    currentUser = user;
+                    updateAuthUI();
+
+                    // Listen for auth changes
+                    supabase.auth.onAuthStateChange((event, session) => {
+                        console.log('Auth state changed:', event, session?.user?.email);
+                        currentUser = session?.user || null;
+                        updateAuthUI();
+                        if (currentUser) {
+                            loadUserFavorites();
+                        } else {
+                            userFavorites.clear();
+                        }
+                    });
+                } else {
+                    // Fallback when Supabase isn't available
+                    currentUser = null;
+                    updateAuthUI();
+                }
+            } catch (error) {
+                console.warn('Auth initialization failed:', error);
+                currentUser = null;
+                updateAuthUI();
+            }
+        }
+
+        // Update auth UI based on current user
+        function updateAuthUI() {
+            const authContainer = document.getElementById('authContainer');
+            if (!authContainer) return;
+
+            if (currentUser) {
+                authContainer.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm text-gray-600">Welcome, ${currentUser.email?.split('@')[0] || 'User'}</span>
+                        <button onclick="handleSignOut()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                            Sign Out
+                        </button>
+                    </div>
+                `;
+            } else {
+                authContainer.innerHTML = `
+                    <button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                        Sign In
+                    </button>
+                `;
+            }
+        }
+
+        // Handle sign in
+        async function handleSignIn() {
+            if (!supabase) {
+                alert('Authentication not available');
+                return;
+            }
+
+            const email = prompt('Enter your email address:');
+            if (!email) return;
+
+            try {
+                const { error } = await supabase.auth.signInWithOtp({
+                    email: email,
+                    options: {
+                        emailRedirectTo: window.location.origin
+                    }
+                });
+
+                if (error) throw error;
+                
+                alert('Check your email for the sign-in link!');
+            } catch (error) {
+                console.error('Sign in error:', error);
+                alert('Failed to send sign-in email: ' + error.message);
+            }
+        }
+
+        // Handle sign out
+        async function handleSignOut() {
+            if (!supabase) return;
+
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+            } catch (error) {
+                console.error('Sign out error:', error);
+                alert('Failed to sign out: ' + error.message);
+            }
+        }
+
+        // Load user favorites
+        async function loadUserFavorites() {
+            if (!currentUser || !supabase) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('favorites')
+                    .select('restaurant_id')
+                    .eq('user_id', currentUser.id);
+
+                if (error) throw error;
+
+                userFavorites = new Set(data.map(f => f.restaurant_id));
+                console.log('Loaded user favorites:', userFavorites.size);
+                displayRestaurants(); // Refresh display to show favorites
+            } catch (error) {
+                console.warn('Failed to load favorites:', error);
+            }
         }
 
         // Display restaurants in grid
@@ -616,24 +735,6 @@
             
             // Re-initialize Lucide icons
             lucide.createIcons();
-        }
-
-        // Generate filter tags
-        function generateTags() {
-            const staticContainer = document.getElementById('staticTagsContainer');
-            if (!staticContainer) return;
-            
-            const allTags = new Set();
-            restaurants.forEach(restaurant => {
-                if (restaurant.tags) {
-                    restaurant.tags.forEach(tag => allTags.add(tag));
-                }
-                allTags.add(restaurant.cuisine || 'Other');
-            });
-            
-            staticContainer.innerHTML = Array.from(allTags).map(tag => 
-                `<button class="tag-button px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:shadow-md" onclick="filterByTag('${tag}')">${tag}</button>`
-            ).join('');
         }
 
         // Filter by tag
@@ -809,6 +910,55 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Toggle favorite functionality
+        async function toggleFavorite(restaurantId, buttonElement) {
+            if (!currentUser) {
+                alert('Please sign in to save favorites');
+                return;
+            }
+
+            try {
+                if (userFavorites.has(restaurantId)) {
+                    // Remove favorite
+                    if (supabase) {
+                        const { error } = await supabase
+                            .from('favorites')
+                            .delete()
+                            .eq('user_id', currentUser.id)
+                            .eq('restaurant_id', restaurantId);
+                        
+                        if (error) throw error;
+                    }
+                    
+                    userFavorites.delete(restaurantId);
+                    buttonElement.classList.remove('favorited');
+                    buttonElement.querySelector('i').classList.remove('fill-current');
+                } else {
+                    // Add favorite
+                    if (supabase) {
+                        const { error } = await supabase
+                            .from('favorites')
+                            .insert([{ 
+                                user_id: currentUser.id, 
+                                restaurant_id: restaurantId 
+                            }]);
+                        
+                        if (error) throw error;
+                    }
+                    
+                    userFavorites.add(restaurantId);
+                    buttonElement.classList.add('favorited');
+                    buttonElement.querySelector('i').classList.add('fill-current');
+                }
+                
+                // Re-initialize Lucide icons
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                alert('Failed to update favorite');
+            }
         }
 
         // Initialize everything when DOM is loaded
