@@ -464,21 +464,259 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="modals.js?v=1.2"></script>
-    <script src="script.js?v=1.2"></script>
-
+    
     <script>
         // Initialize Lucide Icons
         lucide.createIcons();
         
-        // Initialize Supabase
-        const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Initialize Supabase with error handling
+        let supabase = null;
+        try {
+            const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+            
+            if (window.supabase && window.supabase.createClient) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+            } else {
+                console.error('Supabase library not loaded');
+            }
+        } catch (error) {
+            console.error('Failed to initialize Supabase:', error);
+        }
 
         // Global variables for favorites and selections
         let selectedCuisine = null;
         let userFavorites = new Set();
+        let restaurants = [];
+        let currentUser = null;
+
+        // Demo restaurant data (fallback when Supabase fails)
+        const demoRestaurants = [
+            {
+                id: 1,
+                name: "The Salty Dawg Saloon",
+                description: "Historic saloon with live music and hearty Alaskan fare",
+                cuisine: "American",
+                address: "4380 Homer Spit Rd, Homer, AK",
+                rating: 4.5,
+                image: null,
+                tags: ["bar", "live music", "historic"]
+            },
+            {
+                id: 2,
+                name: "Coal Point Seafood Company",
+                description: "Fresh local seafood with stunning views of Kachemak Bay",
+                cuisine: "Seafood",
+                address: "4306 Homer Spit Rd, Homer, AK", 
+                rating: 4.8,
+                image: null,
+                tags: ["seafood", "fresh", "bay views"]
+            },
+            {
+                id: 3,
+                name: "Two Sisters Bakery",
+                description: "Artisan breads and pastries made fresh daily",
+                cuisine: "Bakery", 
+                address: "233 E Bunnell Ave, Homer, AK",
+                rating: 4.6,
+                image: null,
+                tags: ["bakery", "coffee", "breakfast"]
+            },
+            {
+                id: 4,
+                name: "Homer Brewing Company",
+                description: "Local craft brewery with pub fare and Alaska-inspired beers",
+                cuisine: "American",
+                address: "1411 Lakeshore Dr, Homer, AK",
+                rating: 4.4,
+                image: null,
+                tags: ["brewery", "pizza", "local beer"]
+            },
+            {
+                id: 5,
+                name: "Cosmic Kitchen",
+                description: "Creative fusion cuisine with fresh, local ingredients",
+                cuisine: "Fusion",
+                address: "510 E Pioneer Ave, Homer, AK",
+                rating: 4.7,
+                image: null,
+                tags: ["fusion", "creative", "local ingredients"]
+            }
+        ];
+
+        // Load restaurants with fallback
+        async function loadRestaurants() {
+            try {
+                if (supabase) {
+                    console.log('Attempting to load restaurants from Supabase...');
+                    const { data, error } = await supabase
+                        .from('restaurants')
+                        .select('*')
+                        .eq('approved', true);
+                    
+                    if (error) {
+                        console.warn('Supabase error:', error);
+                        throw error;
+                    }
+                    
+                    if (data && data.length > 0) {
+                        restaurants = data;
+                        console.log('Loaded restaurants from Supabase:', restaurants.length);
+                    } else {
+                        throw new Error('No restaurants found in database');
+                    }
+                } else {
+                    throw new Error('Supabase not initialized');
+                }
+            } catch (error) {
+                console.warn('Failed to load from Supabase, using demo data:', error);
+                restaurants = demoRestaurants;
+            }
+            
+            displayRestaurants();
+            generateTags();
+        }
+
+        // Display restaurants in grid
+        function displayRestaurants() {
+            const container = document.getElementById('categoryContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Group restaurants by cuisine
+            const groupedRestaurants = {};
+            restaurants.forEach(restaurant => {
+                const cuisine = restaurant.cuisine || 'Other';
+                if (!groupedRestaurants[cuisine]) {
+                    groupedRestaurants[cuisine] = [];
+                }
+                groupedRestaurants[cuisine].push(restaurant);
+            });
+            
+            // Create sections for each cuisine
+            Object.entries(groupedRestaurants).forEach(([cuisine, restaurantList]) => {
+                const section = document.createElement('div');
+                section.className = 'mb-12';
+                section.innerHTML = `
+                    <h3 class="text-3xl font-bold text-gray-800 mb-8 text-center">${cuisine}</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        ${restaurantList.map(restaurant => createEnhancedRestaurantCard(restaurant)).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+            
+            // Show the view toggle section
+            const viewToggleSection = document.getElementById('viewToggleSection');
+            if (viewToggleSection) {
+                viewToggleSection.classList.remove('hidden');
+            }
+            
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Generate filter tags
+        function generateTags() {
+            const staticContainer = document.getElementById('staticTagsContainer');
+            if (!staticContainer) return;
+            
+            const allTags = new Set();
+            restaurants.forEach(restaurant => {
+                if (restaurant.tags) {
+                    restaurant.tags.forEach(tag => allTags.add(tag));
+                }
+                allTags.add(restaurant.cuisine || 'Other');
+            });
+            
+            staticContainer.innerHTML = Array.from(allTags).map(tag => 
+                `<button class="tag-button px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:shadow-md" onclick="filterByTag('${tag}')">${tag}</button>`
+            ).join('');
+        }
+
+        // Filter by tag
+        function filterByTag(tag) {
+            console.log('Filtering by tag:', tag);
+            scrollToRestaurants();
+        }
+
+        // Simple modal functions
+        function openRestaurantModal(restaurantId) {
+            const restaurant = restaurants.find(r => r.id === restaurantId);
+            if (!restaurant) return;
+            
+            const modal = document.getElementById('restaurantModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">${restaurant.name}</h2>
+                <div class="mb-4">
+                    <span class="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
+                        ${restaurant.cuisine}
+                    </span>
+                    ${restaurant.rating ? `
+                        <span class="inline-block ml-2">
+                            <i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current inline"></i>
+                            <span class="text-sm font-medium text-gray-700">${restaurant.rating}</span>
+                        </span>
+                    ` : ''}
+                </div>
+                <p class="text-gray-600 mb-6">${restaurant.description}</p>
+                <div class="space-y-3">
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="map-pin" class="w-5 h-5 mr-3"></i>
+                        <span>${restaurant.address}</span>
+                    </div>
+                    ${restaurant.phone ? `
+                        <div class="flex items-center text-gray-600">
+                            <i data-lucide="phone" class="w-5 h-5 mr-3"></i>
+                            <span>${restaurant.phone}</span>
+                        </div>
+                    ` : ''}
+                    ${restaurant.website ? `
+                        <div class="flex items-center text-gray-600">
+                            <i data-lucide="external-link" class="w-5 h-5 mr-3"></i>
+                            <a href="${restaurant.website}" target="_blank" class="text-orange-500 hover:underline">Visit Website</a>
+                        </div>
+                    ` : ''}
+                </div>
+                ${restaurant.tags && restaurant.tags.length > 0 ? `
+                    <div class="mt-6">
+                        <h4 class="font-semibold text-gray-800 mb-2">Tags</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${restaurant.tags.map(tag => 
+                                `<span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">${tag}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeRestaurantModal() {
+            document.getElementById('restaurantModal').classList.add('hidden');
+        }
+
+        function closeSubmissionModal() {
+            document.getElementById('submissionModal').classList.add('hidden');
+        }
+
+        // Auth placeholder functions
+        function initializeAuth() {
+            const authContainer = document.getElementById('authContainer');
+            if (authContainer) {
+                authContainer.innerHTML = `
+                    <button class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                        Sign In
+                    </button>
+                `;
+            }
+        }
 
         // Auto-scroll functionality
         function scrollToRestaurants() {
@@ -534,66 +772,93 @@
         function createEnhancedRestaurantCard(restaurant) {
             const isFavorited = userFavorites.has(restaurant.id);
             
-            const card = document.createElement('div');
-            card.className = 'restaurant-card';
-            
-            card.innerHTML = `
-                <div class="relative">
-                    ${restaurant.image ? 
-                        `<img src="${restaurant.image}" alt="${restaurant.name}" class="w-full h-48 object-cover">` :
-                        `<div class="w-full h-48 bg-gradient-to-br from-orange-200 to-rose-200 flex items-center justify-center">
-                            <span class="text-gray-500 font-medium">No image available</span>
-                        </div>`
-                    }
-                    
-                    <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" onclick="toggleFavorite(${restaurant.id}, this)">
-                        <i data-lucide="heart" class="w-5 h-5 ${isFavorited ? 'fill-current' : ''}"></i>
-                    </button>
-                </div>
-                
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">${restaurant.name}</h3>
-                    <p class="text-gray-600 mb-3 line-clamp-2">${restaurant.description || 'A great local dining spot.'}</p>
-                    
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-sm font-medium text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
-                            ${restaurant.cuisine || 'Restaurant'}
-                        </span>
-                        ${restaurant.rating ? 
-                            `<div class="flex items-center">
-                                <i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current mr-1"></i>
-                                <span class="text-sm font-medium text-gray-700">${restaurant.rating}</span>
-                            </div>` : ''
+            return `
+                <div class="restaurant-card">
+                    <div class="relative">
+                        ${restaurant.image ? 
+                            `<img src="${restaurant.image}" alt="${restaurant.name}" class="w-full h-48 object-cover">` :
+                            `<div class="w-full h-48 bg-gradient-to-br from-orange-200 to-rose-200 flex items-center justify-center">
+                                <i data-lucide="utensils" class="w-12 h-12 text-gray-400"></i>
+                            </div>`
                         }
+                        
+                        <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" onclick="toggleFavorite(${restaurant.id}, this)">
+                            <i data-lucide="heart" class="w-5 h-5 ${isFavorited ? 'fill-current' : ''}"></i>
+                        </button>
                     </div>
                     
-                    <button onclick="openRestaurantModal(${restaurant.id})" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors">
-                        View Details
-                    </button>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${restaurant.name}</h3>
+                        <p class="text-gray-600 mb-3 line-clamp-2">${restaurant.description || 'A great local dining spot.'}</p>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-medium text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+                                ${restaurant.cuisine || 'Restaurant'}
+                            </span>
+                            ${restaurant.rating ? 
+                                `<div class="flex items-center">
+                                    <i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current mr-1"></i>
+                                    <span class="text-sm font-medium text-gray-700">${restaurant.rating}</span>
+                                </div>` : ''
+                            }
+                        </div>
+                        
+                        <button onclick="openRestaurantModal(${restaurant.id})" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors">
+                            View Details
+                        </button>
+                    </div>
                 </div>
             `;
-            
-            return card;
         }
 
-        // Toggle favorite functionality
-        function toggleFavorite(restaurantId, buttonElement) {
-            if (userFavorites.has(restaurantId)) {
-                userFavorites.delete(restaurantId);
-                buttonElement.classList.remove('favorited');
-                buttonElement.querySelector('i').classList.remove('fill-current');
-            } else {
-                userFavorites.add(restaurantId);
-                buttonElement.classList.add('favorited');
-                buttonElement.querySelector('i').classList.add('fill-current');
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            
+            // Initialize cuisine selection
+            initializeCuisineSelection();
+            
+            // Initialize auth
+            initializeAuth();
+            
+            // Load restaurants
+            loadRestaurants();
+            
+            // Add auto-scroll to main buttons
+            const findBtn = document.getElementById('findBtn');
+            if (findBtn) {
+                findBtn.addEventListener('click', function() {
+                    const searchTerm = document.getElementById('tagSearchInput').value;
+                    if (searchTerm) {
+                        console.log('Searching for:', searchTerm);
+                    }
+                    scrollToRestaurants();
+                });
             }
             
-            // Here you would typically save to database/localStorage
-            // saveFavoritesToDatabase(Array.from(userFavorites));
-            
-            // Re-initialize Lucide icons
-            lucide.createIcons();
-        }
+            const viewAllBtn = document.getElementById('viewAllBtn');
+            if (viewAllBtn) {
+                viewAllBtn.addEventListener('click', scrollToRestaurants);
+            }
+
+            // Submit restaurant button
+            const submitBtn = document.getElementById('submitRestaurantBtn_bottom');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function() {
+                    document.getElementById('submissionModal').classList.remove('hidden');
+                });
+            }
+
+            // Form submission
+            const submissionForm = document.getElementById('submissionForm');
+            if (submissionForm) {
+                submissionForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('Thank you for your submission! We will review it soon.');
+                    closeSubmissionModal();
+                });
+            }
+        });
 
         // Placeholder restaurant modal function (you'll need to implement in your script.js)
         function openRestaurantModal(restaurantId) {
