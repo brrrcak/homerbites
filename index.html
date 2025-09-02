@@ -85,19 +85,102 @@
             box-shadow: var(--shadow-medium);
         }
 
-        /* Card Hover Effect */
+        /* Card Hover Effect - Enhanced for restaurant cards */
         .card-hover-lift {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card-hover-lift:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-medium);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Enhanced Restaurant Card Styling */
+        .restaurant-card {
+            position: relative;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .restaurant-card .favorite-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .restaurant-card .favorite-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .restaurant-card .favorite-btn.favorited {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        .restaurant-card .favorite-btn.favorited:hover {
+            background: rgba(239, 68, 68, 1);
         }
 
         /* Input Focus Styling */
         input:focus, textarea:focus {
             border-color: var(--color-accent) !important;
             box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
+        }
+
+        /* Cuisine Tag Button Styling - Enhanced */
+        .cuisine-option {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 8px 8px 0;
+            background-color: #f8fafc;
+            color: var(--color-text-light);
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .cuisine-option:hover {
+            background-color: #e2e8f0;
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            transform: translateY(-2px) scale(1.05);
+            text-decoration: underline;
+            box-shadow: 0 4px 12px rgba(255, 112, 67, 0.2);
+        }
+
+        .cuisine-option.selected {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+            transform: translateY(-2px) scale(1.05);
+            text-decoration: underline;
+            box-shadow: 0 6px 20px rgba(255, 112, 67, 0.3);
         }
 
         /* Tag Button Styling */
@@ -137,6 +220,11 @@
         @keyframes slideUp {
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
@@ -179,22 +267,31 @@
             </h2>
             <p class="text-xl text-gray-600 mb-10 animate-fade-in">Your ultimate guide to Homer's vibrant culinary scene. Find local favorites, hidden gems, and unforgettable meals.</p>
 
-            <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 animate-fade-in">
+            <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in">
                 <input type="text" id="tagSearchInput" placeholder="Craving something specific? E.g., 'seafood', 'pizza'..." class="w-full sm:w-2/3 lg:w-1/2 px-6 py-4 rounded-full border border-gray-300 shadow-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all outline-none text-gray-700 text-lg">
                 <button id="findBtn" class="flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 btn-hover-scale text-lg font-semibold">
                     <i data-lucide="search" class="w-6 h-6 mr-3"></i>
                     Discover Eats
                 </button>
             </div>
+
+            <!-- Popular Cuisines to Explore - Moved under search box -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Popular Cuisines to Explore</h3>
+                <div id="popularCuisines" class="flex flex-wrap justify-center">
+                    <span class="cuisine-option" data-cuisine="seafood">Seafood</span>
+                    <span class="cuisine-option" data-cuisine="american">American</span>
+                    <span class="cuisine-option" data-cuisine="pizza">Pizza</span>
+                    <span class="cuisine-option" data-cuisine="coffee">Coffee & Cafes</span>
+                    <span class="cuisine-option" data-cuisine="bakery">Bakery</span>
+                </div>
+            </div>
             
             <div class="flex justify-center gap-4 mb-6">
                 <button id="viewAllBtn" class="px-6 py-3 text-gray-600 hover:text-orange-500 transition-colors text-lg font-medium">
                     Or simply <span class="underline underline-offset-4 decoration-dashed decoration-gray-400">browse all restaurants</span>
                 </button>
-                <button id="randomRestaurantBtn" class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all btn-hover-scale font-medium">
-                    <i data-lucide="shuffle" class="w-5 h-5 mr-2"></i>
-                    Surprise Me!
-                </button>
+                <!-- REMOVED: Surprise Me button as requested -->
             </div>
         </div>
         <!-- Hero Wave Background -->
@@ -205,10 +302,10 @@
         </div>
     </section>
 
-    <!-- Popular Cuisines Section -->
+    <!-- Static Tags Section (kept original styling for now) -->
     <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h3 class="text-3xl font-bold text-gray-800 mb-8">Popular Cuisines to Explore</h3>
+            <h3 class="text-3xl font-bold text-gray-800 mb-8">Browse by Category</h3>
             <div id="staticTagsContainer" class="flex flex-wrap justify-center gap-3 animate-fade-in">
                 <!-- Tags will be populated by JavaScript -->
             </div>
@@ -216,7 +313,7 @@
     </section>
 
     <!-- Restaurant Listings / Map Toggle -->
-    <main class="relative z-10 py-16 bg-gray-50">
+    <main id="restaurantsSection" class="relative z-10 py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div id="viewToggleSection" class="hidden mb-10 flex justify-center gap-4 animate-fade-in">
                 <button id="gridViewBtn" class="flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 rounded-full shadow-md hover:bg-gray-100 transition-all btn-hover-scale active">
@@ -359,6 +456,7 @@
                     <a href="#hero" class="text-gray-300 hover:text-white transition-colors">Discover</a>
                     <a href="#about" class="text-gray-300 hover:text-white transition-colors">About Us</a>
                     <a href="#contact" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                    <a href="admin.html" class="text-gray-300 hover:text-white transition-colors">Admin</a>
                 </nav>
             </div>
             <p class="text-gray-400 text-sm">© 2025 Homer Bites. Crafted with passion for the rich flavors of Homer, Alaska.</p>
@@ -377,6 +475,131 @@
         const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Global variables for favorites and selections
+        let selectedCuisine = null;
+        let userFavorites = new Set();
+
+        // Auto-scroll functionality
+        function scrollToRestaurants() {
+            document.getElementById('restaurantsSection').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        // Initialize popular cuisine selection
+        function initializeCuisineSelection() {
+            const cuisineOptions = document.querySelectorAll('.cuisine-option');
+            
+            cuisineOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options (single selection)
+                    cuisineOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    
+                    // Store selected cuisine
+                    selectedCuisine = this.dataset.cuisine;
+                    
+                    // Filter restaurants by cuisine (you'll need to implement this in your script.js)
+                    // filterRestaurantsByCuisine(selectedCuisine);
+                    
+                    // Auto-scroll to restaurants section
+                    scrollToRestaurants();
+                });
+            });
+        }
+
+        // Auto-scroll for main buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize cuisine selection
+            initializeCuisineSelection();
+            
+            // Add auto-scroll to "Discover Eats" button
+            const findBtn = document.getElementById('findBtn');
+            if (findBtn) {
+                findBtn.addEventListener('click', scrollToRestaurants);
+            }
+            
+            // Add auto-scroll to "browse all restaurants" button
+            const viewAllBtn = document.getElementById('viewAllBtn');
+            if (viewAllBtn) {
+                viewAllBtn.addEventListener('click', scrollToRestaurants);
+            }
+        });
+
+        // Enhanced restaurant card creation with favorites
+        function createEnhancedRestaurantCard(restaurant) {
+            const isFavorited = userFavorites.has(restaurant.id);
+            
+            const card = document.createElement('div');
+            card.className = 'restaurant-card';
+            
+            card.innerHTML = `
+                <div class="relative">
+                    ${restaurant.image ? 
+                        `<img src="${restaurant.image}" alt="${restaurant.name}" class="w-full h-48 object-cover">` :
+                        `<div class="w-full h-48 bg-gradient-to-br from-orange-200 to-rose-200 flex items-center justify-center">
+                            <span class="text-gray-500 font-medium">No image available</span>
+                        </div>`
+                    }
+                    
+                    <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" onclick="toggleFavorite(${restaurant.id}, this)">
+                        <i data-lucide="heart" class="w-5 h-5 ${isFavorited ? 'fill-current' : ''}"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">${restaurant.name}</h3>
+                    <p class="text-gray-600 mb-3 line-clamp-2">${restaurant.description || 'A great local dining spot.'}</p>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm font-medium text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+                            ${restaurant.cuisine || 'Restaurant'}
+                        </span>
+                        ${restaurant.rating ? 
+                            `<div class="flex items-center">
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current mr-1"></i>
+                                <span class="text-sm font-medium text-gray-700">${restaurant.rating}</span>
+                            </div>` : ''
+                        }
+                    </div>
+                    
+                    <button onclick="openRestaurantModal(${restaurant.id})" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors">
+                        View Details
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Toggle favorite functionality
+        function toggleFavorite(restaurantId, buttonElement) {
+            if (userFavorites.has(restaurantId)) {
+                userFavorites.delete(restaurantId);
+                buttonElement.classList.remove('favorited');
+                buttonElement.querySelector('i').classList.remove('fill-current');
+            } else {
+                userFavorites.add(restaurantId);
+                buttonElement.classList.add('favorited');
+                buttonElement.querySelector('i').classList.add('fill-current');
+            }
+            
+            // Here you would typically save to database/localStorage
+            // saveFavoritesToDatabase(Array.from(userFavorites));
+            
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Placeholder restaurant modal function (you'll need to implement in your script.js)
+        function openRestaurantModal(restaurantId) {
+            // Your existing modal logic
+            console.log('Opening modal for restaurant:', restaurantId);
+        }
     </script>
 </body>
 </html>
