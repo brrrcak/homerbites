@@ -51,14 +51,13 @@
     </header>
 
     <main class="py-12">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
                 <div class="bg-gradient-to-br from-blue-100 to-rose-100 p-8 text-center">
                     <h2 class="text-3xl font-bold text-gray-800 mb-2" id="profileDisplayName">Your Profile</h2>
                     <p class="text-gray-600" id="profileEmailDisplay">Loading...</p>
                 </div>
-
-                <div class="p-8 border-b border-gray-200">
+                <div class="p-8">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Profile Settings</h3>
                     <form id="profileForm" class="space-y-6">
                         <div>
@@ -76,9 +75,7 @@
                             </button>
                         </div>
                     </form>
-
                     <hr class="my-8">
-
                     <div>
                         <h3 class="text-xl font-bold text-gray-800 mb-4">Account Settings</h3>
                         <div class="space-y-4">
@@ -93,7 +90,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
                 <div id="favoritesContainer" class="p-8">
                     </div>
             </div>
@@ -104,7 +103,7 @@
     <script>
         lucide.createIcons();
         const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzIいちばんCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
@@ -186,16 +185,16 @@
         async function loadUserFavorites() {
             const container = document.getElementById('favoritesContainer');
             container.innerHTML = `
-                <h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i data-lucide="heart" class="w-6 h-6 mr-3 text-orange-500"></i>
+                    Your Favorite Restaurants
+                </h3>
                 <p class="text-gray-500">Loading your favorites...</p>`;
+            lucide.createIcons();
 
             const { data, error } = await supabase
                 .from('user_favorites')
-                .select(`
-                    restaurants (
-                        id, name, description, address, rating, image_url
-                    )
-                `)
+                .select(`restaurants (id, name, description, address, rating, image_url)`)
                 .eq('user_id', currentUser.id);
 
             if (error) {
@@ -206,16 +205,17 @@
 
             if (!data || data.length === 0) {
                 container.innerHTML = `
-                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i data-lucide="heart" class="w-6 h-6 mr-3 text-orange-500"></i>
+                        Your Favorite Restaurants
+                    </h3>
                     <div class="text-center py-10">
-                        <i data-lucide="heart" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i>
                         <h4 class="text-lg font-semibold text-gray-700">No Favorites Yet</h4>
-                        <p class="text-gray-500 mb-6">You haven't favorited any restaurants yet. Go find some delicious spots!</p>
+                        <p class="text-gray-500 mb-6">You haven't favorited any restaurants. Go find some delicious spots!</p>
                         <a href="index.html" class="inline-flex items-center px-6 py-2 bg-orange-500 text-white rounded-full shadow hover:bg-orange-600">
                             Explore Restaurants
                         </a>
                     </div>`;
-                lucide.createIcons();
                 return;
             }
 
@@ -242,7 +242,10 @@
             }).join('');
 
             container.innerHTML = `
-                <h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i data-lucide="heart" class="w-6 h-6 mr-3 text-orange-500"></i>
+                    Your Favorite Restaurants
+                </h3>
                 <div class="space-y-4">${favoritesHTML}</div>`;
             lucide.createIcons();
         }
