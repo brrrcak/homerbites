@@ -161,6 +161,39 @@
         html {
             scroll-behavior: smooth;
         }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-rose-50 min-h-screen font-sans antialiased">
@@ -619,10 +652,17 @@
             if (currentUser) {
                 const userFirstName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.email.split('@')[0];
                 authContainer.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <span class="text-sm text-gray-600">Welcome, ${userFirstName}</span>
-                        <a href="profile.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">View Profile</a>
-                        <a href="profile.html#favoritesContainer" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">View Favorites</a>
+                    <div class="flex items-center space-x-4">
+                        <div class="dropdown">
+                            <button class="flex items-center space-x-2 text-sm text-gray-600 cursor-pointer">
+                                <span>Welcome, ${userFirstName}</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="profile.html">View Profile</a>
+                                <a href="profile.html#favoritesContainer">View Favorites</a>
+                            </div>
+                        </div>
                         <button onclick="handleSignOut()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">Sign Out</button>
                     </div>`;
             } else {
