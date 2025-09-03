@@ -805,20 +805,40 @@
         }
 
         // Favorite functionality
-        function toggleFavorite(restaurantId, buttonElement) {
+        async function toggleFavorite(restaurantId, buttonElement) {
             if (!currentUser) {
                 showCustomAlert('Please sign in to save favorites', 'info');
                 return;
             }
 
-            if (userFavorites.has(restaurantId)) {
-                userFavorites.delete(restaurantId);
-                buttonElement.classList.remove('favorited');
-                buttonElement.querySelector('i').classList.remove('fill-current');
+            const isFavorited = userFavorites.has(restaurantId);
+            const icon = buttonElement.querySelector('i');
+
+            if (isFavorited) {
+                // Remove from favorites
+                const { error } = await supabase.from('user_favorites')
+                    .delete()
+                    .match({ user_id: currentUser.id, restaurant_id: restaurantId });
+
+                if (!error) {
+                    userFavorites.delete(restaurantId);
+                    buttonElement.classList.remove('favorited');
+                    icon.classList.remove('fill-current');
+                } else {
+                    showCustomAlert(`Error unfavoriting: ${error.message}`, 'error');
+                }
             } else {
-                userFavorites.add(restaurantId);
-                buttonElement.classList.add('favorited');
-                buttonElement.querySelector('i').classList.add('fill-current');
+                // Add to favorites
+                const { error } = await supabase.from('user_favorites')
+                    .insert({ user_id: currentUser.id, restaurant_id: restaurantId });
+
+                if (!error) {
+                    userFavorites.add(restaurantId);
+                    buttonElement.classList.add('favorited');
+                    icon.classList.add('fill-current');
+                } else {
+                    showCustomAlert(`Error favoriting: ${error.message}`, 'error');
+                }
             }
         }
 
