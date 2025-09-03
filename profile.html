@@ -12,16 +12,13 @@
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap');
 
         :root {
-            --color-primary: #FF7043; /* Warm Orange */
-            --color-secondary: #4CAF50; /* Fresh Green */
-            --color-accent: #2196F3; /* Sky Blue */
+            --color-primary: #FF7043;
+            --color-secondary: #4CAF50;
+            --color-accent: #2196F3;
             --color-text-dark: #333333;
             --color-text-light: #555555;
-            --color-bg-light: #F9FAFB; /* Off-white */
-            --color-bg-paper: #FFFFFF; /* Pure White */
-            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.08);
-            --shadow-strong: 0 12px 36px rgba(0, 0, 0, 0.12);
+            --color-bg-light: #F9FAFB;
+            --color-bg-paper: #FFFFFF;
         }
 
         body {
@@ -42,71 +39,9 @@
             color: var(--color-text-dark);
         }
 
-        /* Custom Scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--color-bg-light);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d1d5db; /* Light gray */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #9ca3af; /* Darker gray */
-        }
-
-        /* Button Hover Effect */
-        .btn-hover-scale {
-            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-        }
-        .btn-hover-scale:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        /* Card Hover Effect */
-        .card-hover-lift {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card-hover-lift:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        /* Input Focus Styling */
         input:focus, textarea:focus {
             border-color: var(--color-accent) !important;
             box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-
-        .animate-slide-up {
-            animation: slideUp 0.5s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .favorite-item {
-            transition: all 0.3s ease;
-        }
-        .favorite-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -127,10 +62,6 @@
             <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
                 <a href="index.html" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Back to Restaurants</a>
             </nav>
-
-            <button class="md:hidden p-2 rounded-md hover:bg-gray-100 text-gray-700 transition-colors">
-                <i data-lucide="menu" class="w-6 h-6"></i>
-            </button>
         </div>
     </header>
 
@@ -139,11 +70,8 @@
             <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
                 
                 <div class="bg-gradient-to-br from-blue-100 to-rose-100 p-8 text-center">
-                    <div class="relative w-24 h-24 mx-auto mb-4">
-                        <img id="profileImage" src="" class="w-24 h-24 rounded-full object-cover shadow-lg border-4 border-white">
-                        <div id="profileInitials" class="w-24 h-24 bg-gradient-to-br from-rose-500 to-orange-500 rounded-full flex items-center justify-center text-white font-extrabold text-3xl shadow-lg">
-                            <span>U</span>
-                        </div>
+                    <div id="profilePictureContainer" class="relative w-24 h-24 mx-auto mb-2 rounded-full shadow-lg bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white font-extrabold text-3xl border-4 border-white bg-cover bg-center">
+                        <span id="profileInitials">U</span>
                     </div>
                     <input type="file" id="photoUpload" accept="image/*" class="hidden">
                     <button id="editPhotoBtn" class="text-sm text-gray-600 hover:text-orange-500 transition-colors">Edit Profile Photo</button>
@@ -168,10 +96,10 @@
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                             <input type="email" id="email" name="email" disabled class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm text-gray-500 cursor-not-allowed">
-                            <p class="text-sm text-gray-500 mt-1">Email cannot be changed from this page</p>
+                            <p class="text-sm text-gray-500 mt-1">Email cannot be changed from this page for security reasons.</p>
                         </div>
                         <div class="pt-2">
-                            <button type="submit" class="flex items-center px-8 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 btn-hover-scale font-semibold">
+                            <button type="submit" class="flex items-center px-8 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 font-semibold">
                                 <i data-lucide="save" class="w-5 h-5 mr-2"></i>
                                 Save Changes
                             </button>
@@ -179,37 +107,28 @@
                     </form>
                 </div>
 
-                <div class="p-8">
+                <div id="favoritesContainer" class="p-8">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>
-                    <div id="favoritesContainer" class="space-y-4">
-                        <div class="text-center py-8">
-                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
-                            <p class="text-gray-500">Loading your favorites...</p>
-                        </div>
+                    <div class="text-center py-8">
+                        <p class="text-gray-500">Loading your favorites...</p>
                     </div>
                 </div>
-
             </div>
         </div>
     </main>
 
     <footer class="bg-gray-800 text-white py-12 mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 mb-8">
-                <a href="index.html" class="flex items-center space-x-3 group">
-                    <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl">
-                        HB
-                    </div>
-                    <span class="text-2xl font-bold text-white tracking-tight">Homer Bites</span>
-                </a>
-                <nav class="flex space-x-6 text-sm font-medium">
-                    <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Back to Restaurants</a>
-                </nav>
-            </div>
+            <a href="index.html" class="flex items-center space-x-3 group mx-auto mb-4 w-fit">
+                <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl">
+                    HB
+                </div>
+                <span class="text-2xl font-bold text-white tracking-tight">Homer Bites</span>
+            </a>
             <p class="text-gray-400 text-sm">© 2025 Homer Bites. Crafted with passion for the rich flavors of Homer, Alaska.</p>
         </div>
     </footer>
-
+    
     <script src="modals.js?v=1.2"></script>
     <script>
         // Initialize Lucide Icons
@@ -222,32 +141,23 @@
 
         let currentUser = null;
 
-        // This function will run once the user's session is confirmed
         function initializePage(session) {
-            // If no session is found, redirect to the homepage
             if (!session) {
                 window.location.href = 'index.html';
                 return;
             }
-
-            // Make the page visible now that we've confirmed the user is logged in
             document.body.classList.add('loaded');
-
             currentUser = session.user;
             loadUserProfile();
             loadUserFavorites();
 
-            const profileForm = document.getElementById('profileForm');
-            profileForm.addEventListener('submit', handleProfileUpdate);
-
-            // Setup photo upload listeners
+            document.getElementById('profileForm').addEventListener('submit', handleProfileUpdate);
             document.getElementById('editPhotoBtn').addEventListener('click', () => {
                 document.getElementById('photoUpload').click();
             });
             document.getElementById('photoUpload').addEventListener('change', handlePhotoUpload);
         }
 
-        // Listen for authentication state changes
         supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'INITIAL_SESSION') {
                 initializePage(session);
@@ -255,14 +165,8 @@
         });
 
         async function loadUserProfile() {
-            const emailField = document.getElementById('email');
-            const profileEmail = document.getElementById('profileEmail');
-            const profileDisplayName = document.getElementById('profileDisplayName');
-            const profileInitialsEl = document.getElementById('profileInitials');
-            const profileImageEl = document.getElementById('profileImage');
-            
-            emailField.value = currentUser.email;
-            profileEmail.textContent = currentUser.email;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('email').value = currentUser.email;
 
             const { data, error } = await supabase
                 .from('user_profiles')
@@ -275,44 +179,36 @@
                 return;
             }
             
+            const profilePictureContainer = document.getElementById('profilePictureContainer');
+            const profileInitialsEl = document.getElementById('profileInitials');
+
             if (data) {
                 document.getElementById('fullName').value = data.full_name || '';
                 document.getElementById('username').value = data.username || '';
+                document.getElementById('profileDisplayName').textContent = data.full_name || 'Your Profile';
                 
-                // Update profile display
                 if (data.full_name) {
-                    profileDisplayName.textContent = data.full_name;
-                    const initials = data.full_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                    profileInitialsEl.querySelector('span').textContent = initials;
+                    profileInitialsEl.textContent = data.full_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
                 } else {
-                    profileDisplayName.textContent = 'Your Profile';
-                    profileInitialsEl.querySelector('span').textContent = currentUser.email[0].toUpperCase();
+                    profileInitialsEl.textContent = currentUser.email[0].toUpperCase();
                 }
 
                 if (data.avatar_url) {
-                    profileImageEl.src = data.avatar_url;
-                    profileImageEl.classList.remove('hidden');
+                    profilePictureContainer.style.backgroundImage = `url(${data.avatar_url})`;
                     profileInitialsEl.classList.add('hidden');
                 } else {
-                    profileImageEl.classList.add('hidden');
+                    profilePictureContainer.style.backgroundImage = '';
                     profileInitialsEl.classList.remove('hidden');
                 }
             } else {
-                profileInitialsEl.querySelector('span').textContent = currentUser.email[0].toUpperCase();
-                profileImageEl.classList.add('hidden');
+                profileInitialsEl.textContent = currentUser.email[0].toUpperCase();
+                profilePictureContainer.style.backgroundImage = '';
                 profileInitialsEl.classList.remove('hidden');
             }
         }
 
         async function handleProfileUpdate(event) {
             event.preventDefault();
-            const form = event.target;
-            const submitButton = form.querySelector('button[type="submit"]');
-            const originalText = submitButton.innerHTML;
-            
-            submitButton.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>Saving...';
-            submitButton.disabled = true;
-
             const updates = {
                 id: currentUser.id,
                 full_name: document.getElementById('fullName').value,
@@ -321,150 +217,78 @@
             };
 
             const { error } = await supabase.from('user_profiles').upsert(updates);
-
             if (error) {
-                showCustomAlert('Error updating profile: ' + error.message, 'error');
+                alert('Error updating profile: ' + error.message);
             } else {
-                showCustomAlert('Profile saved successfully!', 'success');
-                loadUserProfile(); // Refresh the profile display
+                alert('Profile saved successfully!');
+                loadUserProfile();
             }
-            
-            submitButton.innerHTML = originalText;
-            submitButton.disabled = false;
         }
 
         async function handlePhotoUpload(event) {
             const file = event.target.files[0];
-            if (!file) {
-                return;
-            }
+            if (!file) return;
 
             const fileExt = file.name.split('.').pop();
             const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
             const filePath = `avatars/${fileName}`;
 
-            showCustomAlert('Uploading photo...', 'info');
+            alert('Uploading photo...');
 
+            // The bucket name here 'user-profiles' MUST match the one you created in Supabase Storage
             const { error: uploadError } = await supabase.storage
                 .from('user-profiles')
                 .upload(filePath, file, { upsert: true });
 
             if (uploadError) {
-                showCustomAlert(`Error uploading photo: ${uploadError.message}`, 'error');
+                alert(`Error uploading photo: ${uploadError.message}`);
                 return;
             }
 
-            const { data: { publicUrl } } = supabase.storage
+            const { data } = supabase.storage
                 .from('user-profiles')
                 .getPublicUrl(filePath);
             
+            const publicUrl = data.publicUrl;
+
             const { error: updateError } = await supabase
                 .from('user_profiles')
                 .upsert({ id: currentUser.id, avatar_url: publicUrl });
             
             if (updateError) {
-                showCustomAlert(`Error updating profile: ${updateError.message}`, 'error');
+                alert(`Error updating profile: ${updateError.message}`);
             } else {
-                showCustomAlert('Profile photo updated!', 'success');
-                loadUserProfile(); // Refresh the profile to show the new photo
+                alert('Profile photo updated!');
+                loadUserProfile();
             }
         }
 
         async function loadUserFavorites() {
             const container = document.getElementById('favoritesContainer');
-
+            container.innerHTML = '<h3>Your Favorite Restaurants</h3> <p>Loading...</p>';
+            
             const { data, error } = await supabase
                 .from('user_favorites')
                 .select('restaurants(*)')
                 .eq('user_id', currentUser.id);
 
             if (error) {
-                console.error('Error fetching favorites:', error);
-                container.innerHTML = '<div class="text-center py-8"><p class="text-red-500">Could not load favorites.</p></div>';
+                container.innerHTML += '<p class="text-red-500">Could not load favorites.</p>';
                 return;
             }
 
-            if (data.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-16">
-                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="heart" class="w-8 h-8 text-gray-400"></i>
-                        </div>
-                        <h4 class="text-xl font-semibold text-gray-800 mb-2">No Favorites Yet</h4>
-                        <p class="text-gray-600 mb-6">You haven't favorited any restaurants yet. Go discover some delicious spots!</p>
-                        <a href="index.html" class="inline-flex items-center px-6 py-3 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all btn-hover-scale font-semibold">
-                            <i data-lucide="search" class="w-5 h-5 mr-2"></i>
-                            Explore Restaurants
-                        </a>
-                    </div>
-                `;
-                lucide.createIcons();
+            if (!data || data.length === 0) {
+                container.innerHTML = `<h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>
+                                       <p>You haven't favorited any restaurants yet.</p>`;
                 return;
             }
 
-            container.innerHTML = data.map(fav => {
-                const restaurant = fav.restaurants;
-                if (!restaurant) return ''; // Skip if restaurant data is missing for some reason
-                const imageUrl = restaurant.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&h=200&q=80';
-                return `
-                    <a href="index.html" class="favorite-item bg-white p-6 rounded-2xl border border-gray-200 flex items-center space-x-6 hover:border-orange-200 group">
-                        <img src="${imageUrl}" alt="${restaurant.name}" class="w-24 h-24 rounded-xl object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=96&h=96&q=80'">
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="text-xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors">${restaurant.name}</h4>
-                                <div class="flex items-center space-x-1 text-sm text-gray-500">
-                                    <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-current"></i>
-                                    <span>${restaurant.rating || 'N/A'}</span>
-                                </div>
-                            </div>
-                            <p class="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-2">${restaurant.description || 'No description available.'}</p>
-                            <div class="flex items-center text-sm text-gray-500">
-                                <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
-                                <span>${restaurant.address || 'Address not available'}</span>
-                            </div>
-                        </div>
-                        <div class="text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <i data-lucide="arrow-right" class="w-6 h-6"></i>
-                        </div>
-                    </a>
-                `;
+            const favoritesHTML = data.map(fav => {
+                const r = fav.restaurants;
+                return r ? `<div class="p-4 border rounded-lg mb-2"><h4>${r.name}</h4><p class="text-sm text-gray-600">${r.description}</p></div>` : '';
             }).join('');
-            
-            lucide.createIcons();
-        }
 
-        // Custom Alert Function (matches your existing modal styling)
-        function showCustomAlert(message, type = 'info') {
-            const existingAlert = document.getElementById('custom-alert-overlay');
-            if (existingAlert) {
-                existingAlert.remove();
-            }
-            
-            const overlay = document.createElement('div');
-            overlay.id = 'custom-alert-overlay';
-            overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
-            
-            const iconColor = type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : 'text-blue-500';
-            const iconName = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
-            
-            overlay.innerHTML = `
-                <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center animate-slide-up">
-                    <div class="mb-4">
-                        <i data-lucide="${iconName}" class="w-12 h-12 ${iconColor} mx-auto"></i>
-                    </div>
-                    <p class="text-gray-800 mb-6">${message}</p>
-                    <button id="custom-alert-ok" class="px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all btn-hover-scale font-semibold">
-                        OK
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(overlay);
-            lucide.createIcons();
-            
-            document.getElementById('custom-alert-ok').addEventListener('click', () => {
-                overlay.remove();
-            });
+            container.innerHTML = `<h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>${favoritesHTML}`;
         }
     </script>
 </body>
