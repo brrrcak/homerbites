@@ -378,7 +378,176 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="modals.js?v=1.4"></script>
+    
+    <script>
+        console.log("modals.js v1.4 Loaded - Updated Design");
+
+        // A shared library for creating styled, site-wide pop-up modals that match the new Homer Bites design
+        function showCustomAlert(message, type = 'info') {
+            const existingAlert = document.getElementById('custom-alert-overlay');
+            if (existingAlert) existingAlert.remove();
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'custom-alert-overlay';
+            overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+            
+            const iconColor = type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : 'text-blue-500';
+            const iconName = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
+            const buttonColor = type === 'success' ? 'bg-green-500 hover:bg-green-600' : 
+                               type === 'error' ? 'bg-red-500 hover:bg-red-600' : 
+                               'bg-blue-500 hover:bg-blue-600';
+            
+            const modalHTML = `
+                <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center modal-slide-up">
+                    <div class="mb-4">
+                        <i data-lucide="${iconName}" class="w-12 h-12 ${iconColor} mx-auto"></i>
+                    </div>
+                    <p class="text-gray-800 mb-6 leading-relaxed">${message}</p>
+                    <button id="custom-alert-ok" class="px-8 py-3 ${buttonColor} text-white rounded-full shadow-lg transition-all duration-300 font-semibold btn-hover-scale">
+                        OK
+                    </button>
+                </div>
+            `;
+            
+            overlay.innerHTML = modalHTML;
+            document.body.appendChild(overlay);
+            
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+            
+            document.getElementById('custom-alert-ok').addEventListener('click', () => {
+                overlay.remove();
+            });
+            
+            addModalStyles();
+        }
+
+        function showCustomPrompt(message, placeholder = '', defaultValue = '') {
+            return new Promise(resolve => {
+                const existingPrompt = document.getElementById('custom-prompt-overlay');
+                if (existingPrompt) existingPrompt.remove();
+                
+                const overlay = document.createElement('div');
+                overlay.id = 'custom-prompt-overlay';
+                overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+                
+                const modalHTML = `
+                    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 modal-slide-up">
+                        <div class="mb-4">
+                            <i data-lucide="mail" class="w-8 h-8 text-blue-500 mx-auto"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">${message}</h3>
+                        <input type="email" id="custom-prompt-input" placeholder="${placeholder}" value="${defaultValue}" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
+                        <input type="password" id="custom-prompt-password" placeholder="Password" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
+                        <div class="text-right mb-6">
+                            <a href="#" id="forgot-password-link" class="text-sm text-blue-500 hover:underline">Forgot Password?</a>
+                        </div>
+                        <div class="flex gap-4">
+                            <button id="custom-prompt-cancel" class="flex-1 px-6 py-3 bg-gray-500 text-white rounded-full shadow-lg hover:bg-gray-600 transition-all duration-300 font-semibold btn-hover-scale">
+                                Cancel
+                            </button>
+                            <button id="custom-prompt-ok" class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 font-semibold btn-hover-scale">
+                                Sign In
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                overlay.innerHTML = modalHTML;
+                document.body.appendChild(overlay);
+                
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                }
+                
+                const emailInput = document.getElementById('custom-prompt-input');
+                const passwordInput = document.getElementById('custom-prompt-password');
+                const okButton = document.getElementById('custom-prompt-ok');
+                const cancelButton = document.getElementById('custom-prompt-cancel');
+                const forgotPasswordLink = document.getElementById('forgot-password-link');
+                
+                setTimeout(() => emailInput.focus(), 100);
+                
+                const handleSignInAction = () => {
+                    const email = emailInput.value;
+                    const password = passwordInput.value;
+                    overlay.remove();
+                    resolve({ email, password });
+                };
+
+                emailInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        passwordInput.focus();
+                    } else if (e.key === 'Escape') {
+                        cancelButton.click();
+                    }
+                });
+
+                passwordInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        okButton.click();
+                    } else if (e.key === 'Escape') {
+                        cancelButton.click();
+                    }
+                });
+                
+                okButton.addEventListener('click', handleSignInAction);
+                
+                cancelButton.addEventListener('click', () => {
+                    overlay.remove();
+                    resolve(null);
+                });
+
+                forgotPasswordLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // This is where you would handle the forgot password logic
+                    showCustomAlert('Password reset functionality is not yet implemented.', 'info');
+                });
+                
+                addModalStyles();
+            });
+        }
+
+        function addModalStyles() {
+            if (document.getElementById('homer-bites-modal-styles')) return;
+            
+            const style = document.createElement('style');
+            style.id = 'homer-bites-modal-styles';
+            style.textContent = `
+                .modal-slide-up {
+                    animation: modalSlideUp 0.3s ease-out forwards;
+                }
+                
+                .btn-hover-scale {
+                    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+                }
+                
+                .btn-hover-scale:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+                }
+                
+                @keyframes modalSlideUp {
+                    from { 
+                        transform: translateY(20px); 
+                        opacity: 0; 
+                    }
+                    to { 
+                        transform: translateY(0); 
+                        opacity: 1; 
+                    }
+                }
+            `;
+            
+            document.head.appendChild(style);
+        }
+
+        // Initialize styles immediately
+        addModalStyles();
+    </script>
     
     <script>
         // Initialize Lucide Icons
@@ -388,7 +557,7 @@
         let supabase = null;
         try {
             const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImexCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
             
             if (window.supabase && window.supabase.createClient) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -406,18 +575,6 @@
         let currentUser = null;
         let currentPage = 0;
         const restaurantsPerPage = 6;
-
-        // Demo restaurant data
-        const demoRestaurants = [
-            { id: 1, name: "The Salty Dawg Saloon", description: "Historic saloon with live music and hearty Alaskan fare", cuisine: "American", address: "4380 Homer Spit Rd, Homer, AK", rating: 4.5, tags: ["bar", "live music", "historic"] },
-            { id: 2, name: "Coal Point Seafood Company", description: "Fresh local seafood with stunning views of Kachemak Bay", cuisine: "Seafood", address: "4306 Homer Spit Rd, Homer, AK", rating: 4.8, tags: ["seafood", "fresh", "bay views"] },
-            { id: 3, name: "Two Sisters Bakery", description: "Artisan breads and pastries made fresh daily", cuisine: "Bakery", address: "233 E Bunnell Ave, Homer, AK", rating: 4.6, tags: ["bakery", "coffee", "breakfast"] },
-            { id: 4, name: "Homer Brewing Company", description: "Local craft brewery with pub fare and Alaska-inspired beers", cuisine: "American", address: "1411 Lakeshore Dr, Homer, AK", rating: 4.4, tags: ["brewery", "pizza", "local beer"] },
-            { id: 5, name: "Cosmic Kitchen", description: "Creative fusion cuisine with fresh, local ingredients", cuisine: "Asian", address: "510 E Pioneer Ave, Homer, AK", rating: 4.7, tags: ["fusion", "creative", "local ingredients", "seafood"] },
-            { id: 6, name: "Fat Olives Restaurant", description: "Italian-inspired dishes with Mediterranean flair", cuisine: "Italian", address: "276 Ohlson Ln, Homer, AK", rating: 4.6, tags: ["italian", "mediterranean", "pasta"] },
-            { id: 7, name: "Fresh Sourdough Express Bakery & Café", description: "Breakfast and lunch spot famous for sourdough pancakes", cuisine: "Breakfast", address: "1316 Ocean Dr, Homer, AK", rating: 4.3, tags: ["breakfast", "pancakes", "sourdough", "bakery"] },
-            { id: 8, name: "La Cantina", description: "Authentic Mexican cuisine with fresh ingredients", cuisine: "Mexican", address: "120 W Bunnell Ave, Homer, AK", rating: 4.5, tags: ["mexican", "authentic", "fresh"] }
-        ];
 
         // Authentication functions
         async function handleSignIn() {
@@ -469,24 +626,26 @@
                 authContainer.innerHTML = '<button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Sign In</button>';
             }
         }
-        
+
         // Load restaurants
         async function loadRestaurants() {
             try {
                 if (supabase) {
                     const { data, error } = await supabase.from('restaurants').select('*').eq('status', 'approved');
-                    if (!error && data && data.length > 0) {
+                    if (error) {
+                        throw new Error(error.message);
+                    }
+                    if (data && data.length > 0) {
                         restaurants = data;
                         console.log('Loaded restaurants from Supabase:', restaurants.length);
-                        return;
                     }
+                } else {
+                    console.warn('Supabase not initialized.');
                 }
             } catch (error) {
-                console.warn('Supabase error:', error);
+                console.error('Error loading restaurants:', error);
+                restaurants = []; // Ensure restaurants are empty if fetch fails
             }
-            
-            restaurants = demoRestaurants;
-            console.log('Using demo restaurants:', restaurants.length);
         }
 
         // Filter and display restaurants
@@ -691,16 +850,6 @@
                 });
             }
             
-            document.querySelectorAll('.cuisine-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
-                    this.classList.add('selected');
-                    selectedCuisine = this.dataset.cuisine;
-                    filterRestaurants(selectedCuisine, null);
-                    scrollToRestaurants();
-                });
-            });
-            
             document.getElementById('findBtn').addEventListener('click', function() {
                 const searchTerm = document.getElementById('tagSearchInput').value.trim();
                 if (searchTerm) {
@@ -737,6 +886,9 @@
                 showCustomAlert('Thank you for your submission! We will review it soon.', 'success');
                 closeSubmissionModal();
             });
+
+            // Initial display
+            filterRestaurants();
         });
     </script>
 </body>
