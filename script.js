@@ -1,5 +1,5 @@
 console.log("Homer Bites Script Version 1.4 Loaded");
-
+ 
 // Global variables
 let map;
 let currentFilter = null;
