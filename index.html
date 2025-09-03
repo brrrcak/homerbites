@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -869,14 +869,14 @@
                 const isFavorited = userFavorites.has(restaurant.id);
                 html += '<div class="restaurant-card">';
                 html += '<div class="relative">';
-                html += '<div class="w-full h-48 bg-gradient-to-br from-orange-200 to-rose-200 flex items-center justify-center"><i data-lucide="utensils" class="w-12 h-12 text-gray-400"></i></div>';
+                html += '<img src="' + (restaurant.image_url || 'https://placehold.co/400x200/1e293b/ffffff?text=Image+Not+Found') + '" alt="' + restaurant.name + '" class="w-full h-48 object-cover">';
                 html += '<button class="favorite-btn ' + (isFavorited ? 'favorited' : '') + '" onclick="toggleFavorite(' + restaurant.id + ', this)">';
                 html += '<i data-lucide="heart" class="w-5 h-5 ' + (isFavorited ? 'fill-current' : '') + '"></i></button>';
                 html += '</div><div class="p-6">';
                 html += '<h3 class="text-xl font-bold text-gray-800 mb-2">' + restaurant.name + '</h3>';
                 html += '<p class="text-gray-600 mb-3">' + restaurant.description + '</p>';
                 html += '<div class="flex items-center justify-between mb-4">';
-                html += '<span class="text-sm font-medium text-orange-600 bg-orange-50 px-3 py-1 rounded-full">' + restaurant.cuisine + '</span>';
+                html += '<span class="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">' + (restaurant.hours || 'Hours not available') + '</span>';
                 if (restaurant.rating) {
                     html += '<div class="flex items-center"><i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current mr-1"></i><span class="text-sm font-medium text-gray-700">' + restaurant.rating + '</span></div>';
                 }
