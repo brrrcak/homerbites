@@ -651,13 +651,20 @@
         }
 
         function updateAuthUI() {
-            const authContainer = document.getElementById('authContainer');
-            if (currentUser) {
-                authContainer.innerHTML = '<div class="flex items-center space-x-3"><span class="text-sm text-gray-600">Welcome, ' + (currentUser.email ? currentUser.email.split('@')[0] : 'User') + '</span><button onclick="handleSignOut()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">Sign Out</button></div>';
-            } else {
-                authContainer.innerHTML = '<button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Sign In</button>';
-            }
-        }
+    const authContainer = document.getElementById('authContainer');
+    if (currentUser) {
+        const userFirstName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.email.split('@')[0];
+        authContainer.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <span class="text-sm text-gray-600">Welcome, ${userFirstName}</span>
+                <a href="profile.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">View Profile</a>
+                <a href="profile.html#favoritesContainer" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">View Favorites</a>
+                <button onclick="handleSignOut()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">Sign Out</button>
+            </div>`;
+    } else {
+        authContainer.innerHTML = '<button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Sign In</button>';
+    }
+}
 
         // Load restaurants
         async function loadRestaurants() {
