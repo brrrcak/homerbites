@@ -1,5 +1,5 @@
 console.log("modals.js v1.4 Loaded - Updated Design");
-
+ 
 // A shared library for creating styled, site-wide pop-up modals that match the new Homer Bites design
 
 function showCustomAlert(message, type = 'info') {
