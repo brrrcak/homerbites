@@ -129,7 +129,7 @@
         </div>
     </footer>
     
-    <script src="modals.js?v=1.2"></script>
+    <script src="modals.js"></script>
     <script>
         // Initialize Lucide Icons
         lucide.createIcons();
@@ -218,9 +218,9 @@
 
             const { error } = await supabase.from('user_profiles').upsert(updates);
             if (error) {
-                alert('Error updating profile: ' + error.message);
+                showCustomAlert('Error updating profile: ' + error.message, 'error');
             } else {
-                alert('Profile saved successfully!');
+                showCustomAlert('Profile saved successfully!', 'success');
                 loadUserProfile();
             }
         }
@@ -233,15 +233,14 @@
             const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
             const filePath = `avatars/${fileName}`;
 
-            alert('Uploading photo...');
+            showCustomAlert('Uploading photo...', 'info');
 
-            // The bucket name here 'user-profiles' MUST match the one you created in Supabase Storage
             const { error: uploadError } = await supabase.storage
                 .from('user-profiles')
                 .upload(filePath, file, { upsert: true });
 
             if (uploadError) {
-                alert(`Error uploading photo: ${uploadError.message}`);
+                showCustomAlert(`Error uploading photo: ${uploadError.message}`, 'error');
                 return;
             }
 
@@ -256,16 +255,18 @@
                 .upsert({ id: currentUser.id, avatar_url: publicUrl });
             
             if (updateError) {
-                alert(`Error updating profile: ${updateError.message}`);
+                showCustomAlert(`Error updating profile: ${updateError.message}`, 'error');
             } else {
-                alert('Profile photo updated!');
+                showCustomAlert('Profile photo updated!', 'success');
                 loadUserProfile();
             }
         }
 
         async function loadUserFavorites() {
             const container = document.getElementById('favoritesContainer');
-            container.innerHTML = '<h3>Your Favorite Restaurants</h3> <p>Loading...</p>';
+            // Reset content while loading
+            container.innerHTML = `<h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>
+                                   <p class="text-gray-500">Loading your favorites...</p>`;
             
             const { data, error } = await supabase
                 .from('user_favorites')
@@ -279,13 +280,17 @@
 
             if (!data || data.length === 0) {
                 container.innerHTML = `<h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>
-                                       <p>You haven't favorited any restaurants yet.</p>`;
+                                       <p class="text-gray-600">You haven't favorited any restaurants yet.</p>`;
                 return;
             }
 
             const favoritesHTML = data.map(fav => {
                 const r = fav.restaurants;
-                return r ? `<div class="p-4 border rounded-lg mb-2"><h4>${r.name}</h4><p class="text-sm text-gray-600">${r.description}</p></div>` : '';
+                if (!r) return '';
+                return `<div class="p-4 border rounded-lg mb-2 bg-gray-50">
+                            <h4 class="font-bold text-gray-800">${r.name}</h4>
+                            <p class="text-sm text-gray-600">${r.description}</p>
+                        </div>`;
             }).join('');
 
             container.innerHTML = `<h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>${favoritesHTML}`;
