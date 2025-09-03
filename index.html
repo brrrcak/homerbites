@@ -203,19 +203,19 @@
             <p class="text-xl text-gray-600 mb-10 animate-fade-in">Your ultimate guide to Homer's vibrant culinary scene. Find local favorites, hidden gems, and unforgettable meals.</p>
 
             <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in">
-                <input type="text" id="tagSearchInput" placeholder="Craving something specific? E.g., 'seafood', 'pizza'..." class="w-full sm:w-2/3 lg:w-1/2 px-6 py-4 rounded-full border border-gray-300 shadow-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all outline-none text-gray-700 text-lg">
+                <input type="text" id="tagSearchInput" placeholder="&quot;open now&quot;" class="w-full sm:w-2/3 lg:w-1/2 px-6 py-4 rounded-full border border-gray-300 shadow-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all outline-none text-gray-700 text-lg">
                 <button id="findBtn" class="flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 btn-hover-scale text-lg font-semibold">
                     <i data-lucide="search" class="w-6 h-6 mr-3"></i>
                     Discover Eats
                 </button>
             </div>
             
-            <div class="flex flex-col items-center justify-center gap-4">
-                <button id="viewAllBtn" class="px-6 py-3 text-gray-600 hover:text-orange-500 transition-colors text-lg font-medium">
-                    Or simply <span class="underline underline-offset-4 decoration-dashed decoration-gray-400">browse all restaurants</span>
-                </button>
+            <div class="flex flex-col items-center justify-center gap-2">
                 <button id="browseByTagBtn" class="px-6 py-3 text-gray-600 hover:text-orange-500 transition-colors text-lg font-medium">
                     <span class="underline underline-offset-4 decoration-dashed decoration-gray-400">Browse by #tag</span>
+                </button>
+                <button id="viewAllBtn" class="px-6 py-3 text-gray-600 hover:text-orange-500 transition-colors text-lg font-medium">
+                    Or simply <span class="underline underline-offset-4 decoration-dashed decoration-gray-400">browse all restaurants</span>
                 </button>
             </div>
         </div>
@@ -388,7 +388,7 @@
         let supabase = null;
         try {
             const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImexCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
             
             if (window.supabase && window.supabase.createClient) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
