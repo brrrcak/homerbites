@@ -134,35 +134,11 @@
             border-color: var(--color-accent) !important;
             box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
         }
-
-        .cuisine-option {
-            display: inline-block;
-            padding: 8px 12px;
-            margin: 0 16px 8px 0;
-            color: var(--color-text-light);
-            font-weight: 500;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            user-select: none;
-            text-decoration: none;
-            border: none;
-            background: none;
-        }
-
-        .cuisine-option:hover {
-            color: var(--color-primary);
-            transform: scale(1.05);
-            text-decoration: underline;
-            text-underline-offset: 4px;
-        }
-
-        .cuisine-option.selected {
-            color: var(--color-primary);
-            transform: scale(1.05);
-            text-decoration: underline;
-            text-underline-offset: 4px;
-            font-weight: 600;
+        
+        .tag-option.selected {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
         }
 
         .modal-fade-in {
@@ -189,7 +165,6 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-rose-50 min-h-screen font-sans antialiased">
 
-    <!-- Navigation Bar -->
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 py-3">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             <a href="#" class="flex items-center space-x-3 group animate-fade-in">
@@ -220,7 +195,6 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section id="hero" class="relative bg-gradient-to-br from-blue-100 to-rose-100 py-24 sm:py-32 overflow-hidden text-center">
         <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-5xl md:text-6xl font-extrabold text-gray-800 leading-tight mb-6 animate-slide-up">
@@ -235,29 +209,13 @@
                     Discover Eats
                 </button>
             </div>
-
-            <!-- Popular Cuisines to Explore -->
-            <div class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Popular Cuisines to Explore</h3>
-                <div id="popularCuisines" class="flex flex-wrap justify-center">
-                    <span class="cuisine-option" data-cuisine="seafood">Seafood</span>
-                    <span class="cuisine-option" data-cuisine="american">American</span>
-                    <span class="cuisine-option" data-cuisine="pizza">Pizza</span>
-                    <span class="cuisine-option" data-cuisine="coffee">Coffee & Cafes</span>
-                    <span class="cuisine-option" data-cuisine="bakery">Bakery</span>
-                    <span class="cuisine-option" data-cuisine="mexican">Mexican</span>
-                    <span class="cuisine-option" data-cuisine="asian">Asian</span>
-                    <span class="cuisine-option" data-cuisine="italian">Italian</span>
-                    <span class="cuisine-option" data-cuisine="burgers">Burgers</span>
-                    <span class="cuisine-option" data-cuisine="sandwiches">Sandwiches</span>
-                    <span class="cuisine-option" data-cuisine="breakfast">Breakfast</span>
-                    <span class="cuisine-option" data-cuisine="fine-dining">Fine Dining</span>
-                </div>
-            </div>
             
-            <div class="flex justify-center gap-4 mb-6">
+            <div class="flex flex-col items-center justify-center gap-4">
                 <button id="viewAllBtn" class="px-6 py-3 text-gray-600 hover:text-orange-500 transition-colors text-lg font-medium">
                     Or simply <span class="underline underline-offset-4 decoration-dashed decoration-gray-400">browse all restaurants</span>
+                </button>
+                <button id="browseByTagBtn" class="px-6 py-3 text-gray-600 hover:text-orange-500 transition-colors text-lg font-medium">
+                    <span class="underline underline-offset-4 decoration-dashed decoration-gray-400">Browse by #tag</span>
                 </button>
             </div>
         </div>
@@ -269,7 +227,6 @@
         </div>
     </section>
 
-    <!-- Restaurant Listings -->
     <main id="restaurantsSection" class="relative z-10 py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div id="categoryContainer" class="space-y-16">
@@ -286,7 +243,6 @@
         </div>
     </main>
 
-    <!-- About Section -->
     <section id="about" class="py-20 bg-gradient-to-br from-blue-50 to-rose-50">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h3 class="text-4xl font-extrabold text-gray-800 mb-6">Our Mission: Connecting You with Homer's Best</h3>
@@ -313,7 +269,6 @@
         </div>
     </section>
 
-    <!-- Call to Action Section -->
     <section class="py-16 bg-white text-center">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <h3 class="text-3xl font-bold text-gray-800 mb-4">Don't See Your Favorite Spot?</h3>
@@ -327,7 +282,6 @@
         </div>
     </section>
 
-    <!-- Restaurant Detail Modal -->
     <div id="restaurantModal" class="fixed inset-0 z-50 hidden modal-fade-in">
         <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRestaurantModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
@@ -337,14 +291,34 @@
                         <i data-lucide="x" class="w-6 h-6"></i>
                     </button>
                     <div id="modalContent" class="p-8">
-                        <!-- Dynamic content will be loaded here -->
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="tagModal" class="fixed inset-0 z-50 hidden modal-fade-in">
+        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeTagModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl modal-slide-up">
+                <div class="relative p-8">
+                    <button onclick="closeTagModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-sm">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Browse by Tag</h2>
+                    <div id="tagList" class="flex flex-wrap gap-3 mb-8">
+                        </div>
+                    <div class="mt-6">
+                        <button id="tagDoneBtn" class="w-full flex items-center justify-center px-6 py-3 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 btn-hover-scale text-base font-semibold">
+                            Done
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Submission Modal -->
+
     <div id="submissionModal" class="fixed inset-0 z-50 hidden modal-fade-in">
         <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSubmissionModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
@@ -384,7 +358,6 @@
         </div>
     </div>
 
-    <!-- Footer Section -->
     <footer id="contact" class="bg-gray-800 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 mb-8">
@@ -405,176 +378,7 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    
-    <script>
-        console.log("modals.js v1.4 Loaded - Updated Design");
-
-        // A shared library for creating styled, site-wide pop-up modals that match the new Homer Bites design
-        function showCustomAlert(message, type = 'info') {
-            const existingAlert = document.getElementById('custom-alert-overlay');
-            if (existingAlert) existingAlert.remove();
-            
-            const overlay = document.createElement('div');
-            overlay.id = 'custom-alert-overlay';
-            overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
-            
-            const iconColor = type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : 'text-blue-500';
-            const iconName = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
-            const buttonColor = type === 'success' ? 'bg-green-500 hover:bg-green-600' : 
-                               type === 'error' ? 'bg-red-500 hover:bg-red-600' : 
-                               'bg-blue-500 hover:bg-blue-600';
-            
-            const modalHTML = `
-                <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center modal-slide-up">
-                    <div class="mb-4">
-                        <i data-lucide="${iconName}" class="w-12 h-12 ${iconColor} mx-auto"></i>
-                    </div>
-                    <p class="text-gray-800 mb-6 leading-relaxed">${message}</p>
-                    <button id="custom-alert-ok" class="px-8 py-3 ${buttonColor} text-white rounded-full shadow-lg transition-all duration-300 font-semibold btn-hover-scale">
-                        OK
-                    </button>
-                </div>
-            `;
-            
-            overlay.innerHTML = modalHTML;
-            document.body.appendChild(overlay);
-            
-            if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                lucide.createIcons();
-            }
-            
-            document.getElementById('custom-alert-ok').addEventListener('click', () => {
-                overlay.remove();
-            });
-            
-            addModalStyles();
-        }
-
-        function showCustomPrompt(message, placeholder = '', defaultValue = '') {
-            return new Promise(resolve => {
-                const existingPrompt = document.getElementById('custom-prompt-overlay');
-                if (existingPrompt) existingPrompt.remove();
-                
-                const overlay = document.createElement('div');
-                overlay.id = 'custom-prompt-overlay';
-                overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
-                
-                const modalHTML = `
-                    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 modal-slide-up">
-                        <div class="mb-4">
-                            <i data-lucide="mail" class="w-8 h-8 text-blue-500 mx-auto"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">${message}</h3>
-                        <input type="email" id="custom-prompt-input" placeholder="${placeholder}" value="${defaultValue}" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
-                        <input type="password" id="custom-prompt-password" placeholder="Password" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
-                        <div class="text-right mb-6">
-                            <a href="#" id="forgot-password-link" class="text-sm text-blue-500 hover:underline">Forgot Password?</a>
-                        </div>
-                        <div class="flex gap-4">
-                            <button id="custom-prompt-cancel" class="flex-1 px-6 py-3 bg-gray-500 text-white rounded-full shadow-lg hover:bg-gray-600 transition-all duration-300 font-semibold btn-hover-scale">
-                                Cancel
-                            </button>
-                            <button id="custom-prompt-ok" class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 font-semibold btn-hover-scale">
-                                Sign In
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                overlay.innerHTML = modalHTML;
-                document.body.appendChild(overlay);
-                
-                if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                    lucide.createIcons();
-                }
-                
-                const emailInput = document.getElementById('custom-prompt-input');
-                const passwordInput = document.getElementById('custom-prompt-password');
-                const okButton = document.getElementById('custom-prompt-ok');
-                const cancelButton = document.getElementById('custom-prompt-cancel');
-                const forgotPasswordLink = document.getElementById('forgot-password-link');
-                
-                setTimeout(() => emailInput.focus(), 100);
-                
-                const handleSignInAction = () => {
-                    const email = emailInput.value;
-                    const password = passwordInput.value;
-                    overlay.remove();
-                    resolve({ email, password });
-                };
-
-                emailInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        passwordInput.focus();
-                    } else if (e.key === 'Escape') {
-                        cancelButton.click();
-                    }
-                });
-
-                passwordInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        okButton.click();
-                    } else if (e.key === 'Escape') {
-                        cancelButton.click();
-                    }
-                });
-                
-                okButton.addEventListener('click', handleSignInAction);
-                
-                cancelButton.addEventListener('click', () => {
-                    overlay.remove();
-                    resolve(null);
-                });
-
-                forgotPasswordLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    // This is where you would handle the forgot password logic
-                    showCustomAlert('Password reset functionality is not yet implemented.', 'info');
-                });
-                
-                addModalStyles();
-            });
-        }
-
-        function addModalStyles() {
-            if (document.getElementById('homer-bites-modal-styles')) return;
-            
-            const style = document.createElement('style');
-            style.id = 'homer-bites-modal-styles';
-            style.textContent = `
-                .modal-slide-up {
-                    animation: modalSlideUp 0.3s ease-out forwards;
-                }
-                
-                .btn-hover-scale {
-                    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-                }
-                
-                .btn-hover-scale:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-                }
-                
-                @keyframes modalSlideUp {
-                    from { 
-                        transform: translateY(20px); 
-                        opacity: 0; 
-                    }
-                    to { 
-                        transform: translateY(0); 
-                        opacity: 1; 
-                    }
-                }
-            `;
-            
-            document.head.appendChild(style);
-        }
-
-        // Initialize styles immediately
-        addModalStyles();
-    </script>
+    <script src="modals.js?v=1.4"></script>
     
     <script>
         // Initialize Lucide Icons
@@ -609,9 +413,9 @@
             { id: 2, name: "Coal Point Seafood Company", description: "Fresh local seafood with stunning views of Kachemak Bay", cuisine: "Seafood", address: "4306 Homer Spit Rd, Homer, AK", rating: 4.8, tags: ["seafood", "fresh", "bay views"] },
             { id: 3, name: "Two Sisters Bakery", description: "Artisan breads and pastries made fresh daily", cuisine: "Bakery", address: "233 E Bunnell Ave, Homer, AK", rating: 4.6, tags: ["bakery", "coffee", "breakfast"] },
             { id: 4, name: "Homer Brewing Company", description: "Local craft brewery with pub fare and Alaska-inspired beers", cuisine: "American", address: "1411 Lakeshore Dr, Homer, AK", rating: 4.4, tags: ["brewery", "pizza", "local beer"] },
-            { id: 5, name: "Cosmic Kitchen", description: "Creative fusion cuisine with fresh, local ingredients", cuisine: "Asian", address: "510 E Pioneer Ave, Homer, AK", rating: 4.7, tags: ["fusion", "creative", "local ingredients"] },
+            { id: 5, name: "Cosmic Kitchen", description: "Creative fusion cuisine with fresh, local ingredients", cuisine: "Asian", address: "510 E Pioneer Ave, Homer, AK", rating: 4.7, tags: ["fusion", "creative", "local ingredients", "seafood"] },
             { id: 6, name: "Fat Olives Restaurant", description: "Italian-inspired dishes with Mediterranean flair", cuisine: "Italian", address: "276 Ohlson Ln, Homer, AK", rating: 4.6, tags: ["italian", "mediterranean", "pasta"] },
-            { id: 7, name: "Fresh Sourdough Express Bakery & Café", description: "Breakfast and lunch spot famous for sourdough pancakes", cuisine: "Breakfast", address: "1316 Ocean Dr, Homer, AK", rating: 4.3, tags: ["breakfast", "pancakes", "sourdough"] },
+            { id: 7, name: "Fresh Sourdough Express Bakery & Café", description: "Breakfast and lunch spot famous for sourdough pancakes", cuisine: "Breakfast", address: "1316 Ocean Dr, Homer, AK", rating: 4.3, tags: ["breakfast", "pancakes", "sourdough", "bakery"] },
             { id: 8, name: "La Cantina", description: "Authentic Mexican cuisine with fresh ingredients", cuisine: "Mexican", address: "120 W Bunnell Ave, Homer, AK", rating: 4.5, tags: ["mexican", "authentic", "fresh"] }
         ];
 
@@ -651,21 +455,21 @@
         }
 
         function updateAuthUI() {
-    const authContainer = document.getElementById('authContainer');
-    if (currentUser) {
-        const userFirstName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.email.split('@')[0];
-        authContainer.innerHTML = `
-            <div class="flex items-center space-x-3">
-                <span class="text-sm text-gray-600">Welcome, ${userFirstName}</span>
-                <a href="profile.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">View Profile</a>
-                <a href="profile.html#favoritesContainer" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">View Favorites</a>
-                <button onclick="handleSignOut()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">Sign Out</button>
-            </div>`;
-    } else {
-        authContainer.innerHTML = '<button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Sign In</button>';
-    }
-}
-
+            const authContainer = document.getElementById('authContainer');
+            if (currentUser) {
+                const userFirstName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.email.split('@')[0];
+                authContainer.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm text-gray-600">Welcome, ${userFirstName}</span>
+                        <a href="profile.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">View Profile</a>
+                        <a href="profile.html#favoritesContainer" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">View Favorites</a>
+                        <button onclick="handleSignOut()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">Sign Out</button>
+                    </div>`;
+            } else {
+                authContainer.innerHTML = '<button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Sign In</button>';
+            }
+        }
+        
         // Load restaurants
         async function loadRestaurants() {
             try {
@@ -687,23 +491,36 @@
 
         // Filter and display restaurants
         function filterRestaurants(cuisineFilter, searchTerm) {
+            let tempFiltered = [];
             if (cuisineFilter) {
-                filteredRestaurants = restaurants.filter(r => 
+                tempFiltered = restaurants.filter(r => 
                     r.cuisine && r.cuisine.toLowerCase() === cuisineFilter.toLowerCase()
                 );
             } else if (searchTerm) {
                 const term = searchTerm.toLowerCase();
-                filteredRestaurants = restaurants.filter(r =>
+                tempFiltered = restaurants.filter(r =>
                     r.name.toLowerCase().includes(term) ||
                     r.description.toLowerCase().includes(term) ||
-                    (r.cuisine && r.cuisine.toLowerCase().includes(term))
+                    (r.cuisine && r.cuisine.toLowerCase().includes(term)) ||
+                    (r.tags && r.tags.some(tag => tag.toLowerCase().includes(term)))
                 );
             } else {
-                filteredRestaurants = [...restaurants];
+                tempFiltered = [...restaurants];
             }
             
+            filteredRestaurants = tempFiltered;
             currentPage = 0;
             displayRestaurants();
+        }
+        
+        function filterRestaurantsByTags(tags) {
+            filteredRestaurants = restaurants.filter(r =>
+                tags.every(tag => r.tags && r.tags.map(t => t.toLowerCase()).includes(tag.toLowerCase()))
+            );
+            currentPage = 0;
+            selectedCuisine = tags.map(t => `#${t}`).join(', '); // Update header title
+            displayRestaurants();
+            scrollToRestaurants();
         }
 
         function displayRestaurants() {
@@ -822,6 +639,32 @@
             document.getElementById('restaurantModal').classList.add('hidden');
         }
 
+        function openTagModal() {
+            populateTagModal();
+            document.getElementById('tagModal').classList.remove('hidden');
+        }
+
+        function closeTagModal() {
+            document.getElementById('tagModal').classList.add('hidden');
+        }
+
+        function populateTagModal() {
+            const tagList = document.getElementById('tagList');
+            const allTags = [...new Set(restaurants.flatMap(r => r.tags || []))].filter(Boolean);
+            allTags.sort();
+            tagList.innerHTML = allTags.map(tag => `
+                <button class="tag-option px-4 py-2 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors capitalize" data-tag="${tag}">
+                    ${tag.replace(/_/g, ' ')}
+                </button>
+            `).join('');
+
+            tagList.querySelectorAll('.tag-option').forEach(button => {
+                button.addEventListener('click', () => {
+                    button.classList.toggle('selected');
+                });
+            });
+        }
+
         function closeSubmissionModal() {
             document.getElementById('submissionModal').classList.add('hidden');
         }
@@ -832,18 +675,15 @@
         }
 
         // Initialize everything
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('Initializing Homer Bites...');
             
-            // Load restaurants
-            loadRestaurants();
+            await loadRestaurants();
             
-            // Initialize auth
             if (supabase) {
-                supabase.auth.getUser().then(({ data: { user } }) => {
-                    currentUser = user;
-                    updateAuthUI();
-                });
+                const { data: { user } } = await supabase.auth.getUser();
+                currentUser = user;
+                updateAuthUI();
                 
                 supabase.auth.onAuthStateChange((event, session) => {
                     currentUser = session?.user || null;
@@ -851,22 +691,19 @@
                 });
             }
             
-            // Initialize cuisine selection
             document.querySelectorAll('.cuisine-option').forEach(option => {
                 option.addEventListener('click', function() {
                     document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
                     this.classList.add('selected');
                     selectedCuisine = this.dataset.cuisine;
-                    filterRestaurants(selectedCuisine);
+                    filterRestaurants(selectedCuisine, null);
                     scrollToRestaurants();
                 });
             });
             
-            // Search functionality
             document.getElementById('findBtn').addEventListener('click', function() {
                 const searchTerm = document.getElementById('tagSearchInput').value.trim();
                 if (searchTerm) {
-                    document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
                     selectedCuisine = null;
                     filterRestaurants(null, searchTerm);
                     scrollToRestaurants();
@@ -875,15 +712,22 @@
                 }
             });
             
-            // Browse all functionality
             document.getElementById('viewAllBtn').addEventListener('click', function() {
-                document.querySelectorAll('.cuisine-option').forEach(opt => opt.classList.remove('selected'));
                 selectedCuisine = null;
                 filterRestaurants();
                 scrollToRestaurants();
             });
+
+            document.getElementById('browseByTagBtn').addEventListener('click', openTagModal);
             
-            // Submit restaurant functionality
+            document.getElementById('tagDoneBtn').addEventListener('click', function() {
+                const selectedTags = [...document.querySelectorAll('#tagList .tag-option.selected')].map(btn => btn.dataset.tag);
+                if (selectedTags.length > 0) {
+                    filterRestaurantsByTags(selectedTags);
+                }
+                closeTagModal();
+            });
+
             document.getElementById('submitRestaurantBtn_bottom').addEventListener('click', function() {
                 document.getElementById('submissionModal').classList.remove('hidden');
             });
