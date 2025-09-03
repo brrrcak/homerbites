@@ -112,7 +112,6 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-rose-50 min-h-screen font-sans antialiased">
 
-    <!-- Navigation Bar -->
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 py-3">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             <a href="index.html" class="flex items-center space-x-3 group">
@@ -139,16 +138,20 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
                 
-                <!-- Profile Header -->
                 <div class="bg-gradient-to-br from-blue-100 to-rose-100 p-8 text-center">
-                    <div class="w-20 h-20 bg-gradient-to-br from-rose-500 to-orange-500 rounded-full flex items-center justify-center text-white font-extrabold text-2xl mx-auto mb-4 shadow-lg">
-                        <span id="profileInitials">U</span>
+                    <div class="relative w-24 h-24 mx-auto mb-4">
+                        <img id="profileImage" src="" class="w-24 h-24 rounded-full object-cover shadow-lg border-4 border-white">
+                        <div id="profileInitials" class="w-24 h-24 bg-gradient-to-br from-rose-500 to-orange-500 rounded-full flex items-center justify-center text-white font-extrabold text-3xl shadow-lg">
+                            <span>U</span>
+                        </div>
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2" id="profileDisplayName">Your Profile</h2>
+                    <input type="file" id="photoUpload" accept="image/*" class="hidden">
+                    <button id="editPhotoBtn" class="text-sm text-gray-600 hover:text-orange-500 transition-colors">Edit Profile Photo</button>
+
+                    <h2 class="text-3xl font-bold text-gray-800 mt-4 mb-2" id="profileDisplayName">Your Profile</h2>
                     <p class="text-gray-600" id="profileEmail">Loading...</p>
                 </div>
 
-                <!-- Profile Settings -->
                 <div class="p-8 border-b border-gray-200">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Profile Settings</h3>
                     <form id="profileForm" class="space-y-6">
@@ -176,7 +179,6 @@
                     </form>
                 </div>
 
-                <!-- Favorites Section -->
                 <div class="p-8">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Your Favorite Restaurants</h3>
                     <div id="favoritesContainer" class="space-y-4">
@@ -191,7 +193,6 @@
         </div>
     </main>
 
-    <!-- Footer Section -->
     <footer class="bg-gray-800 text-white py-12 mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 mb-8">
@@ -238,12 +239,16 @@
 
             const profileForm = document.getElementById('profileForm');
             profileForm.addEventListener('submit', handleProfileUpdate);
+
+            // Setup photo upload listeners
+            document.getElementById('editPhotoBtn').addEventListener('click', () => {
+                document.getElementById('photoUpload').click();
+            });
+            document.getElementById('photoUpload').addEventListener('change', handlePhotoUpload);
         }
 
         // Listen for authentication state changes
         supabase.auth.onAuthStateChange((event, session) => {
-            // The 'INITIAL_SESSION' event fires once when the client first loads.
-            // This is the ideal time to check for a user and initialize the page.
             if (event === 'INITIAL_SESSION') {
                 initializePage(session);
             }
@@ -253,18 +258,19 @@
             const emailField = document.getElementById('email');
             const profileEmail = document.getElementById('profileEmail');
             const profileDisplayName = document.getElementById('profileDisplayName');
-            const profileInitials = document.getElementById('profileInitials');
+            const profileInitialsEl = document.getElementById('profileInitials');
+            const profileImageEl = document.getElementById('profileImage');
             
             emailField.value = currentUser.email;
             profileEmail.textContent = currentUser.email;
 
             const { data, error } = await supabase
                 .from('user_profiles')
-                .select('full_name, username')
+                .select('full_name, username, avatar_url')
                 .eq('id', currentUser.id)
                 .single();
 
-            if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found, which is fine for new users
+            if (error && error.code !== 'PGRST116') {
                 console.error('Error fetching profile:', error);
                 return;
             }
@@ -276,13 +282,25 @@
                 // Update profile display
                 if (data.full_name) {
                     profileDisplayName.textContent = data.full_name;
-                    profileInitials.textContent = data.full_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                    const initials = data.full_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                    profileInitialsEl.querySelector('span').textContent = initials;
                 } else {
                     profileDisplayName.textContent = 'Your Profile';
-                    profileInitials.textContent = currentUser.email[0].toUpperCase();
+                    profileInitialsEl.querySelector('span').textContent = currentUser.email[0].toUpperCase();
+                }
+
+                if (data.avatar_url) {
+                    profileImageEl.src = data.avatar_url;
+                    profileImageEl.classList.remove('hidden');
+                    profileInitialsEl.classList.add('hidden');
+                } else {
+                    profileImageEl.classList.add('hidden');
+                    profileInitialsEl.classList.remove('hidden');
                 }
             } else {
-                profileInitials.textContent = currentUser.email[0].toUpperCase();
+                profileInitialsEl.querySelector('span').textContent = currentUser.email[0].toUpperCase();
+                profileImageEl.classList.add('hidden');
+                profileInitialsEl.classList.remove('hidden');
             }
         }
 
@@ -313,6 +331,43 @@
             
             submitButton.innerHTML = originalText;
             submitButton.disabled = false;
+        }
+
+        async function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
+            const filePath = `avatars/${fileName}`;
+
+            showCustomAlert('Uploading photo...', 'info');
+
+            const { error: uploadError } = await supabase.storage
+                .from('user-profiles')
+                .upload(filePath, file, { upsert: true });
+
+            if (uploadError) {
+                showCustomAlert(`Error uploading photo: ${uploadError.message}`, 'error');
+                return;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('user-profiles')
+                .getPublicUrl(filePath);
+            
+            const { error: updateError } = await supabase
+                .from('user_profiles')
+                .upsert({ id: currentUser.id, avatar_url: publicUrl });
+            
+            if (updateError) {
+                showCustomAlert(`Error updating profile: ${updateError.message}`, 'error');
+            } else {
+                showCustomAlert('Profile photo updated!', 'success');
+                loadUserProfile(); // Refresh the profile to show the new photo
+            }
         }
 
         async function loadUserFavorites() {
@@ -350,10 +405,10 @@
             container.innerHTML = data.map(fav => {
                 const restaurant = fav.restaurants;
                 if (!restaurant) return ''; // Skip if restaurant data is missing for some reason
-                const imageUrl = restaurant.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&h=200&q=80';
+                const imageUrl = restaurant.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&h=200&q=80';
                 return `
                     <a href="index.html" class="favorite-item bg-white p-6 rounded-2xl border border-gray-200 flex items-center space-x-6 hover:border-orange-200 group">
-                        <img src="${imageUrl}" alt="${restaurant.name}" class="w-24 h-24 rounded-xl object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=96&h=96&q=80'">
+                        <img src="${imageUrl}" alt="${restaurant.name}" class="w-24 h-24 rounded-xl object-cover flex-shrink-0 group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=96&h=96&q=80'">
                         <div class="flex-1">
                             <div class="flex items-center justify-between mb-2">
                                 <h4 class="text-xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors">${restaurant.name}</h4>
