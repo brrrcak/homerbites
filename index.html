@@ -165,33 +165,36 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-rose-50 min-h-screen font-sans antialiased">
 
-    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 py-3">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-            <a href="#" class="flex items-center space-x-3 group animate-fade-in">
-                <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl shadow-md group-hover:shadow-lg transition-all duration-300">
-                    HB
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-gray-800 tracking-tight">Homer Bites</h1>
-                    <p class="text-xs text-gray-500">Discover local food</p>
-                </div>
-            </a>
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative flex justify-between items-center h-16">
+            <div class="flex-shrink-0">
+                <a href="#" class="flex items-center space-x-3 group animate-fade-in">
+                    <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl shadow-md group-hover:shadow-lg transition-all duration-300">
+                        HB
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800 tracking-tight">Homer Bites</h1>
+                        <p class="text-xs text-gray-500">Discover local food</p>
+                    </div>
+                </a>
+            </div>
 
-            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+            <nav class="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 items-center space-x-6 text-sm font-medium">
                 <a href="#hero" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Discover</a>
                 <a href="#about" class="text-gray-600 hover:text-orange-500 transition-colors py-2">About</a>
                 <a href="#contact" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Contact</a>
             </nav>
 
-            <div id="authContainer" class="flex items-center space-x-3">
-                <button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
-                    Sign In
+            <div>
+                <div id="authContainer" class="flex items-center space-x-3">
+                    <button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                        Sign In
+                    </button>
+                </div>
+                <button class="md:hidden p-2 rounded-md hover:bg-gray-100 text-gray-700 transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
             </div>
-
-            <button class="md:hidden p-2 rounded-md hover:bg-gray-100 text-gray-700 transition-colors">
-                <i data-lucide="menu" class="w-6 h-6"></i>
-            </button>
         </div>
     </header>
 
