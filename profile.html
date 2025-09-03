@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -165,6 +165,7 @@
             event.preventDefault();
             const usernameInput = document.getElementById('username');
             const updates = {
+                id: currentUser.id,
                 full_name: document.getElementById('fullName').value,
                 updated_at: new Date(),
             };
@@ -173,7 +174,7 @@
                 updates.username = usernameInput.value;
             }
 
-            const { error } = await supabase.from('user_profiles').update(updates).eq('id', currentUser.id);
+            const { error } = await supabase.from('user_profiles').upsert(updates);
             if (error) {
                 showCustomAlert('Error: ' + error.message, 'error');
             } else {
