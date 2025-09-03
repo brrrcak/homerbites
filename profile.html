@@ -98,12 +98,27 @@
             </div>
         </div>
     </main>
+
+    <div id="restaurantModal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRestaurantModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                <div class="relative">
+                    <button onclick="closeRestaurantModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-sm">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                    <div id="modalContent" class="p-8">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <script src="modals.js"></script>
     <script>
         lucide.createIcons();
         const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzIいちばんCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
@@ -121,6 +136,7 @@
         function initializePage() {
             loadUserProfile();
             loadUserFavorites();
+            loadAllRestaurants(); // Load all restaurant data
             document.getElementById('profileForm').addEventListener('submit', handleProfileUpdate);
             document.getElementById('updateEmailBtn').addEventListener('click', handleEmailUpdate);
         }
@@ -192,18 +208,19 @@
                 <p class="text-gray-500">Loading your favorites...</p>`;
             lucide.createIcons();
 
-            const { data, error } = await supabase
+            // Step 1: Get the IDs of the favorited restaurants
+            const { data: favoriteRows, error: idError } = await supabase
                 .from('user_favorites')
-                .select(`restaurants (id, name, description, address, rating, image_url)`)
+                .select('restaurant_id')
                 .eq('user_id', currentUser.id);
 
-            if (error) {
-                console.error('Error fetching favorites:', error);
+            if (idError) {
+                console.error('Error fetching favorite IDs:', idError);
                 container.innerHTML += '<p class="text-red-500">Could not load your favorites.</p>';
                 return;
             }
 
-            if (!data || data.length === 0) {
+            if (!favoriteRows || favoriteRows.length === 0) {
                 container.innerHTML = `
                     <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                         <i data-lucide="heart" class="w-6 h-6 mr-3 text-orange-500"></i>
@@ -219,24 +236,35 @@
                 return;
             }
 
-            const favoritesHTML = data.map(fav => {
-                const restaurant = fav.restaurants;
+            const restaurantIds = favoriteRows.map(fav => fav.restaurant_id);
+
+            // Step 2: Get the details of the favorited restaurants
+            const { data: restaurantData, error: restaurantError } = await supabase
+                .from('restaurants')
+                .select('*')
+                .in('id', restaurantIds);
+
+            if (restaurantError) {
+                console.error('Error fetching restaurant details:', restaurantError);
+                container.innerHTML += '<p class="text-red-500">Could not load favorite restaurant details.</p>';
+                return;
+            }
+
+            const favoritesHTML = restaurantData.map(restaurant => {
                 if (!restaurant) return '';
                 const imageUrl = restaurant.image_url || 'https://placehold.co/96x96/f3f4f6/6b7280?text=No+Image';
                 
                 return `
-                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex items-center space-x-4">
+                    <div class="relative bg-gray-50 p-4 rounded-xl border border-gray-200 flex items-center space-x-4 group">
+                        <a href="#" class="absolute inset-0 z-10" onclick="showRestaurantDetails(${restaurant.id})"></a>
                         <img src="${imageUrl}" alt="${restaurant.name}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
                         <div class="flex-1">
-                            <div class="flex justify-between items-start">
-                                 <h4 class="font-bold text-gray-800">${restaurant.name}</h4>
-                                 <div class="flex items-center text-sm text-gray-600">
-                                    <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-current mr-1"></i>
-                                    <span>${restaurant.rating || 'N/A'}</span>
-                                </div>
-                            </div>
+                            <h4 class="font-bold text-gray-800">${restaurant.name}</h4>
                             <p class="text-sm text-gray-600 line-clamp-2">${restaurant.description || 'No description available.'}</p>
                         </div>
+                        <button onclick="event.stopPropagation(); removeFromFavorites('${restaurant.id}')" class="relative z-20 text-sm text-gray-500 hover:text-orange-500 transition-colors font-semibold whitespace-nowrap px-3 py-2">
+                            Remove from Favorites
+                        </button>
                     </div>
                 `;
             }).join('');
@@ -248,6 +276,70 @@
                 </h3>
                 <div class="space-y-4">${favoritesHTML}</div>`;
             lucide.createIcons();
+        }
+
+        async function removeFromFavorites(restaurantId) {
+            const confirmed = await showCustomConfirm('Are you sure you want to remove this restaurant from your favorites?');
+            if (!confirmed) {
+                return;
+            }
+
+            const { error } = await supabase
+                .from('user_favorites')
+                .delete()
+                .eq('user_id', currentUser.id)
+                .eq('restaurant_id', restaurantId);
+
+            if (error) {
+                showCustomAlert('Error removing favorite: ' + error.message, 'error');
+            } else {
+                showCustomAlert('Restaurant removed from favorites!', 'success');
+                loadUserFavorites(); // Refresh the list
+            }
+        }
+
+        let allRestaurants = [];
+
+        async function loadAllRestaurants() {
+            const { data, error } = await supabase.from('restaurants').select('*').eq('status', 'approved');
+            if (error) {
+                console.error('Error fetching all restaurants:', error);
+            } else {
+                allRestaurants = data;
+            }
+        }
+
+        function showRestaurantDetails(restaurantId) {
+            const restaurant = allRestaurants.find(r => r.id === restaurantId);
+            if (!restaurant) {
+                showCustomAlert('Could not find restaurant details.', 'error');
+                return;
+            }
+
+            const modal = document.getElementById('restaurantModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            let html = `<h2 class="text-3xl font-bold text-gray-800 mb-4">${restaurant.name}</h2>`;
+            html += `<div class="mb-4"><span class="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">${(restaurant.tags && restaurant.tags.length > 0 ? restaurant.tags[0] : 'Restaurant')}</span>`;
+            if (restaurant.rating) {
+                html += `<span class="inline-block ml-2"><i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current inline mr-1"></i>${restaurant.rating}</span>`;
+            }
+            html += `</div>`;
+            html += `<p class="text-gray-600 mb-6">${restaurant.description}</p>`;
+            html += `<div class="space-y-3">`;
+            html += `<div class="flex items-center text-gray-600"><i data-lucide="map-pin" class="w-5 h-5 mr-3"></i><span>${restaurant.address}</span></div>`;
+            html += `</div>`;
+            
+            modalContent.innerHTML = html;
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeRestaurantModal() {
+            const modal = document.getElementById('restaurantModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
         }
     </script>
 </body>
