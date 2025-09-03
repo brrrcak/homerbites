@@ -32,6 +32,7 @@ async function initializeApp() {
     initializeMap();
     setupSubmissionForm();
     showInitialMessage();
+    handleUrlParams();
 }
 
 function showInitialMessage() {
@@ -93,12 +94,8 @@ function updateAuthUI() {
 
 async function handleLogout() {
     if (typeof supabase === 'undefined') return;
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-        currentUser = null;
-        userFavorites.clear();
-        updateAuthUI();
-    }
+    // onAuthStateChange will handle the UI updates
+    await supabase.auth.signOut();
 }
 
 async function toggleFavorite(event, restaurantId) {
@@ -370,6 +367,56 @@ const modalHTML=`
         </div>
     `;document.body.insertAdjacentHTML('beforeend',modalHTML);const form=document.getElementById('authForm');form.addEventListener('submit',async(e)=>{e.preventDefault();const formData=new FormData(form);const email=formData.get('email');const password=formData.get('password');const fullName=formData.get('fullName');if(type==='login'){await handleLogin(email,password);}else if(type==='signup'){await handleSignup(email,password,fullName);}else if(type==='reset_password'){await handlePasswordReset(email);}});}
 function closeAuthModal(){const modal=document.getElementById('authModal');if(modal)modal.remove();}
+
+function handleUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    const restaurantId = params.get('restaurant');
+    if (restaurantId) {
+        // The restaurant data might not be loaded yet, so we wait for it.
+        // A simple way is to use a timeout, but a more robust solution
+        // would be to use a promise that resolves when data is loaded.
+        const interval = setInterval(() => {
+            if (restaurants.length > 0) {
+                clearInterval(interval);
+                openRestaurantModal(parseInt(restaurantId, 10));
+                // Clean up the URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }, 100);
+    }
+}
+
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(!document.getElementById('submissionModal')?.classList.contains('hidden')){closeSubmissionModal();}else if(document.getElementById('authModal')){closeAuthModal();}else{closeRestaurantModal();}}});
-if(typeof supabase!=='undefined'){supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'){currentUser=session.user;updateAuthUI();}else if(event==='SIGNED_OUT'){currentUser=null;updateAuthUI();}});
+if (typeof supabase !== 'undefined') {
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        // Check if a re-render is needed (i.e., if restaurants are currently displayed)
+        const container = document.getElementById('categoryContainer');
+        const needsRerender = container && container.innerHTML.trim() !== '' && !container.querySelector('p');
+
+        if (event === 'SIGNED_IN') {
+            currentUser = session.user;
+            updateAuthUI();
+            await loadUserFavorites();
+            if (needsRerender) {
+                const searchInput = document.getElementById('tagSearchInput');
+                if (searchInput && searchInput.value.trim() !== '') {
+                    handleSearch();
+                } else {
+                    renderAllAlphabetical();
+                }
+            }
+        } else if (event === 'SIGNED_OUT') {
+            currentUser = null;
+            userFavorites.clear();
+            updateAuthUI();
+            if (needsRerender) {
+                const searchInput = document.getElementById('tagSearchInput');
+                if (searchInput && searchInput.value.trim() !== '') {
+                    handleSearch();
+                } else {
+                    renderAllAlphabetical();
+                }
+            }
+        }
+    });
 }
