@@ -141,6 +141,12 @@
             border-color: var(--color-primary);
         }
 
+        .tag-option.selected:hover {
+            background-color: var(--color-primary);
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
         .modal-fade-in {
             animation: fadeIn 0.3s ease-out forwards;
         }
@@ -249,7 +255,7 @@
             <p class="text-xl text-gray-600 mb-10 animate-fade-in">Your ultimate guide to Homer's vibrant culinary scene. Find local favorites, hidden gems, and unforgettable meals.</p>
 
             <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in">
-                <input type="text" id="tagSearchInput" placeholder="Search what you crave" class="w-full sm:w-2/3 lg:w-1/2 px-6 py-4 rounded-full border border-gray-300 shadow-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all outline-none text-gray-700 text-lg">
+                <input type="text" id="tagSearchInput" placeholder="What you craving?" class="w-full sm:w-2/3 lg:w-1/2 px-6 py-4 rounded-full border border-gray-300 shadow-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all outline-none text-gray-700 text-lg">
                 <button id="findBtn" class="flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 btn-hover-scale text-lg font-semibold">
                     <i data-lucide="search" class="w-6 h-6 mr-3"></i>
                     Discover Eats
