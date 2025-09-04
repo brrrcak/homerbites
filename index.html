@@ -558,70 +558,112 @@
         }
 
         function showSignUpPrompt() {
-            return new Promise(resolve => {
-                const existingPrompt = document.getElementById('custom-prompt-overlay');
-                if (existingPrompt) existingPrompt.remove();
-                
-                const overlay = document.createElement('div');
-                overlay.id = 'custom-prompt-overlay';
-                overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
-                
-                const modalHTML = `
-                    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 modal-slide-up">
-                        <div class="mb-4">
-                            <i data-lucide="user-plus" class="w-8 h-8 text-blue-500 mx-auto"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Create an Account</h3>
-                        <input type="text" id="custom-prompt-name" placeholder="Full Name" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
-                        <input type="email" id="custom-prompt-email" placeholder="your@email.com"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
-                        <input type="password" id="custom-prompt-password" placeholder="Password" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-6">
-                        <div class="flex gap-4">
-                            <button id="custom-prompt-cancel" class="flex-1 px-6 py-3 bg-gray-500 text-white rounded-full shadow-lg hover:bg-gray-600 transition-all duration-300 font-semibold btn-hover-scale">
-                                Cancel
-                            </button>
-                            <button id="custom-prompt-ok" class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 font-semibold btn-hover-scale">
-                                Sign Up
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                overlay.innerHTML = modalHTML;
-                document.body.appendChild(overlay);
-                
-                if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                    lucide.createIcons();
-                }
-                
-                const nameInput = document.getElementById('custom-prompt-name');
-                const emailInput = document.getElementById('custom-prompt-email');
-                const passwordInput = document.getElementById('custom-prompt-password');
-                const okButton = document.getElementById('custom-prompt-ok');
-                const cancelButton = document.getElementById('custom-prompt-cancel');
-                
-                setTimeout(() => nameInput.focus(), 100);
-                
-                const handleSignUpAction = () => {
-                    const fullName = nameInput.value;
-                    const email = emailInput.value;
-                    const password = passwordInput.value;
-                    overlay.remove();
-                    resolve({ fullName, email, password });
-                };
-
-                okButton.addEventListener('click', handleSignUpAction);
-                
-                cancelButton.addEventListener('click', () => {
-                    overlay.remove();
-                    resolve(null);
-                });
-                
-                addModalStyles();
-            });
+    return new Promise(resolve => {
+        const existingPrompt = document.getElementById('custom-prompt-overlay');
+        if (existingPrompt) existingPrompt.remove();
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'custom-prompt-overlay';
+        overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+        
+        const modalHTML = `
+            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 modal-slide-up">
+                <div class="mb-4">
+                    <i data-lucide="user-plus" class="w-8 h-8 text-blue-500 mx-auto"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Create an Account</h3>
+                <input type="text" id="custom-prompt-firstname" placeholder="First Name" 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
+                <input type="text" id="custom-prompt-lastname" placeholder="Last Name" 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
+                <input type="email" id="custom-prompt-email" placeholder="your@email.com"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
+                <input type="text" id="custom-prompt-username" placeholder="Username"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-4">
+                <input type="password" id="custom-prompt-password" placeholder="Password" 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all mb-6">
+                <div class="flex gap-4">
+                    <button id="custom-prompt-cancel" class="flex-1 px-6 py-3 bg-gray-500 text-white rounded-full shadow-lg hover:bg-gray-600 transition-all duration-300 font-semibold btn-hover-scale">
+                        Cancel
+                    </button>
+                    <button id="custom-prompt-ok" class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 font-semibold btn-hover-scale">
+                        Sign Up
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        overlay.innerHTML = modalHTML;
+        document.body.appendChild(overlay);
+        
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
         }
+        
+        const firstNameInput = document.getElementById('custom-prompt-firstname');
+        const lastNameInput = document.getElementById('custom-prompt-lastname');
+        const emailInput = document.getElementById('custom-prompt-email');
+        const usernameInput = document.getElementById('custom-prompt-username');
+        const passwordInput = document.getElementById('custom-prompt-password');
+        const okButton = document.getElementById('custom-prompt-ok');
+        const cancelButton = document.getElementById('custom-prompt-cancel');
+        
+        setTimeout(() => firstNameInput.focus(), 100);
+        
+        const handleSignUpAction = () => {
+            const firstName = firstNameInput.value;
+            const lastName = lastNameInput.value;
+            const email = emailInput.value;
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            overlay.remove();
+            resolve({ firstName, lastName, email, username, password });
+        };
+
+        okButton.addEventListener('click', handleSignUpAction);
+        
+        cancelButton.addEventListener('click', () => {
+            overlay.remove();
+            resolve(null);
+        });
+        
+        addModalStyles();
+    });
+}
+
+async function handleSignUp() {
+    if (!supabase) {
+        showCustomAlert('Authentication not available - Supabase connection failed', 'error');
+        return;
+    }
+
+    const credentials = await showSignUpPrompt();
+    if (!credentials) return;
+
+    const { firstName, lastName, email, username, password } = credentials;
+    const fullName = `${firstName} ${lastName}`;
+
+    try {
+        const { error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    full_name: fullName,
+                    username: username
+                }
+            }
+        });
+
+        if (error) {
+            showCustomAlert('Failed to sign up: ' + error.message, 'error');
+        } else {
+            showCustomAlert('Sign up successful! Please check your email to confirm your account.', 'success');
+        }
+    } catch (error) {
+        showCustomAlert('Failed to sign up: ' + error.message, 'error');
+    }
+}
 
         function addModalStyles() {
             if (document.getElementById('homer-bites-modal-styles')) return;
