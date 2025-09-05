@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Restaurant Details - Homer Bites</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap');
+        body { font-family: 'Montserrat', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Playfair Display', serif; }
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 4px;
+        }
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+        .star-rating label {
+            cursor: pointer;
+            color: #d1d5db; /* gray-300 */
+            transition: color 0.2s;
+        }
+        .star-rating input[type="radio"]:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #f59e0b; /* amber-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <a href="index.html" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl">HB</div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800">Homer Bites</h1>
+                </div>
+            </a>
+            <a href="index.html" class="text-gray-600 hover:text-orange-500 transition-colors flex items-center">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                Back to Restaurants
+            </a>
+        </div>
+    </header>
+
+    <main class="py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="restaurant-details" class="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+                <div class="text-center py-16">
+                    <h2 class="text-2xl font-bold text-gray-600 mb-4">Loading Restaurant...</h2>
+                </div>
+            </div>
+
+            <div id="new-post-section" class="mt-12 text-center">
+                <button id="show-post-form-btn" class="px-8 py-4 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 font-semibold">
+                    <i data-lucide="plus" class="inline-block w-5 h-5 mr-2"></i>Share Your Experience
+                </button>
+                <form id="new-post-form" class="hidden bg-white p-8 rounded-3xl shadow-lg mt-6 text-left space-y-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Share Your Experience</h3>
+                    <div>
+                        <label for="post-ate" class="block text-sm font-medium text-gray-700 mb-2">What did you eat?</label>
+                        <input type="text" id="post-ate" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm" placeholder="e.g., Halibut Tacos, Reindeer Burger...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5"><label for="star5"><i data-lucide="star" class="w-6 h-6 fill-current"></i></label>
+                            <input type="radio" id="star4" name="rating" value="4"><label for="star4"><i data-lucide="star" class="w-6 h-6 fill-current"></i></label>
+                            <input type="radio" id="star3" name="rating" value="3"><label for="star3"><i data-lucide="star" class="w-6 h-6 fill-current"></i></label>
+                            <input type="radio" id="star2" name="rating" value="2"><label for="star2"><i data-lucide="star" class="w-6 h-6 fill-current"></i></label>
+                            <input type="radio" id="star1" name="rating" value="1"><label for="star1"><i data-lucide="star" class="w-6 h-6 fill-current"></i></label>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="post-content" class="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+                        <textarea id="post-content" class="w-full p-4 border border-gray-300 rounded-lg" rows="4" placeholder="How was it? What did you like?"></textarea>
+                    </div>
+                    <div>
+                        <label for="post-photo" class="block text-sm font-medium text-gray-700 mb-2">Upload a Photo</label>
+                        <input type="file" id="post-photo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                    </div>
+                    <div class="flex justify-end gap-4">
+                        <button type="button" id="cancel-post-btn" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300">Cancel</button>
+                        <button type="submit" class="px-6 py-3 bg-orange-500 text-white rounded-full hover:bg-orange-600">Submit Post</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="posts-section" class="mt-12">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Community Posts</h3>
+                <div id="posts-container" class="space-y-8">
+                    <!-- Posts will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-400 text-sm">© 2025 Homer Bites. Crafted with passion for the rich flavors of Homer, Alaska.</p>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            const params = new URLSearchParams(window.location.search);
+            const restaurantId = params.get('id');
+
+            const showFormBtn = document.getElementById('show-post-form-btn');
+            const newPostForm = document.getElementById('new-post-form');
+            const cancelPostBtn = document.getElementById('cancel-post-btn');
+
+            showFormBtn.addEventListener('click', () => {
+                newPostForm.classList.remove('hidden');
+                showFormBtn.classList.add('hidden');
+            });
+
+            cancelPostBtn.addEventListener('click', () => {
+                newPostForm.classList.add('hidden');
+                showFormBtn.classList.remove('hidden');
+            });
+
+            if (restaurantId) {
+                await loadRestaurantDetails(restaurantId);
+                await loadPosts(restaurantId);
+            } else {
+                document.getElementById('restaurant-details').innerHTML = '<p>Restaurant not found.</p>';
+            }
+
+            newPostForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const content = document.getElementById('post-content').value;
+                const ate = document.getElementById('post-ate').value;
+                const photoFile = document.getElementById('post-photo').files[0];
+                const rating = document.querySelector('input[name="rating"]:checked')?.value;
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (!user) {
+                    alert('You must be logged in to post a review.');
+                    return;
+                }
+
+                let imageUrl = null;
+                if (photoFile) {
+                    const filePath = `public/${user.id}/${Date.now()}-${photoFile.name}`;
+                    const { error: uploadError } = await supabase.storage.from('posts').upload(filePath, photoFile);
+                    if (uploadError) {
+                        console.error('Error uploading photo:', uploadError);
+                        return;
+                    }
+                    const { data } = supabase.storage.from('posts').getPublicUrl(filePath);
+                    imageUrl = data.publicUrl;
+                }
+
+                if (content.trim()) {
+                    const { error } = await supabase.from('posts').insert([
+                        { restaurant_id: restaurantId, user_id: user.id, content: content, ate: ate, image_url: imageUrl, rating: rating }
+                    ]);
+
+                    if (error) {
+                        console.error('Error submitting post:', error);
+                    } else {
+                        newPostForm.reset();
+                        newPostForm.classList.add('hidden');
+                        showFormBtn.classList.remove('hidden');
+                        await loadPosts(restaurantId);
+                    }
+                }
+            });
+        });
+
+        async function loadRestaurantDetails(id) {
+            const { data, error } = await supabase
+                .from('restaurants')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                console.error('Error fetching restaurant details:', error);
+                document.getElementById('restaurant-details').innerHTML = '<p>Error loading restaurant.</p>';
+                return;
+            }
+
+            const detailsContainer = document.getElementById('restaurant-details');
+            detailsContainer.innerHTML = `
+                <img src="${data.image_url || 'https://placehold.co/800x400/f3f4f6/6b7280?text=No+Image'}" alt="${data.name}" class="w-full h-64 object-cover rounded-2xl mb-6">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">${data.name}</h2>
+                <p class="text-lg text-gray-600 mb-6">${data.description}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
+                    <div><strong>Address:</strong> ${data.address}</div>
+                    <div><strong>Cuisine:</strong> ${data.cuisine}</div>
+                    <div><strong>Hours:</strong> ${data.hours}</div>
+                    <div><strong>Website:</strong> <a href="${data.website}" target="_blank" class="text-blue-500 hover:underline">${data.website}</a></div>
+                </div>
+            `;
+        }
+
+        async function loadPosts(restaurantId) {
+            const { data, error } = await supabase
+                .from('posts')
+                .select('*, profiles:user_profiles(username)')
+                .eq('restaurant_id', restaurantId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching posts:', error);
+                return;
+            }
+
+            const postsContainer = document.getElementById('posts-container');
+            if (data.length === 0) {
+                postsContainer.innerHTML = '<div class="text-center text-gray-500 py-8">No posts yet. Be the first to share your experience!</div>';
+                return;
+            }
+
+            postsContainer.innerHTML = data.map(post => `
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                    ${post.image_url ? `<img src="${post.image_url}" alt="User post image" class="w-full h-64 object-cover rounded-xl mb-4">` : ''}
+                    <div class="flex justify-between items-start">
+                        <div>
+                            ${post.ate ? `<p class="font-semibold text-gray-800">Ate: ${post.ate}</p>` : ''}
+                            <p class="text-gray-700 mt-2">${post.content}</p>
+                        </div>
+                        ${post.rating ? `
+                            <div class="flex items-center gap-1 text-amber-500">
+                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                                <span class="font-bold text-lg">${post.rating}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4">Posted by ${post.profiles.username} on ${new Date(post.created_at).toLocaleDateString()}</p>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+    </script>
+
+</body>
+</html>
