@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Homer Bites - Local Food Discovery in Homer, Alaska</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
     <meta name="description" content="Discover the best local eateries, hidden gems, and delightful dining experiences in Homer, Alaska with Homer Bites.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -426,8 +427,8 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    
-        <script src="modals.js"></script>
+    <script src="utils.js"></script>
+    <script src="modals.js"></script>
     
     <script>
         // Initialize Lucide Icons
@@ -437,7 +438,7 @@
         let supabase = null;
         try {
             const SUPABASE_URL = 'https://qtjwacufuwkehfkkijsl.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tijanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0andhY3VmdXdrZWhma2tpanNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwOTY5NTksImV4cCI6MjA3MTY3Mjk1OX0.bh33UFK75tnb13Cr0FhI-MByl0OTEtPj5lJdoJoLuQc';
             
             if (window.supabase && window.supabase.createClient) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -758,6 +759,7 @@
             html += '</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
             
             currentRestaurants.forEach(restaurant => {
+                const { isOpen, todaysHours } = getRestaurantStatus(restaurant.opening_hours);
                 const isFavorited = userFavorites.has(restaurant.id);
                 html += '<div class="restaurant-card">';
                 html += '<div class="relative">';
@@ -768,12 +770,20 @@
                 html += '<h3 class="text-xl font-bold text-gray-800 mb-2">' + restaurant.name + '</h3>';
                 html += '<p class="text-gray-600 mb-3">' + restaurant.description + '</p>';
                 html += '<div class="flex items-center justify-between mb-4">';
-                html += '<span class="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">' + (restaurant.hours || 'Hours not available') + '</span>';
+                
+                let hoursAndStatusHtml = '<div class="flex items-center gap-2">';
+                hoursAndStatusHtml += '<span class="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">' + todaysHours + '</span>';
+                if (isOpen) {
+                    hoursAndStatusHtml += '<span class="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">Open Now</span>';
+                }
+                hoursAndStatusHtml += '</div>';
+                html += hoursAndStatusHtml;
+
                 if (restaurant.rating) {
                     html += '<div class="flex items-center"><i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current mr-1"></i><span class="text-sm font-medium text-gray-700">' + restaurant.rating + '</span></div>';
                 }
                 html += '</div>';
-                html += '<button onclick="openRestaurantModal(' + restaurant.id + ')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors">View Details</button>';
+                html += '<a href="restaurant.html?id=' + restaurant.id + '" class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors">View Details</a>';
                 html += '</div></div>';
             });
             
@@ -959,7 +969,7 @@
 
             // Handle incoming restaurant ID from profile page
             handleUrlParams();
-        };
+        });
 
         function handleUrlParams() {
             const params = new URLSearchParams(window.location.search);
@@ -973,7 +983,7 @@
                     }
                 }, 100);
             }
-        });
+        }
 
         document.addEventListener('click', function(event) {
             const dropdownBtn = document.getElementById('dropdownBtn');
