@@ -93,6 +93,11 @@
             </div>
 
             <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+                <div id="postsContainer" class="p-8">
+                    </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
                 <div id="favoritesContainer" class="p-8">
                     </div>
             </div>
@@ -136,6 +141,7 @@
         function initializePage() {
             loadUserProfile();
             loadUserFavorites();
+            loadUserPosts();
             loadAllRestaurants(); // Load all restaurant data
             document.getElementById('profileForm').addEventListener('submit', handleProfileUpdate);
             document.getElementById('updateEmailBtn').addEventListener('click', handleEmailUpdate);
@@ -341,6 +347,63 @@
             if (modal) {
                 modal.classList.add('hidden');
             }
+        }
+
+        async function loadUserPosts() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = `
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i data-lucide="message-square" class="w-6 h-6 mr-3 text-blue-500"></i>
+                    Your Posts
+                </h3>
+                <p class="text-gray-500">Loading your posts...</p>`;
+            lucide.createIcons();
+
+            const { data, error } = await supabase
+                .from('posts')
+                .select('*, restaurant:restaurants(name)')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching user posts:', error);
+                container.innerHTML += '<p class="text-red-500">Could not load your posts.</p>';
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i data-lucide="message-square" class="w-6 h-6 mr-3 text-blue-500"></i>
+                        Your Posts
+                    </h3>
+                    <div class="text-center py-10">
+                        <h4 class="text-lg font-semibold text-gray-700">No Posts Yet</h4>
+                        <p class="text-gray-500 mb-6">You haven't posted any reviews yet.</p>
+                        <a href="index.html" class="inline-flex items-center px-6 py-2 bg-blue-500 text-white rounded-full shadow hover:bg-blue-600">
+                            Find a Restaurant to Review
+                        </a>
+                    </div>`;
+                return;
+            }
+
+            const postsHTML = data.map(post => `
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <p class="text-gray-800">${post.content}</p>
+                    <p class="text-sm text-gray-500 mt-2">
+                        Posted on ${new Date(post.created_at).toLocaleDateString()} 
+                        for <a href="restaurant.html?id=${post.restaurant_id}" class="font-semibold text-blue-500 hover:underline">${post.restaurant.name}</a>
+                    </p>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i data-lucide="message-square" class="w-6 h-6 mr-3 text-blue-500"></i>
+                    Your Posts
+                </h3>
+                <div class="space-y-4">${postsHTML}</div>`;
+            lucide.createIcons();
         }
     </script>
 </body>
