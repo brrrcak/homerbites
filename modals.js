@@ -73,7 +73,7 @@ function showCustomConfirm(message) {
                     <button id="custom-confirm-cancel" class="flex-1 px-6 py-3 bg-gray-500 text-white rounded-full shadow-lg hover:bg-gray-600 transition-all duration-300 font-semibold btn-hover-scale">
                         Cancel
                     </button>
-                    <button id="custom-confirm-ok" class="flex-1 px-6 py-3 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-all duration-300 font-semibold btn-hover-scale">
+                    <button id="custom-confirm-ok" class="flex-1 px-6 py-3 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 font-semibold btn-hover-scale">
                         Confirm
                     </button>
                 </div>
@@ -274,48 +274,3 @@ if (typeof module !== 'undefined' && module.exports) {
 
 // Initialize styles immediately
 addModalStyles();
-
-function showCustomConfirm(message) {
-    return new Promise(resolve => {
-        const existingConfirm = document.getElementById('custom-confirm-overlay');
-        if (existingConfirm) existingConfirm.remove();
-
-        const overlay = document.createElement('div');
-        overlay.id = 'custom-confirm-overlay';
-        overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
-
-        const modalHTML = `
-            <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center modal-slide-up">
-                <div class="mb-4">
-                    <i data-lucide="alert-triangle" class="w-12 h-12 text-orange-500 mx-auto"></i>
-                </div>
-                <p class="text-gray-800 mb-6 leading-relaxed">${message}</p>
-                <div class="flex gap-4">
-                    <button id="custom-confirm-cancel" class="flex-1 px-6 py-3 bg-gray-500 text-white rounded-full shadow-lg hover:bg-gray-600 transition-all duration-300 font-semibold btn-hover-scale">
-                        Cancel
-                    </button>
-                    <button id="custom-confirm-ok" class="flex-1 px-6 py-3 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 font-semibold btn-hover-scale">
-                        Confirm
-                    </button>
-                </div>
-            </div>
-        `;
-
-        overlay.innerHTML = modalHTML;
-        document.body.appendChild(overlay);
-
-        if (typeof lucide !== 'undefined' && lucide.createIcons) {
-            lucide.createIcons();
-        }
-
-        document.getElementById('custom-confirm-ok').addEventListener('click', () => {
-            overlay.remove();
-            resolve(true);
-        });
-
-        document.getElementById('custom-confirm-cancel').addEventListener('click', () => {
-            overlay.remove();
-            resolve(false);
-        });
-    });
-}
