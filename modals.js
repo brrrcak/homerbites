@@ -12,7 +12,7 @@ function showCustomAlert(message, type = 'info') {
     // Create overlay
     const overlay = document.createElement('div');
     overlay.id = 'custom-alert-overlay';
-    overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+    overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate__animated animate__fadeIn';
     
     // Determine icon and color based on type
     const iconColor = type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : 'text-blue-500';
@@ -23,7 +23,7 @@ function showCustomAlert(message, type = 'info') {
     
     // Create modal content with new styling
     const modalHTML = `
-        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center modal-slide-up">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center animate__animated animate__fadeIn">
             <div class="mb-4">
                 <i data-lucide="${iconName}" class="w-12 h-12 ${iconColor} mx-auto"></i>
             </div>
@@ -61,10 +61,10 @@ function showCustomConfirm(message) {
         
         const overlay = document.createElement('div');
         overlay.id = 'custom-confirm-overlay';
-        overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+        overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate__animated animate__fadeIn';
         
         const modalHTML = `
-            <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center modal-slide-up">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center animate__animated animate__fadeIn">
                 <div class="mb-4">
                     <i data-lucide="alert-triangle" class="w-12 h-12 text-orange-500 mx-auto"></i>
                 </div>
@@ -116,10 +116,10 @@ function showCustomPrompt(message, placeholder = '', defaultValue = '') {
         
         const overlay = document.createElement('div');
         overlay.id = 'custom-prompt-overlay';
-        overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+        overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate__animated animate__fadeIn';
         
         const modalHTML = `
-            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 modal-slide-up">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate__animated animate__fadeIn">
                 <div class="mb-4">
                     <i data-lucide="message-square" class="w-8 h-8 text-blue-500 mx-auto"></i>
                 </div>
@@ -186,10 +186,10 @@ function showCustomLoader(message = 'Loading...') {
     
     const overlay = document.createElement('div');
     overlay.id = 'custom-loader-overlay';
-    overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+    overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate__animated animate__fadeIn';
     
     const modalHTML = `
-        <div class="bg-white rounded-3xl shadow-2xl p-8 text-center modal-slide-up">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 text-center animate__animated animate__fadeIn">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
             <p class="text-gray-800 font-medium">${message}</p>
         </div>
@@ -224,6 +224,10 @@ function addModalStyles() {
     const style = document.createElement('style');
     style.id = 'homer-bites-modal-styles';
     style.textContent = `
+        .animate__animated {
+            --animate-duration: 0.5s;
+        }
+
         .modal-slide-up {
             animation: modalSlideUp 0.3s ease-out forwards;
         }
