@@ -33,25 +33,44 @@
             background-color: #f3f4f6;
             cursor: not-allowed;
         }
+        .scrollable-favorites {
+            max-height: 400px; /* Adjust as needed */
+            overflow-y: auto;
+            padding-right: 1rem; /* For scrollbar spacing */
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-rose-50 min-h-screen">
 
-    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 py-3">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-            <a href="index.html" class="flex items-center space-x-3 group">
-                <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-extrabold text-xl">HB</div>
-                <div>
-                    <h1 class="text-xl font-bold text-gray-800">Homer Bites</h1>
-                    <p class="text-xs text-gray-500">Your Profile</p>
-                </div>
-            </a>
-            <a href="index.html" class="text-gray-600 hover:text-orange-500 transition-colors">Back to Restaurants</a>
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative flex justify-between items-center h-16">
+            <div class="flex-shrink-0">
+                <a href="index.html" class="flex items-center space-x-3 group">
+                    <img src="https://qtjwacufuwkehfkkijsl.supabase.co/storage/v1/object/public/restaurant-images/hb_logo.png" alt="Homer Bites Logo" class="w-12 h-12 object-contain">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">Homer Bites</h1>
+                        <p class="text-xs text-gray-500">Your Profile</p>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 items-center space-x-6 text-sm font-medium">
+                <a href="#postsContainer" class="text-gray-600 hover:text-orange-500 transition-colors py-2">My Posts</a>
+                <a href="#favoritesContainer" class="text-gray-600 hover:text-orange-500 transition-colors py-2">My Favorites</a>
+            </nav>
+
+            <div>
+                <div id="authContainer" class="flex items-center space-x-3">
+                    </div>
+                <button class="md:hidden p-2 rounded-md hover:bg-gray-100 text-gray-700 transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
         </div>
     </header>
 
     <main class="py-12">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8" style="scroll-margin-top: 100px;">
             <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
                 <div class="bg-gradient-to-br from-blue-100 to-rose-100 p-8 text-center">
                     <h2 class="text-3xl font-bold text-gray-800 mb-2" id="profileDisplayName">Your Profile</h2>
@@ -145,6 +164,21 @@
             loadAllRestaurants(); // Load all restaurant data
             document.getElementById('profileForm').addEventListener('submit', handleProfileUpdate);
             document.getElementById('updateEmailBtn').addEventListener('click', handleEmailUpdate);
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const authContainer = document.getElementById('authContainer');
+            if (currentUser) {
+                const userFirstName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.email.split('@')[0];
+                authContainer.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <a href="index.html" class="text-gray-600 hover:text-orange-500 transition-colors flex items-center">
+                            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                            Back to Restaurants
+                        </a>
+                    </div>`;
+            }
         }
 
         async function loadUserProfile() {
@@ -263,7 +297,7 @@
                 
                 return `
                     <div class="relative bg-gray-50 p-4 rounded-xl border border-gray-200 flex items-center space-x-4 group">
-                        <a href="#" class="absolute inset-0 z-10" onclick="showRestaurantDetails(${restaurant.id})"></a>
+                        <a href="restaurant.html?id=${restaurant.id}" class="absolute inset-0 z-10"></a>
                         <img src="${imageUrl}" alt="${restaurant.name}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
                         <div class="flex-1">
                             <h4 class="font-bold text-gray-800">${restaurant.name}</h4>
@@ -281,8 +315,12 @@
                     <i data-lucide="heart" class="w-6 h-6 mr-3 text-orange-500"></i>
                     Your Favorite Restaurants
                 </h3>
-                <div class="space-y-4">${favoritesHTML}</div>`;
+                <div class="scrollable-favorites space-y-4">${favoritesHTML}</div>`;
             lucide.createIcons();
+
+            if (window.location.hash === '#favoritesContainer') {
+                container.scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
         async function removeFromFavorites(restaurantId) {
@@ -405,6 +443,7 @@
                 <div class="space-y-4">${postsHTML}</div>`;
             lucide.createIcons();
         }
+
     </script>
 </body>
 </html>
