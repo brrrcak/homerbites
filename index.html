@@ -4,13 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Homer Bites - Local Food Discovery in Homer, Alaska</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+    <link rel="icon" href="https://qtjwacufuwkehfkkijsl.supabase.co/storage/v1/object/public/restaurant-images/hb_logo.png">
     <meta name="description" content="Discover the best local eateries, hidden gems, and delightful dining experiences in Homer, Alaska with Homer Bites.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
     <style>
+        .mobile-nav-open {
+            overflow: hidden;
+        }
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+        }
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap');
 
         :root {
@@ -155,6 +165,29 @@
             animation: slideUp 0.3s ease-out forwards;
         }
 
+        .animate__animated {
+            --animate-duration: 0.5s;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #FF7043;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -25px;
+            margin-left: -25px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -202,7 +235,7 @@
             padding: 12px 16px;
             text-decoration: none;
             display: block;
-            text-align: left;
+            text-align: center;
             font-size: 0.875rem; /* Matches text-sm class */
             transition: color 0.2s;
         }
@@ -219,7 +252,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative flex justify-between items-center h-16">
             <div class="flex-shrink-0">
                 <a href="#" class="flex items-center space-x-3 group animate-fade-in">
-                    <img src="https://qtjwacufuwkehfkkijsl.supabase.co/storage/v1/object/public/restaurant-images/ChatGPT%20Image%20Sep%203,%202025,%2010_17_35%20PM.png" alt="Homer Bites Logo" class="w-10 h-10 object-contain">
+                    <img src="https://qtjwacufuwkehfkkijsl.supabase.co/storage/v1/object/public/restaurant-images/hb_logo.png" alt="Homer Bites Logo" class="w-12 h-12 object-contain">
                     <div>
                         <h1 class="text-xl font-bold text-gray-800 tracking-tight">Homer Bites</h1>
                         <p class="text-xs text-gray-500">Discover local food</p>
@@ -230,33 +263,48 @@
             <nav class="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 items-center space-x-6 text-sm font-medium">
                 <a href="#hero" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Discover</a>
                 <a href="#about" class="text-gray-600 hover:text-orange-500 transition-colors py-2">About</a>
-                <a href="#contact" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Contact</a>
+                <a href="#submit-restaurant" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Submit a Restaurant</a>
             </nav>
 
-            <div>
-                <div id="authContainer" class="flex items-center space-x-3">
-                    <button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+            <div class="flex items-center">
+                <div id="authContainer" class="hidden md:flex items-center space-x-3">
+                    <button onclick="handleSignIn()" class="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors">
                         Sign In
                     </button>
                 </div>
-                <button class="md:hidden p-2 rounded-md hover:bg-gray-100 text-gray-700 transition-colors">
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md hover:bg-gray-100 text-gray-700 transition-colors">
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
             </div>
+        </div>
+        <div id="mobile-menu" class="md:hidden fixed inset-0 bg-white z-50 transform -translate-x-full">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 class="text-lg font-bold">Menu</h2>
+                <button id="mobile-menu-close-button" class="p-2">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <nav class="flex flex-col p-4 space-y-4">
+                <a href="#hero" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Discover</a>
+                <a href="#about" class="text-gray-600 hover:text-orange-500 transition-colors py-2">About</a>
+                <a href="#submit-restaurant" class="text-gray-600 hover:text-orange-500 transition-colors py-2">Submit a Restaurant</a>
+                <div id="mobileAuthContainer" class="pt-4 border-t">
+                </div>
+            </nav>
         </div>
     </header>
 
     <section id="hero" class="relative bg-gradient-to-br from-blue-100 to-rose-100 py-24 sm:py-32 overflow-hidden text-center">
         <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-5xl md:text-6xl font-extrabold text-gray-800 leading-tight mb-6 animate-slide-up">
+            <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-800 leading-tight mb-6 animate-slide-up">
                 Savor the Flavor of <span class="text-rose-600">Homer</span>.
             </h2>
-            <p class="text-xl text-gray-600 mb-10 animate-fade-in">Your ultimate guide to Homer's vibrant culinary scene. Find local favorites, hidden gems, and unforgettable meals.</p>
+            <p class="text-lg sm:text-xl text-gray-600 mb-10 animate-fade-in">Your ultimate guide to Homer's vibrant culinary scene. Find local favorites, hidden gems, and unforgettable meals.</p>
 
             <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in">
-                <input type="text" id="tagSearchInput" placeholder="What you craving?" class="w-full sm:w-2/3 lg:w-1/2 px-6 py-4 rounded-full border border-gray-300 shadow-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all outline-none text-gray-700 text-lg">
-                <button id="findBtn" class="flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 btn-hover-scale text-lg font-semibold">
-                    <i data-lucide="search" class="w-6 h-6 mr-3"></i>
+                <input type="text" id="tagSearchInput" placeholder="Craving halibut tacos? Find them here..." class="w-full sm:w-2/3 lg:w-1/2 px-6 py-4 rounded-full border border-gray-300 shadow-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all outline-none text-gray-700 text-base sm:text-lg">
+                <button id="findBtn" class="flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 btn-hover-scale text-base sm:text-lg font-semibold">
+                    <i data-lucide="search" class="w-5 h-5 sm:w-6 sm:h-6 mr-3"></i>
                     Discover Eats
                 </button>
             </div>
@@ -269,6 +317,7 @@
                     Or simply <span class="underline underline-offset-4 decoration-gray-400">browse all restaurants</span>
                 </button>
             </div>
+            
         </div>
         
         <div class="hero-wave">
@@ -280,6 +329,9 @@
 
     <main id="restaurantsSection" class="relative z-10 py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="loader" class="hidden">
+                <div class="loader"></div>
+            </div>
             <div id="categoryContainer" class="space-y-16">
                 <div class="text-center py-16">
                     <div class="mb-6">
@@ -294,49 +346,49 @@
         </div>
     </main>
 
-    <section id="about" class="py-20 bg-gradient-to-br from-blue-50 to-rose-50">
+    <section id="about" class="py-16 sm:py-20 bg-gradient-to-br from-blue-50 to-rose-50">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h3 class="text-4xl font-extrabold text-gray-800 mb-6">Our Mission: Connecting You with Homer's Best</h3>
-            <p class="text-lg text-gray-700 leading-relaxed mb-8">Homer Bites was built on two things: a deep love for our local food scene and a sheer frustration with trying to find it. We believe finding your next great meal shouldn't require hunting through social media or piecing together search results. Our mission is to showcase the town's incredible culinary talent, helping both lifelong residents and curious visitors easily discover everything from comforting classics to innovative new tastes.</p>
+            <h3 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-6">Our Mission: Connecting You with Homer's Best</h3>
+            <p class="text-base sm:text-lg text-gray-700 leading-relaxed mb-8">Homer Bites was built on two things: a deep love for our local food scene and a sheer frustration with trying to find it. We believe finding your next great meal shouldn't require hunting through social media or piecing together search results. Our mission is to showcase the town's incredible culinary talent, helping both lifelong residents and curious visitors easily discover everything from comforting classics to innovative new tastes.</p>
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-2xl shadow-lg">
-                    <i data-lucide="heart" class="w-12 h-12 text-orange-500 mb-4"></i>
-                    <h4 class="text-2xl font-bold text-gray-800 mb-2">Love for Local</h4>
-                    <p class="text-gray-600">Our guide is dedicated to the independent restaurants, cafes, and food trucks owned and operated right here in our community.</p>
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg text-center">
+                    <i data-lucide="heart" class="w-10 h-10 sm:w-12 sm:h-12 text-orange-500 mb-4 mx-auto"></i>
+                    <h4 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Love for Local</h4>
+                    <p class="text-sm sm:text-base text-gray-600">Our guide is dedicated to the independent restaurants, cafes, and food trucks owned and operated right here in our community.</p>
                 </div>
-                <div class="bg-white p-8 rounded-2xl shadow-lg">
-                    <i data-lucide="compass" class="w-12 h-12 text-blue-500 mb-4"></i>
-                    <h4 class="text-2xl font-bold text-gray-800 mb-2">Effortless Discovery</h4>
-                    <p class="text-gray-600">Our platform makes it easy to find exactly what you're craving, with intuitive search and curated categories.</p>
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg text-center">
+                    <i data-lucide="compass" class="w-10 h-10 sm:w-12 sm:h-12 text-blue-500 mb-4 mx-auto"></i>
+                    <h4 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Effortless Discovery</h4>
+                    <p class="text-sm sm:text-base text-gray-600">Our platform makes it easy to find exactly what you're craving, with intuitive search and curated categories.</p>
                 </div>
-                <div class="bg-white p-8 rounded-2xl shadow-lg">
-                    <i data-lucide="lightbulb" class="w-12 h-12 text-green-500 mb-4"></i>
-                    <h4 class="text-2xl font-bold text-gray-800 mb-2">Community Driven</h4>
-                    <p class="text-gray-600">Submit your favorite spots and help us grow our comprehensive guide. Together, we celebrate Homer's culinary spirit.</p>
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg text-center">
+                    <i data-lucide="lightbulb" class="w-10 h-10 sm:w-12 sm:h-12 text-green-500 mb-4 mx-auto"></i>
+                    <h4 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Community Driven</h4>
+                    <p class="text-sm sm:text-base text-gray-600">Submit your favorite spots and help us grow our comprehensive guide. Together, we celebrate Homer's culinary spirit.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-16 bg-white text-center">
+    <section id="submit-restaurant" class="py-16 bg-white text-center">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h3 class="text-3xl font-bold text-gray-800 mb-4">Don't See Your Favorite Spot?</h3>
-            <p class="text-lg text-gray-600 mb-8">
+            <h3 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Don't See Your Favorite Spot?</h3>
+            <p class="text-base sm:text-lg text-gray-600 mb-8">
                 Help us make Homer Bites even better! If there's a restaurant you love that's not listed, please let us know.
             </p>
-            <button id="submitRestaurantBtn_bottom" class="flex items-center justify-center mx-auto px-8 py-4 bg-rose-500 text-white rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 btn-hover-scale text-lg font-semibold">
-                <i data-lucide="plus" class="w-6 h-6 mr-3"></i>
+            <button id="submitRestaurantBtn_bottom" class="flex items-center justify-center mx-auto px-8 py-3 sm:py-4 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 btn-hover-scale text-base sm:text-lg font-semibold">
+                <i data-lucide="plus" class="w-5 h-5 sm:w-6 sm:h-6 mr-3"></i>
                 Submit a Restaurant
             </button>
         </div>
     </section>
 
-    <div id="restaurantModal" class="fixed inset-0 z-50 hidden modal-fade-in">
+    <div id="restaurantModal" class="fixed inset-0 z-50 hidden">
         <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRestaurantModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl modal-slide-up">
+            <div id="restaurantModalContent" class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
                 <div class="relative">
                     <button onclick="closeRestaurantModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-sm">
                         <i data-lucide="x" class="w-6 h-6"></i>
@@ -348,10 +400,10 @@
         </div>
     </div>
     
-    <div id="tagModal" class="fixed inset-0 z-50 hidden modal-fade-in">
+    <div id="tagModal" class="fixed inset-0 z-50 hidden">
         <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeTagModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl modal-slide-up">
+            <div id="tagModalContent" class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
                 <div class="relative p-8">
                     <button onclick="closeTagModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-sm">
                         <i data-lucide="x" class="w-6 h-6"></i>
@@ -370,10 +422,10 @@
     </div>
 
 
-    <div id="submissionModal" class="fixed inset-0 z-50 hidden modal-fade-in">
+    <div id="submissionModal" class="fixed inset-0 z-50 hidden">
         <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSubmissionModal()"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl modal-slide-up">
+            <div id="submissionModalContent" class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
                 <div class="relative p-8">
                     <button onclick="closeSubmissionModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-sm">
                         <i data-lucide="x" class="w-6 h-6"></i>
@@ -411,20 +463,28 @@
 
     <footer id="contact" class="bg-gray-800 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 mb-8">
+            <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0 mb-8">
                 <a href="#" class="flex items-center space-x-3 group">
-                    <img src="https://qtjwacufuwkehfkkijsl.supabase.co/storage/v1/object/public/restaurant-images/ChatGPT%20Image%20Sep%203,%202025,%2010_17_35%20PM.png" alt="Homer Bites Logo" class="w-10 h-10 object-contain">
-                    <span class="text-2xl font-bold text-white tracking-tight">Homer Bites</span>
+                    <img src="https://qtjwacufuwkehfkkijsl.supabase.co/storage/v1/object/public/restaurant-images/hb_logo.png" alt="Homer Bites Logo" class="w-10 h-10 sm:w-12 sm:h-12 object-contain">
+                    <span class="text-xl sm:text-2xl font-bold text-white tracking-tight">Homer Bites</span>
                 </a>
-                <nav class="flex space-x-6 text-sm font-medium">
+                <nav class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium">
                     <a href="#hero" class="text-gray-300 hover:text-white transition-colors">Discover</a>
                     <a href="#about" class="text-gray-300 hover:text-white transition-colors">About Us</a>
-                    <a href="#contact" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                    <a href="#" id="supportLink" class="text-gray-300 hover:text-white transition-colors">Support</a>
                 </nav>
             </div>
-            <p class="text-gray-400 text-sm">© 2025 Homer Bites. Crafted with passion for the rich flavors of Homer, Alaska.</p>
+            <p class="text-gray-400 text-xs sm:text-sm">© 2025 Homer Bites. Crafted with passion for the rich flavors of Homer, Alaska.</p>
         </div>
     </footer>
+
+    <div id="supportModal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSupportModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div id="supportModalContent" class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="utils.js"></script>
@@ -465,10 +525,10 @@
 
                 const overlay = document.createElement('div');
                 overlay.id = 'custom-auth-overlay';
-                overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+                overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate__animated animate__fadeIn';
 
                 const modalContainer = document.createElement('div');
-                modalContainer.className = 'bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 modal-slide-up';
+                modalContainer.className = 'bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate__animated animate__fadeIn';
                 overlay.appendChild(modalContainer);
 
                 const renderSignInView = () => {
@@ -504,11 +564,27 @@
                         renderSignUpView();
                     });
 
-                    modalContainer.querySelector('#custom-auth-ok').addEventListener('click', () => {
-                        const identifier = modalContainer.querySelector('#custom-auth-identifier').value;
-                        const password = modalContainer.querySelector('#custom-auth-password').value;
+                    const signInButton = modalContainer.querySelector('#custom-auth-ok');
+                    const signInIdentifierInput = modalContainer.querySelector('#custom-auth-identifier');
+                    const signInPasswordInput = modalContainer.querySelector('#custom-auth-password');
+
+                    signInButton.addEventListener('click', () => {
+                        const identifier = signInIdentifierInput.value;
+                        const password = signInPasswordInput.value;
                         overlay.remove();
                         resolve({ view: 'signIn', identifier, password });
+                    });
+
+                    signInIdentifierInput.addEventListener('keyup', function(event) {
+                        if (event.key === 'Enter') {
+                            signInButton.click();
+                        }
+                    });
+
+                    signInPasswordInput.addEventListener('keyup', function(event) {
+                        if (event.key === 'Enter') {
+                            signInButton.click();
+                        }
                     });
                      modalContainer.querySelector('#custom-auth-cancel').addEventListener('click', () => {
                         overlay.remove();
@@ -553,14 +629,31 @@
                         renderSignInView();
                     });
 
-                    modalContainer.querySelector('#custom-auth-ok').addEventListener('click', () => {
-                        const firstName = modalContainer.querySelector('#custom-prompt-firstname').value;
-                        const lastName = modalContainer.querySelector('#custom-prompt-lastname').value;
-                        const email = modalContainer.querySelector('#custom-prompt-email').value;
-                        const username = modalContainer.querySelector('#custom-prompt-username').value;
-                        const password = modalContainer.querySelector('#custom-prompt-password').value;
+                    const signUpButton = modalContainer.querySelector('#custom-auth-ok');
+                    const inputs = [
+                        modalContainer.querySelector('#custom-prompt-firstname'),
+                        modalContainer.querySelector('#custom-prompt-lastname'),
+                        modalContainer.querySelector('#custom-prompt-email'),
+                        modalContainer.querySelector('#custom-prompt-username'),
+                        modalContainer.querySelector('#custom-prompt-password')
+                    ];
+
+                    signUpButton.addEventListener('click', () => {
+                        const firstName = inputs[0].value;
+                        const lastName = inputs[1].value;
+                        const email = inputs[2].value;
+                        const username = inputs[3].value;
+                        const password = inputs[4].value;
                         overlay.remove();
                         resolve({ view: 'signUp', firstName, lastName, email, username, password });
+                    });
+
+                    inputs.forEach(input => {
+                        input.addEventListener('keyup', function(event) {
+                            if (event.key === 'Enter') {
+                                signUpButton.click();
+                            }
+                        });
                     });
                     modalContainer.querySelector('#custom-auth-cancel').addEventListener('click', () => {
                         overlay.remove();
@@ -650,9 +743,11 @@
 
         function updateAuthUI() {
             const authContainer = document.getElementById('authContainer');
+            const mobileAuthContainer = document.getElementById('mobileAuthContainer');
+
             if (currentUser) {
                 const userFirstName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.email.split('@')[0];
-                authContainer.innerHTML = `
+                const loggedInHTML = `
                     <div class="flex items-center space-x-4">
                         <div class="dropdown">
                             <button id="dropdownBtn" class="flex items-center space-x-2 text-sm text-gray-600 cursor-pointer">
@@ -666,17 +761,38 @@
                         </div>
                         <button onclick="handleSignOut()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">Sign Out</button>
                     </div>`;
+                const mobileLoggedInHTML = `
+                    <div class="flex flex-col space-y-4">
+                        <a href="profile.html" class="text-gray-600 hover:text-orange-500 transition-colors py-2">View Profile</a>
+                        <a href="profile.html#favoritesContainer" class="text-gray-600 hover:text-orange-500 transition-colors py-2">View Favorites</a>
+                        <button onclick="handleSignOut()" class="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">Sign Out</button>
+                    </div>`;
+                authContainer.innerHTML = loggedInHTML;
+                mobileAuthContainer.innerHTML = mobileLoggedInHTML;
             } else {
-                authContainer.innerHTML = `
-                    <button onclick="handleSignIn()" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                const loggedOutHTML = `
+                    <button onclick="handleSignIn()" class="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors">
                         Sign In
                     </button>
                 `;
+                const mobileLoggedOutHTML = `
+                    <button onclick="handleSignIn()" class="w-full px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors">
+                        Sign In
+                    </button>
+                `;
+                authContainer.innerHTML = loggedOutHTML;
+                mobileAuthContainer.innerHTML = mobileLoggedOutHTML;
             }
         }
 
         // Load restaurants
         async function loadRestaurants() {
+            const loader = document.getElementById('loader');
+            const categoryContainer = document.getElementById('categoryContainer');
+            
+            loader.classList.remove('hidden');
+            categoryContainer.classList.add('hidden');
+
             try {
                 if (supabase) {
                     const { data, error } = await supabase.from('restaurants').select('*').eq('status', 'approved');
@@ -693,12 +809,16 @@
             } catch (error) {
                 console.error('Error loading restaurants:', error);
                 restaurants = []; // Ensure restaurants are empty if fetch fails
+            } finally {
+                loader.classList.add('hidden');
+                categoryContainer.classList.remove('hidden');
             }
         }
 
         // Filter and display restaurants
         function filterRestaurants(cuisineFilter, searchTerm) {
             let tempFiltered = [];
+
             if (cuisineFilter) {
                 tempFiltered = restaurants.filter(r => 
                     r.cuisine && r.cuisine.toLowerCase() === cuisineFilter.toLowerCase()
@@ -715,23 +835,51 @@
                 tempFiltered = [...restaurants];
             }
             
+            // Sort by open status
+            tempFiltered.sort((a, b) => {
+                const statusA = getRestaurantStatus(a.opening_hours).status;
+                const statusB = getRestaurantStatus(b.opening_hours).status;
+
+                const isAOpen = statusA === 'open' || statusA === 'closingSoon';
+                const isBOpen = statusB === 'open' || statusB === 'closingSoon';
+
+                if (isAOpen && !isBOpen) return -1;
+                if (!isAOpen && isBOpen) return 1;
+                return 0;
+            });
+
             filteredRestaurants = tempFiltered;
             currentPage = 0;
             displayRestaurants();
         }
         
         function filterRestaurantsByTags(tags) {
-            filteredRestaurants = restaurants.filter(r =>
+            let tempFiltered = restaurants.filter(r =>
                 tags.every(tag => r.tags && r.tags.map(t => t.toLowerCase()).includes(tag.toLowerCase()))
             );
+
+            // Sort by open status
+            tempFiltered.sort((a, b) => {
+                const statusA = getRestaurantStatus(a.opening_hours).status;
+                const statusB = getRestaurantStatus(b.opening_hours).status;
+
+                const isAOpen = statusA === 'open' || statusA === 'closingSoon';
+                const isBOpen = statusB === 'open' || statusB === 'closingSoon';
+
+                if (isAOpen && !isBOpen) return -1;
+                if (!isAOpen && isBOpen) return 1;
+                return 0;
+            });
+
+            filteredRestaurants = tempFiltered;
             currentPage = 0;
             selectedCuisine = tags.map(t => `#${t}`).join(', '); // Update header title
             displayRestaurants();
-            scrollToRestaurants();
         }
 
         function displayRestaurants() {
             const container = document.getElementById('categoryContainer');
+            container.innerHTML = ''; // Clear previous content
             
             if (filteredRestaurants.length === 0) {
                 container.innerHTML = '<div class="text-center py-16"><h3 class="text-2xl font-bold text-gray-600 mb-4">No Results Found</h3><p class="text-gray-500">Try a different cuisine or search term.</p></div>';
@@ -742,39 +890,49 @@
             const startIndex = currentPage * restaurantsPerPage;
             const currentRestaurants = filteredRestaurants.slice(startIndex, startIndex + restaurantsPerPage);
             
+            let paginationHtml = '';
+            if (totalPages > 1) {
+                paginationHtml += '<div class="flex items-center justify-end space-x-4 mt-8">';
+                paginationHtml += '<span class="text-sm text-gray-600">Page ' + (currentPage + 1) + ' of ' + totalPages + '</span>';
+                paginationHtml += '<div class="flex items-center space-x-2">';
+                paginationHtml += '<button onclick="previousPage()" ' + (currentPage === 0 ? 'disabled' : '') + ' class="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-5 h-5 text-gray-600"></i></button>';
+                paginationHtml += '<button onclick="nextPage()" ' + (currentPage >= totalPages - 1 ? 'disabled' : '') + ' class="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-right" class="w-5 h-5 text-gray-600"></i></button>';
+                paginationHtml += '</div></div>';
+            }
+
             let html = '<div class="mb-8"><div class="flex items-center justify-between mb-6">';
+            html += '<div class="flex items-center">';
             html += '<h3 class="text-3xl font-bold text-gray-800">';
             html += selectedCuisine ? selectedCuisine.charAt(0).toUpperCase() + selectedCuisine.slice(1) : 'All Restaurants';
             html += ' <span class="text-lg font-normal text-gray-500 ml-2">(' + filteredRestaurants.length + ' found)</span></h3>';
+            html += '</div>';
+            html += '<div class="flex items-center space-x-4">';
+            html += paginationHtml;
+            html += '</div></div>';
             
-            if (totalPages > 1) {
-                html += '<div class="flex items-center space-x-4">';
-                html += '<span class="text-sm text-gray-600">Page ' + (currentPage + 1) + ' of ' + totalPages + '</span>';
-                html += '<div class="flex items-center space-x-2">';
-                html += '<button onclick="previousPage()" ' + (currentPage === 0 ? 'disabled' : '') + ' class="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-5 h-5 text-gray-600"></i></button>';
-                html += '<button onclick="nextPage()" ' + (currentPage >= totalPages - 1 ? 'disabled' : '') + ' class="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-right" class="w-5 h-5 text-gray-600"></i></button>';
-                html += '</div></div>';
-            }
-            
-            html += '</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">';
+            html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">';
             
             currentRestaurants.forEach(restaurant => {
-                const { isOpen, todaysHours } = getRestaurantStatus(restaurant.opening_hours);
+                const { status, todaysHours } = getRestaurantStatus(restaurant.opening_hours);
                 const isFavorited = userFavorites.has(restaurant.id);
-                html += '<div class="restaurant-card">';
+                html += `<a href="restaurant.html?id=${restaurant.id}" class="restaurant-card block group">`;
                 html += '<div class="relative">';
                 html += '<img src="' + (restaurant.image_url || 'https://placehold.co/400x200/1e293b/ffffff?text=Image+Not+Found') + '" alt="' + restaurant.name + '" class="w-full h-48 object-cover">';
-                html += '<button class="favorite-btn ' + (isFavorited ? 'favorited' : '') + '" onclick="toggleFavorite(' + restaurant.id + ', this)">';
+                html += '<button class="favorite-btn ' + (isFavorited ? 'favorited' : '') + '" onclick="event.preventDefault(); event.stopPropagation(); toggleFavorite(' + restaurant.id + ', this)">';
                 html += '<i data-lucide="heart" class="w-5 h-5 ' + (isFavorited ? 'fill-current' : '') + '"></i></button>';
-                html += '</div><div class="p-6">';
-                html += '<h3 class="text-xl font-bold text-gray-800 mb-2">' + restaurant.name + '</h3>';
-                html += '<p class="text-gray-600 mb-3">' + restaurant.description + '</p>';
-                html += '<div class="flex items-center justify-between mb-4">';
+                html += '</div><div class="p-4 sm:p-6">';
+                html += '<h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">' + restaurant.name + '</h3>';
+                html += '<p class="text-sm sm:text-base text-gray-600 mb-3 line-clamp-2">' + restaurant.description + '</p>';
+                html += '<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mt-4">';
                 
                 let hoursAndStatusHtml = '<div class="flex items-center gap-2">';
-                hoursAndStatusHtml += '<span class="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">' + todaysHours + '</span>';
-                if (isOpen) {
+                hoursAndStatusHtml += '<span class="text-xs sm:text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">' + todaysHours + '</span>';
+                if (status === 'open') {
                     hoursAndStatusHtml += '<span class="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">Open Now</span>';
+                } else if (status === 'closingSoon') {
+                    hoursAndStatusHtml += '<span class="text-xs font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded-full">Closing Soon</span>';
+                } else {
+                    hoursAndStatusHtml += '<span class="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">Closed</span>';
                 }
                 hoursAndStatusHtml += '</div>';
                 html += hoursAndStatusHtml;
@@ -783,11 +941,10 @@
                     html += '<div class="flex items-center"><i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current mr-1"></i><span class="text-sm font-medium text-gray-700">' + restaurant.rating + '</span></div>';
                 }
                 html += '</div>';
-                html += '<a href="restaurant.html?id=' + restaurant.id + '" class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors">View Details</a>';
-                html += '</div></div>';
+                html += '</div></a>';
             });
             
-            html += '</div></div>';
+            html += '</div>' + paginationHtml + '</div>';
             container.innerHTML = html;
             lucide.createIcons();
         }
@@ -853,6 +1010,7 @@
             
             const modal = document.getElementById('restaurantModal');
             const modalContent = document.getElementById('modalContent');
+            const restaurantModalContent = document.getElementById('restaurantModalContent');
             
             let html = '<h2 class="text-3xl font-bold text-gray-800 mb-4">' + restaurant.name + '</h2>';
             html += '<div class="mb-4"><span class="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">' + (restaurant.tags && restaurant.tags.length > 0 ? restaurant.tags[0] : 'Restaurant') + '</span>';
@@ -867,21 +1025,37 @@
             
             modalContent.innerHTML = html;
             modal.classList.remove('hidden');
+            restaurantModalContent.classList.add('animate__animated', 'animate__fadeIn');
             lucide.createIcons();
         }
 
         // Modal functions
         function closeRestaurantModal() {
-            document.getElementById('restaurantModal').classList.add('hidden');
+            const modal = document.getElementById('restaurantModal');
+            const restaurantModalContent = document.getElementById('restaurantModalContent');
+            restaurantModalContent.classList.add('animate__animated', 'animate__fadeOut');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                restaurantModalContent.classList.remove('animate__animated', 'animate__fadeOut');
+            }, 500);
         }
 
         function openTagModal() {
             populateTagModal();
-            document.getElementById('tagModal').classList.remove('hidden');
+            const modal = document.getElementById('tagModal');
+            const tagModalContent = document.getElementById('tagModalContent');
+            modal.classList.remove('hidden');
+            tagModalContent.classList.add('animate__animated', 'animate__fadeIn');
         }
 
         function closeTagModal() {
-            document.getElementById('tagModal').classList.add('hidden');
+            const modal = document.getElementById('tagModal');
+            const tagModalContent = document.getElementById('tagModalContent');
+            tagModalContent.classList.add('animate__animated', 'animate__fadeOut');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                tagModalContent.classList.remove('animate__animated', 'animate__fadeOut');
+            }, 500);
         }
 
         function populateTagModal() {
@@ -902,7 +1076,125 @@
         }
 
         function closeSubmissionModal() {
-            document.getElementById('submissionModal').classList.add('hidden');
+            const modal = document.getElementById('submissionModal');
+            const submissionModalContent = document.getElementById('submissionModalContent');
+            submissionModalContent.classList.add('animate__animated', 'animate__fadeOut');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                submissionModalContent.classList.remove('animate__animated', 'animate__fadeOut');
+            }, 500);
+        }
+
+        function openSupportModal() {
+            const modal = document.getElementById('supportModal');
+            const modalContent = document.getElementById('supportModalContent');
+            
+            let formHtml = '';
+            if (currentUser) {
+                // Form for signed-in users
+                formHtml = `
+                    <div class="relative p-8">
+                        <button onclick="closeSupportModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-sm">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                        <div class="text-center">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Contact Support</h2>
+                            <p class="text-gray-600 mb-6">Need help or have a suggestion? Let us know!</p>
+                        </div>
+                        <form id="supportForm" class="space-y-5">
+                            <div>
+                                <label for="supportMessage" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                                <textarea id="supportMessage" name="supportMessage" rows="4" required class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-200 focus:border-blue-500 outline-none transition-colors"></textarea>
+                            </div>
+                            <div class="mt-6">
+                                <button type="submit" class="w-full flex items-center justify-center px-6 py-3 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 btn-hover-scale text-base font-semibold">
+                                    <i data-lucide="send" class="w-5 h-5 mr-3"></i>
+                                    Send Message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            } else {
+                // Form for non-signed-in users
+                formHtml = `
+                    <div class="relative p-8">
+                        <button onclick="closeSupportModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors shadow-sm">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                        <div class="text-center">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Contact Support</h2>
+                            <p class="text-gray-600 mb-6">Need help or have a suggestion? Let us know!</p>
+                        </div>
+                        <form id="supportForm" class="space-y-5">
+                            <div>
+                                <label for="supportName" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                                <input type="text" id="supportName" name="supportName" required class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-200 focus:border-blue-500 outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label for="supportEmail" class="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
+                                <input type="email" id="supportEmail" name="supportEmail" required class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-200 focus:border-blue-500 outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label for="supportMessage" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                                <textarea id="supportMessage" name="supportMessage" rows="4" required class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-200 focus:border-blue-500 outline-none transition-colors"></textarea>
+                            </div>
+                            <div class="mt-6">
+                                <button type="submit" class="w-full flex items-center justify-center px-6 py-3 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 btn-hover-scale text-base font-semibold">
+                                    <i data-lucide="send" class="w-5 h-5 mr-3"></i>
+                                    Send Message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            }
+            
+            modalContent.innerHTML = formHtml;
+            modal.classList.remove('hidden');
+            modalContent.classList.add('animate__animated', 'animate__fadeIn');
+            lucide.createIcons();
+
+            const supportForm = document.getElementById('supportForm');
+            if (supportForm) {
+                supportForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const message = document.getElementById('supportMessage').value;
+                    let submission = { message };
+
+                    if (currentUser) {
+                        submission.user_id = currentUser.id;
+                        submission.name = currentUser.user_metadata?.full_name || 'N/A';
+                        submission.email = currentUser.email;
+                    } else {
+                        submission.name = document.getElementById('supportName').value;
+                        submission.email = document.getElementById('supportEmail').value;
+                    }
+
+                    if (supabase) {
+                        const { error } = await supabase.from('support_submissions').insert([submission]);
+                        if (error) {
+                            console.error('Error submitting support form:', error);
+                            showCustomAlert('There was an error submitting your message. Please try again.', 'error');
+                        } else {
+                            showCustomAlert('Thank you for your message! We will get back to you soon.', 'success');
+                            closeSupportModal();
+                        }
+                    } else {
+                        showCustomAlert('Database connection is not available. Please try again later.', 'error');
+                    }
+                });
+            }
+        }
+
+        function closeSupportModal() {
+            const modal = document.getElementById('supportModal');
+            const supportModalContent = document.getElementById('supportModalContent');
+            supportModalContent.classList.add('animate__animated', 'animate__fadeOut');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                supportModalContent.classList.remove('animate__animated', 'animate__fadeOut');
+            }, 500);
         }
 
         // Scroll to restaurants
@@ -911,6 +1203,21 @@
         }
 
         // Initialize everything
+        async function loadUserFavorites() {
+            if (!currentUser) return;
+            const { data, error } = await supabase
+                .from('user_favorites')
+                .select('restaurant_id')
+                .eq('user_id', currentUser.id);
+
+            if (error) {
+                console.error('Error fetching user favorites:', error);
+                return;
+            }
+
+            userFavorites = new Set(data.map(fav => fav.restaurant_id));
+        }
+
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Initializing Homer Bites...');
             
@@ -919,10 +1226,12 @@
             if (supabase) {
                 const { data: { user } } = await supabase.auth.getUser();
                 currentUser = user;
+                await loadUserFavorites();
                 updateAuthUI();
                 
-                supabase.auth.onAuthStateChange((event, session) => {
+                supabase.auth.onAuthStateChange(async (event, session) => {
                     currentUser = session?.user || null;
+                    await loadUserFavorites();
                     updateAuthUI();
                 });
             }
@@ -937,12 +1246,19 @@
                     showCustomAlert('Please enter a search term to discover restaurants', 'info');
                 }
             });
+
+            document.getElementById('tagSearchInput').addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    document.getElementById('findBtn').click();
+                }
+            });
             
             document.getElementById('viewAllBtn').addEventListener('click', function() {
                 selectedCuisine = null;
-                filterRestaurants();
+                filterRestaurants(null, null);
                 scrollToRestaurants();
             });
+
 
             document.getElementById('browseByTagBtn').addEventListener('click', openTagModal);
             
@@ -950,12 +1266,16 @@
                 const selectedTags = [...document.querySelectorAll('#tagList .tag-option.selected')].map(btn => btn.dataset.tag);
                 if (selectedTags.length > 0) {
                     filterRestaurantsByTags(selectedTags);
+                    scrollToRestaurants();
                 }
                 closeTagModal();
             });
 
             document.getElementById('submitRestaurantBtn_bottom').addEventListener('click', function() {
-                document.getElementById('submissionModal').classList.remove('hidden');
+                const modal = document.getElementById('submissionModal');
+                const submissionModalContent = document.getElementById('submissionModalContent');
+                modal.classList.remove('hidden');
+                submissionModalContent.classList.add('animate__animated', 'animate__fadeIn');
             });
             
             document.getElementById('submissionForm').addEventListener('submit', function(e) {
@@ -964,11 +1284,39 @@
                 closeSubmissionModal();
             });
 
+            document.getElementById('supportLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                openSupportModal();
+            });
+
             // Do not display restaurants on initial load
             // filterRestaurants(); 
 
             // Handle incoming restaurant ID from profile page
             handleUrlParams();
+
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenuCloseButton = document.getElementById('mobile-menu-close-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mainContent = document.querySelector('main');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.remove('-translate-x-full');
+                document.body.classList.add('mobile-nav-open');
+            });
+
+            mobileMenuCloseButton.addEventListener('click', () => {
+                mobileMenu.classList.add('-translate-x-full');
+                document.body.classList.remove('mobile-nav-open');
+            });
+            
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('-translate-x-full');
+                    document.body.classList.remove('mobile-nav-open');
+                });
+            });
         });
 
         function handleUrlParams() {
