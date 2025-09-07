@@ -134,7 +134,7 @@ function createRestaurantCard(restaurant) {
         : `<svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>`;
 
     return `
-        <div class="restaurant-card group" onclick="openRestaurantModal(${restaurant.id})">
+        <div class="restaurant-card group" onclick="window.location.href='restaurant.html?id=${restaurant.id}'">
             <div class="restaurant-image">
                 <img src="${imageUrl}" alt="${restaurant.name}" loading="lazy" onerror="this.src='https://placehold.co/400x200/1e293b/ffffff?text=Image+Not+Found'; this.onerror=null;">
                 <div class="restaurant-overlay"></div>
@@ -151,9 +151,6 @@ function createRestaurantCard(restaurant) {
                     <p class="text-gray-600 mb-4 leading-relaxed line-clamp-3">${restaurant.description}</p>
                 </div>
                 <div class="mt-auto pt-4 border-t border-gray-200 flex justify-between items-center gap-2">
-                    <button type="button" onclick="event.stopPropagation(); openRestaurantModal(${restaurant.id})" class="flex-grow px-4 py-2 bg-brand-500 text-white font-semibold rounded-lg hover:bg-brand-600 transition-colors text-center text-sm">
-                        View Details
-                    </button>
                     <button type="button" class="fav-btn p-2 rounded-lg hover:bg-gray-200" data-id="${restaurant.id}" onclick="toggleFavorite(event, ${restaurant.id})">
                         ${heartIconSVG}
                     </button>
@@ -237,7 +234,7 @@ const{data,error}=await supabase.auth.signUp({email:email,password:password,opti
 async function handlePasswordReset(email){if(typeof supabase==='undefined'){await showCustomAlert('Database connection not available.','error');return;}
 const{data,error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.href,});if(error){await showCustomAlert('Error: '+error.message,'error');}else{await showCustomAlert('Password reset link sent! Please check your email.');closeAuthModal();}}
 async function loadRestaurantsFromSupabase(){if(typeof supabase==='undefined'){console.log('Supabase not available, using static data');restaurants=getStaticRestaurants();return;}
-try{const{data,error}=await supabase.from('restaurants').select('*').eq('status','approved');if(error)throw error;restaurants=data.map(restaurant=>({id:restaurant.id,name:restaurant.name,description:restaurant.description,address:restaurant.address,phone:restaurant.phone,website:restaurant.website,hours:restaurant.hours,imageURL:restaurant.image_url,lat:restaurant.lat,lng:restaurant.lng,menu:restaurant.menu_url,tags:restaurant.tags||[],rating:restaurant.rating,priceRange:restaurant.price_range}));console.log('Loaded',restaurants.length,'restaurants from Supabase');}catch(error){console.error('Error loading restaurants:',error);restaurants=getStaticRestaurants();console.log('Using fallback static data');}}
+try{const{data,error}=await supabase.from('restaurants').select('*').eq('status','approved');if(error)throw error;restaurants=data.map(restaurant=>({id:restaurant.id,name:restaurant.name,description:restaurant.description,address:restaurant.address,phone:restaurant.phone,website:restaurant.website,hours:restaurant.opening_hours,imageURL:restaurant.image_url,lat:restaurant.lat,lng:restaurant.lng,menu:restaurant.menu_url,tags:restaurant.tags||[],rating:restaurant.rating,priceRange:restaurant.price_range}));console.log('Loaded',restaurants.length,'restaurants from Supabase');}catch(error){console.error('Error loading restaurants:',error);restaurants=getStaticRestaurants();console.log('Using fallback static data');}}
 async function submitRestaurant(formData){if(typeof supabase==='undefined'){await showCustomAlert('Database connection not available.','error');return false;}
 if(!currentUser){await showCustomAlert('Please log in to submit a restaurant.');return false;}
 try{let imageUrl=null;const imageFile=formData.get('restaurantImage');if(imageFile&&imageFile.size>0){const fileName=`${Date.now()}-${imageFile.name}`;const{data:uploadData,error:uploadError}=await supabase.storage.from('restaurant-images').upload(fileName,imageFile);if(uploadError)throw uploadError;const{data:{publicUrl}}=supabase.storage.from('restaurant-images').getPublicUrl(fileName);imageUrl=publicUrl;}
@@ -251,7 +248,14 @@ function setupSubmissionForm(){const form=document.getElementById('submissionFor
 form.addEventListener('submit',async function(e){e.preventDefault();if(typeof supabase==='undefined'){await showCustomAlert('Database connection not available. Please try again later.','error');return;}
 if(!currentUser){await showCustomAlert('Please log in to submit a restaurant');showAuthModal('login');return;}
 const formData=new FormData(form);const submitButton=form.querySelector('button[type="submit"]');const originalButtonText=submitButton.innerHTML;submitButton.disabled=true;submitButton.innerHTML='Submitting...';const success=await submitRestaurant(formData);if(success){form.reset();closeSubmissionModal();}
-submitButton.disabled=false;submitButton.innerHTML=originalButtonText;});}}
+submitButton.disabled=false;submitButton.innerHTML=originalButtonText;});
+form.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        form.querySelector('button[type="submit"]').click();
+    }
+});
+}}
 function setupRandomButton(){const randomBtn=document.getElementById('randomRestaurantBtn');if(randomBtn){randomBtn.addEventListener('click',function(){if(restaurants.length>0){const randomIndex=Math.floor(Math.random()*restaurants.length);const randomRestaurant=restaurants[randomIndex];openRestaurantModal(randomRestaurant.id);}});}}
 function setupViewToggle(){const gridBtn=document.getElementById('gridViewBtn');const mapBtn=document.getElementById('mapViewBtn');const gridContent=document.getElementById('gridContent');const mapContent=document.getElementById('mapContent');if(!gridBtn||!mapBtn)return;gridBtn.addEventListener('click',function(){gridBtn.className='glow-button glow-button-blue';mapBtn.className='glow-button glow-button-gray';if(gridContent)gridContent.classList.remove('hidden');if(mapContent)mapContent.classList.add('hidden');});mapBtn.addEventListener('click',function(){mapBtn.className='glow-button glow-button-blue';gridBtn.className='glow-button glow-button-gray';if(mapContent)mapContent.classList.remove('hidden');if(gridContent)gridContent.classList.add('hidden');setTimeout(()=>{if(map){map.invalidateSize();map.setView([59.6426,-151.5377],12);updateMapMarkers();}},100);});}
 function openRestaurantModal(restaurantId){const restaurant=restaurants.find(r=>r.id===restaurantId);if(!restaurant)return;const modal=document.getElementById('restaurantModal');const modalContent=document.getElementById('modalContent');if(!modal||!modalContent)return;const tags=restaurant.tags||[];const tagsDisplay=tags.map(tag=>tag.charAt(0).toUpperCase()+tag.slice(1)).join(' • ');const imageUrl=restaurant.imageURL||'https://placehold.co/600x250/1e293b/ffffff?text=Image+Not+Found';modalContent.innerHTML=`
@@ -365,7 +369,14 @@ const modalHTML=`
                 </div>
             </div>
         </div>
-    `;document.body.insertAdjacentHTML('beforeend',modalHTML);const form=document.getElementById('authForm');form.addEventListener('submit',async(e)=>{e.preventDefault();const formData=new FormData(form);const email=formData.get('email');const password=formData.get('password');const fullName=formData.get('fullName');if(type==='login'){await handleLogin(email,password);}else if(type==='signup'){await handleSignup(email,password,fullName);}else if(type==='reset_password'){await handlePasswordReset(email);}});}
+    `;document.body.insertAdjacentHTML('beforeend',modalHTML);const form=document.getElementById('authForm');form.addEventListener('submit',async(e)=>{e.preventDefault();const formData=new FormData(form);const email=formData.get('email');const password=formData.get('password');const fullName=formData.get('fullName');if(type==='login'){await handleLogin(email,password);}else if(type==='signup'){await handleSignup(email,password,fullName);}else if(type==='reset_password'){await handlePasswordReset(email);}});
+    form.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            form.querySelector('button[type="submit"]').click();
+        }
+    });
+}
 function closeAuthModal(){const modal=document.getElementById('authModal');if(modal)modal.remove();}
 
 function handleUrlParams() {
